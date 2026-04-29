@@ -14,10 +14,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { AudioLinesIcon, TerminalIcon, Settings2Icon, Activity, LayoutDashboardIcon, MessageSquare, Users, Calendar, Megaphone, Star, HelpCircle } from "lucide-react"
-import Dashboard from "../pages/dashboard"
-import Inbox from "../pages/inbox"
-import Patients from "../pages/patients"
-import Appointments from "../pages/appointments"
 
 // This is sample data.
 const data = {
