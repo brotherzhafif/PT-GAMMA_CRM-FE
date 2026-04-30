@@ -56,13 +56,13 @@ export default function HandlingChart() {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="-pb-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">
             Handling (Chatbot vs Human)
           </h3>
 
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex flex-col items-start gap-0 text-xs">
             <div className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-700"></span>
               <span className="text-muted-foreground">AI</span>
@@ -82,6 +82,7 @@ export default function HandlingChart() {
           series={series}
           type="bar"
           height={260}
+          width={350}
         />
       </CardContent>
     </Card>

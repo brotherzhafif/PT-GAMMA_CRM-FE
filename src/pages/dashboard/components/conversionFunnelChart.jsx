@@ -24,7 +24,7 @@ export default function ConversionFunnel() {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="-pb-2">
         <h3 className="text-sm font-semibold text-foreground">
           Conversion Funnel
         </h3>

@@ -54,7 +54,7 @@ export default function ConversationChart() {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="-pb-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">
             Conversations (Today)
@@ -72,6 +72,7 @@ export default function ConversationChart() {
           series={series}
           type="bar"
           height={280}
+          width={350}
         />
       </CardContent>
     </Card>

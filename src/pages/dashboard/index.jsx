@@ -16,6 +16,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ConversationChart from "./components/conversationsChart";
 import HandlingChart from "./components/handlingChart";
 import ConversionFunnel from "./components/conversionFunnelChart";
+import ChatbotInsight from "./components/chatbotInsight";
+import LiveActivity from "./components/liveActivity";
 
 export default function Dashboard() {
   const [date, setDate] = useState(new Date());
@@ -57,7 +59,7 @@ export default function Dashboard() {
     },
   ];
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-6 w-full mb-9">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-col items-start">
           <h2 className="font-semibold">CRM Dashboard</h2>
@@ -69,15 +71,27 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-wrap gap-3 items-center">
-        <Button variant="default" size="sm" className="flex flex-row items-center gap-2">
+        <Button
+          variant="default"
+          size="sm"
+          className="flex flex-row items-center gap-2"
+        >
           <Megaphone />
           Start Broadcast
         </Button>
-        <Button variant="outline" size="sm" className="flex flex-row items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex flex-row items-center gap-2"
+        >
           <Inbox />
           Open Inbox
         </Button>
-        <Button variant="secondary" size="sm" className="flex flex-row items-center gap-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          className="flex flex-row items-center gap-2"
+        >
           <BrainCircuit />
           Train Chatbot
         </Button>
@@ -97,18 +111,24 @@ export default function Dashboard() {
                   </p>
                 </div>
 
-                <div className="flex h-12 min-w-12 items-center justify-center rounded-2xl border border-green-500 bg-green-50 text-green-600">
+                <div className="flex h-10 min-w-10 items-center justify-center rounded-xl border border-green-500 bg-green-50 text-green-600">
                   <Icon className="w-5 h-5" />
                 </div>
               </CardHeader>
 
               <CardContent className="flex flex-col gap-2 -mt-8">
                 <h3 className="text-2xl font-semibold text-foreground">
-                    {item.value}
-                  </h3>
+                  {item.value}
+                </h3>
                 <div className="flex items-center justify-between text-xs">
-                  <span className={`flex items-center gap-1 font-medium ${isUp ? "text-emerald-600" : "text-rose-600"}`}>
-                    {isUp ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                  <span
+                    className={`flex items-center gap-1 font-medium ${isUp ? "text-emerald-600" : "text-rose-600"}`}
+                  >
+                    {isUp ? (
+                      <ArrowUpRight className="w-4 h-4" />
+                    ) : (
+                      <ArrowDownRight className="w-4 h-4" />
+                    )}
                     {item.graph}
                   </span>
                   <span className="text-muted-foreground">vs Last Month</span>
@@ -128,6 +148,15 @@ export default function Dashboard() {
         </div>
         <div className="h-full w-full">
           <ConversionFunnel />
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-3 items-start justify-between">
+        <div className="w-full lg:w-1/2">
+          <ChatbotInsight />
+        </div>
+        <div className="w-full">
+          <LiveActivity />
         </div>
       </div>
     </div>
