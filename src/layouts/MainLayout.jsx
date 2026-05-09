@@ -27,59 +27,60 @@ export default function MainLayout() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-14 sm:h-16 items-center gap-2 px-3 sm:px-4 shadow-md">
-            <div className="flex flex-row w-full h-full justify-between items-center gap-2">
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <SidebarTrigger className="shrink-0" />
-                <Separator
-                  orientation="vertical"
-                  className="hidden sm:block bg-gray-300"
-                />
-                <h2 className="hidden sm:block text-sm font-semibold text-foreground truncate">
-                  {title}
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-4">
-                <div className="relative hidden md:block w-44 lg:w-64">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="w-full pl-10 rounded-full border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+      <div className="w-screen max-w-[100vw] overflow-x-hidden">
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset className="min-w-0 overflow-x-hidden">
+            <header className="flex h-14 sm:h-16 items-center gap-2 px-3 sm:px-4 shadow-md">
+              <div className="flex flex-row w-full h-full justify-between items-center gap-2">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <SidebarTrigger className="shrink-0" />
+                  <Separator
+                    orientation="vertical"
+                    className="hidden sm:block bg-gray-300"
                   />
+                  <h2 className="hidden sm:block text-sm font-semibold text-foreground truncate">
+                    {title}
+                  </h2>
                 </div>
 
-                <MobileSearch />
-
-                <NotificationBell />
-
-                <Separator
-                  orientation="vertical"
-                  className="hidden sm:block bg-gray-300"
-                />
-
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="hidden sm:flex flex-col items-start leading-tight">
-                    <h4 className="text-sm font-medium text-foreground whitespace-nowrap">
-                      Dr. John Doe
-                    </h4>
-                    <span className="text-xs text-muted-foreground">Admin</span>
+                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                  <div className="relative hidden md:block w-44 lg:w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      type="search"
+                      placeholder="Search..."
+                      className="w-full pl-10 rounded-full border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
                   </div>
-                  <UserAvatar />
+
+                  <MobileSearch />
+                  <NotificationBell />
+
+                  <Separator
+                    orientation="vertical"
+                    className="hidden sm:block bg-gray-300"
+                  />
+
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="hidden sm:flex flex-col items-start leading-tight">
+                      <h4 className="text-sm font-medium text-foreground whitespace-nowrap">
+                        Dr. John Doe
+                      </h4>
+                      <span className="text-xs text-muted-foreground">Admin</span>
+                    </div>
+                    <UserAvatar />
+                  </div>
                 </div>
               </div>
-            </div>
-          </header>
+            </header>
 
-          <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8">
-            <Outlet />
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+            <main className="flex-1 min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6 lg:p-8">
+              <Outlet />
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
+      </div>
     </TooltipProvider>
   );
 }
@@ -121,24 +122,9 @@ function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   const notifications = [
-    {
-      id: 1,
-      title: "Pasien baru terdaftar",
-      time: "2 menit lalu",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "Janji temu hari ini",
-      time: "10 menit lalu",
-      unread: true,
-    },
-    {
-      id: 3,
-      title: "Promo berhasil dikirim",
-      time: "1 jam lalu",
-      unread: false,
-    },
+    { id: 1, title: "Pasien baru terdaftar", time: "2 menit lalu", unread: true },
+    { id: 2, title: "Janji temu hari ini", time: "10 menit lalu", unread: true },
+    { id: 3, title: "Promo berhasil dikirim", time: "1 jam lalu", unread: false },
   ];
 
   const unreadCount = notifications.filter((n) => n.unread).length;
@@ -158,7 +144,6 @@ function NotificationBell() {
 
       {open && (
         <>
-          {/* Backdrop for mobile */}
           <div
             className="fixed inset-0 z-40 sm:hidden"
             onClick={() => setOpen(false)}
@@ -175,9 +160,7 @@ function NotificationBell() {
                   }`}
                 >
                   <p className="text-foreground">{notif.title}</p>
-                  <span className="text-xs text-muted-foreground">
-                    {notif.time}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{notif.time}</span>
                 </div>
               ))}
             </div>
@@ -202,9 +185,7 @@ function UserAvatar() {
         <button>
           <Avatar className="cursor-pointer w-8 h-8 sm:w-10 sm:h-10">
             <AvatarImage src={user.image} />
-            <AvatarFallback className="text-xs sm:text-sm">
-              {initials}
-            </AvatarFallback>
+            <AvatarFallback className="text-xs sm:text-sm">{initials}</AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>

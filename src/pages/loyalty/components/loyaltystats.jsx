@@ -13,7 +13,7 @@ export function LoyaltyStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {stats.map((stat, i) => (
-        <Card key={i} className="p-5 shadow-sm border-none bg-white relative overflow-hidden">
+        <Card key={i} className="p-5 flex flex-col gap-2 shadow-md bg-white relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div className={`p-2 rounded-lg ${stat.bg}`}>
               <stat.icon className={`w-5 h-5 ${stat.color}`} />

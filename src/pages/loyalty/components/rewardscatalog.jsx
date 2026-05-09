@@ -17,18 +17,18 @@ export function RewardsCatalog() {
     <Card className="flex-1 p-6 shadow-sm border-none bg-white">
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h3 className="text-lg font-bold text-slate-800">Rewards Catalog</h3>
-          <p className="text-sm text-slate-400">Vouchers and discounts available for point redemption.</p>
+          <h3 className="text-lg font-semibold text-slate-800">Rewards Catalog</h3>
+          <p className="text-xs text-slate-400">Vouchers and discounts available for point redemption.</p>
         </div>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 font-bold h-10 px-4">
-          <Plus className="w-4 h-4 stroke-[3px]" /> CREATE REWARD
+        <Button className="cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white gap-2 font-semibold h-10 px-4">
+          <Plus className="w-4 h-4 " /> CREATE REWARD
         </Button>
       </div>
 
       <ScrollArea className="h-[350px] pr-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {rewards.map((reward, i) => (
-            <div key={i} className="flex border rounded-xl overflow-hidden group cursor-pointer hover:border-emerald-200 transition-colors">
+            <div key={i} className="flex shadow-md border border-slate-200 hover:translate-y-1 duration-200 rounded-xl overflow-hidden group cursor-pointer hover:border-emerald-200 transition-colors">
               <div className={`w-24 flex flex-col items-center justify-center gap-2 p-4 ${
                 reward.color === 'emerald' ? 'bg-emerald-50 text-emerald-500' : 
                 reward.color === 'orange' ? 'bg-orange-50 text-orange-500' : 'bg-slate-50 text-slate-500'
