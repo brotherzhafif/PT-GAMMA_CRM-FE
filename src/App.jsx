@@ -9,6 +9,11 @@ import Appointments from "@/pages/appointments";
 import Marketing from "@/pages/marketing";
 import Loyalty from "@/pages/loyalty";
 import Settings from "@/pages/settings";
+import General from "./pages/settings/general";
+import WhatsapApi from "./pages/settings/whatsapp-api";
+import ChatbotSettings from "./pages/settings/chatbot-settings";
+import UserRoles from "./pages/settings/user-roles";
+import Security from "./pages/settings/security";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +57,31 @@ const router = createBrowserRouter([
         path: "/settings",
         element: <Settings />,
         handle: { title: "Settings" },
+
+        children: [
+          {
+            index: true,
+            element: <General />,
+          },
+          {
+            path: "/settings/whatsapp-Api",
+            element: <WhatsapApi />,
+          },
+          {
+            path: "/settings/chatbot-settings",
+            element: <ChatbotSettings />,
+          },
+          {
+            path: "/settings/user-roles",
+            element: <UserRoles />,
+          },
+          {
+            path: "/settings/security",
+            element: <Security />,
+          }
+        ]
+
+        
       },
     ],
   },
