@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bot, User, AlertCircle } from "lucide-react";
+import { Bot, User, AlertCircle, Eye, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const appointments = [
   {
@@ -66,8 +67,8 @@ export function TodaySchedule() {
   return (
     <div className="w-full min-w-[640px] bg-white rounded-xl shadow-sm shadow-md overflow-hidden">
       <Table>
-        <TableHeader className="bg-slate-50/50 border-none">
-          <TableRow>
+        <TableHeader className="bg-slate-50/50 border-none shadow-sm">
+          <TableRow className="border-none">
             <TableHead className="text-[11px] font-bold text-slate-400 tracking-wider pl-6 w-[100px]">
               TIME
             </TableHead>
@@ -83,6 +84,9 @@ export function TodaySchedule() {
             <TableHead className="text-[11px] font-bold text-slate-400 tracking-wider text-right pr-6">
               SOURCE
             </TableHead>
+            <TableHead className="text-[11px] font-bold text-slate-400 tracking-wider text-right pr-6">
+              ACTION
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -93,11 +97,7 @@ export function TodaySchedule() {
                 apt.hasHighlight ? "bg-orange-50/30" : "hover:bg-slate-50/50"
               }`}
             >
-              {apt.hasHighlight && (
-                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-orange-400" />
-              )}
-
-              <TableCell className="py-4 pl-6">
+              <TableCell className={`py-4 pl-6 ${apt.hasHighlight ? 'border-l-3 border-l-orange-400 pr-4' : ''}`}>
                 <div className="font-bold text-slate-900 text-sm leading-none">{apt.time}</div>
                 <div className="text-[11px] text-slate-400 mt-1">{apt.duration}</div>
               </TableCell>
@@ -148,6 +148,17 @@ export function TodaySchedule() {
                     <User size={13} className="text-orange-400" />
                   )}
                   {apt.source}
+                </div>
+              </TableCell>
+
+              <TableCell className="text-center pr-6">
+                <div className="flex items-center justify-center">
+                  <Button variant="ghost" className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
+                    <Eye />
+                  </Button>
+                  <Button variant="ghost" className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                    <Edit />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>

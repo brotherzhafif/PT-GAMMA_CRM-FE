@@ -27,7 +27,7 @@ export default function MainLayout() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="w-screen max-w-[100vw] overflow-x-hidden">
+      <div className="w-full max-w-[100vw] overflow-x-hidden">
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset className="min-w-0 overflow-x-hidden">

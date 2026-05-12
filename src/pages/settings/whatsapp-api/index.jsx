@@ -8,7 +8,6 @@ export default function WhatsapApi() {
   return (
     <div className="flex flex-col gap-5 h-full">
       
-      {/* Header */}
       <div className="flex flex-col gap-1">
         <h3 className="text-xl font-semibold">WhatsApp API Settings</h3>
         <p className="text-xs text-gray-500">
@@ -17,15 +16,14 @@ export default function WhatsapApi() {
         </p>
       </div>
 
-      {/* Scroll Area */}
       <ScrollArea className="flex-1">
         <div className="flex flex-col gap-5 pr-4">
 
-          <Card className="w-full flex flex-col p-4 gap-4">
-            <div className="flex flex-row items-center justify-between">
+          <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300 ">
+            <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300" >
               <div className="flex flex-col items-start">
-                <h4 className="font-semibold">Connection Status</h4>
-                <span className="text-xs">
+                <h3 className="font-semibold text-lg">Connection Status</h3>
+                <span className="text-xs text-muted-foreground">
                   Your WhatsApp Business account integration status.
                 </span>
               </div>
