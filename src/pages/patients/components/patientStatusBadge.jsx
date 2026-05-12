@@ -5,7 +5,7 @@ export default function PatientStatusBadge({
 }) {
   return (
     <span
-      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClasses(
+      className={`px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap ${getStatusClasses(
         status
       )}`}
     >

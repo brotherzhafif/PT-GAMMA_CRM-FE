@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Bot, LayoutDashboard, MessageCircle, Shield, Users } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { NavLink, Outlet } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const menus = [
   { label: "General", path: "/settings", icon: LayoutDashboard },
@@ -13,9 +13,8 @@ const menus = [
 
 export default function Settings() {
   return (
-    <div className="flex flex-col w-full gap-6 h-[76vh] overflow-hidden">
+    <div className="flex flex-col w-full gap-6 h-[81vh] overflow-hidden">
       
-      {/* Header */}
       <div className="flex flex-col gap-1">
         <h3 className="font-semibold text-lg">CRM Configuration</h3>
         <p className="text-gray-500 text-sm">
@@ -23,11 +22,9 @@ export default function Settings() {
         </p>
       </div>
 
-      {/* Main */}
-      <Card className="w-full flex flex-row flex-1 overflow-hidden">
+      <Card className="w-full flex flex-row flex-1 overflow-hidden border border-gray-300 shadow-md">
         
-        {/* Sidebar */}
-        <div className="w-[240px] border-r p-4 flex flex-col gap-2">
+        <div className="w-[240px] border-r border-gray-300 p-4 flex flex-col gap-2">
           {menus.map((item) => (
             <NavLink
               key={item.path}
@@ -47,13 +44,10 @@ export default function Settings() {
           ))}
         </div>
 
-        <Separator orientation="vertical" />
-
-        {/* Content */}
         <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto p-6">
+          <ScrollArea className="h-full w-full overflow-hidden">
             <Outlet />
-          </div>
+          </ScrollArea>
         </div>
 
       </Card>

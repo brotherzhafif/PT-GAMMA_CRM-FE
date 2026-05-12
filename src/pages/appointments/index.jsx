@@ -24,9 +24,7 @@ export default function Appointments() {
         </ScrollArea>
       </aside>
 
-      {/* MAIN — fixed height, no outer scroll */}
       <main className="flex-1 min-w-0 h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
-        {/* Header — fixed, never scrolls */}
         <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight">Today's Schedule</h3>
@@ -67,7 +65,6 @@ export default function Appointments() {
           </div>
         </div>
 
-        {/* TABLE AREA — vertical + horizontal scroll di sini saja */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="px-6 pb-6 pt-2">
             <TodaySchedule />

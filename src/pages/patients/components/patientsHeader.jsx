@@ -4,8 +4,8 @@ export default function PatientsHeader() {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h2 className="text-2xl font-semibold">Patient Database</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold text-slate-900">Patient Database</h2>
+        <p className="text-xs text-slate-500">
           Manage patient records and communication.
         </p>
       </div>
@@ -15,8 +15,8 @@ export default function PatientsHeader() {
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium">Dr. Siti Aminah</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs font-medium text-slate-900">Dr. Siti Aminah</p>
+            <p className="text-[11px] text-slate-500">
               Super Admin
             </p>
           </div>

@@ -59,7 +59,7 @@ export default function Dashboard() {
     },
   ];
   return (
-    <div className="flex flex-col gap-6 w-full mb-9">
+    <div className="flex flex-col gap-6 w-full mb-9 overflow-x-hidden">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-col items-start">
           <h2 className="font-semibold">CRM Dashboard</h2>
