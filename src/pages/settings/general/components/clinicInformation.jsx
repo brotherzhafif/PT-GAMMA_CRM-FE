@@ -6,7 +6,7 @@ import UploadLogo from "@/components/ui/uploadLogo";
 
 export default function ClinicInformation() {
   return (
-    <Card className=" flex flex-col gap-8 shadow-md border border-gray-300">
+    <Card className="flex flex-col gap-8 shadow-md border border-gray-300">
       <CardHeader className="gap-0 flex flex-col items-start border-b border-gray-300">
         <h3 className="text-lg font-semibold">Clinic Information</h3>
         <span className="text-xs text-gray-500">
