@@ -1,0 +1,6 @@
+# 1. Reset: Anggap SEMUA file di repo ini tidak perlu dihitung
+* linguist-vendored
+
+# 2. Whitelist
+src/hooks/** -linguist-vendored
+src/lib/** -linguist-vendored
