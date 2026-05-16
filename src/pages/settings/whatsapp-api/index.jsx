@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function WhatsapApi() {
   return (
-    <div className="flex flex-col gap-5 h-full">
+    <div className="flex flex-col gap-5 h-full mb-10">
       
       <div className="flex flex-col gap-1">
         <h3 className="text-xl font-semibold">WhatsApp API Settings</h3>

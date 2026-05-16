@@ -7,7 +7,7 @@ import OperatingHours from "./components/operatingHours";
 
 export default function General() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mb-10">
       <div className="flex flex-col gap-1">
         <h3 className="text-xl font-semibold">General Settings</h3>
         <p className="text-xs text-gray-500">
