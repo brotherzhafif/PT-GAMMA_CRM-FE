@@ -35,11 +35,11 @@ export default function Inbox() {
 
   return (
     <div className="flex gap-2 h-[81vh] overflow-y-hidden w-full bg-background">
-      <Card className="w-[300px] flex-shrink-0 h-full flex flex-col rounded-lg">
+      <Card className="w-[300px] flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden">
         <InboxList onSelect={handleSelectChat} selectedId={selectedChat?.id} />
       </Card>
 
-      <Card className="flex-1  flex flex-col rounded-lg">
+      <Card className="flex-1 flex flex-col rounded-lg">
         <ChatArea
           chat={selectedChat}
           onToggleProfile={handleToggleProfile}
@@ -47,8 +47,20 @@ export default function Inbox() {
         />
       </Card>
 
-      <Card className={`flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden transition-all duration-300 ease-out ${showProfilePanel && selectedChat ? "w-[300px]" : "w-0 border-0 ring-0 shadow-none"}`}>
-        <div className={`h-full transition-opacity duration-300 ease-out ${showProfilePanel && selectedChat ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+      <Card
+        className={`flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          showProfilePanel && selectedChat
+            ? "w-[300px]"
+            : "w-0 border-0 ring-0 shadow-none"
+        }`}
+      >
+        <div
+          className={`h-full transition-opacity duration-300 ease-out ${
+            showProfilePanel && selectedChat
+              ? "opacity-100"
+              : "opacity-0 pointer-events-none"
+          }`}
+        >
           {selectedChat && <ProfilePanel chat={selectedChat} />}
         </div>
       </Card>

@@ -25,7 +25,7 @@ export const getMessages = async () => {
   return res.data;
 };
 
-export const getMessageLatest = async () => {
+export const getLatestMessages = async () => {
   const res = await api.get("/api/messages/latest");
   return res.data;
 };

@@ -1,15 +1,20 @@
 import { Bot, User, Check, CheckCheck } from "lucide-react";
 
 export default function MessageBubble({ msg }) {
-  const isMe = msg.from === "me";
+  const isMe = msg.sender === "agent";
   const isAi = msg.senderType === "ai";
 
   return (
     <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-3 gap-2`}>
+      
       {!isMe && (
         <div className="flex items-end flex-shrink-0">
           <div className="bg-muted rounded-full p-1.5">
-            <User className="w-3.5 h-3.5 text-muted-foreground" />
+            {isAi ? (
+              <Bot className="w-3.5 h-3.5 text-muted-foreground" />
+            ) : (
+              <User className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
           </div>
         </div>
       )}

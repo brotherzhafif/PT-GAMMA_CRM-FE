@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 
 const filterOptions = [
   { id: "all", label: "All" },
-  { id: "unread", label: "Unread" },
-  { id: "waiting", label: "Waiting" },
+  // { id: "unread", label: "Unread" },
+  // { id: "waiting", label: "Waiting" },
   { id: "ai-handled", label: "AI Handled" },
   { id: "needs-human", label: "Needs Human" },
 ];

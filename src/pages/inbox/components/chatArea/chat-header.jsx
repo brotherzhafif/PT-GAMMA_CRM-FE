@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 // import { Badge } from "@/components/ui/badge";
-import { Phone, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 
 export default function ChatHeader({ chat, onToggleProfile, showProfilePanel }) {
   return (
@@ -22,8 +22,8 @@ export default function ChatHeader({ chat, onToggleProfile, showProfilePanel }) 
           <div className="flex items-center gap-1 mt-0.5">
             <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
             <span className="text-xs text-muted-foreground">WhatsApp</span>
-            <span className="text-xs text-muted-foreground">•</span>
-            <span className="text-xs text-green-600 font-medium">Online</span>
+            {/* <span className="text-xs text-muted-foreground">•</span> */}
+            {/* <span className="text-xs text-green-600 font-medium">Online</span> */}
           </div>
         </div>
       </div>
@@ -33,20 +33,20 @@ export default function ChatHeader({ chat, onToggleProfile, showProfilePanel }) 
           <UserPlus className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Assign to You</span>
         </Button>
-
+{/* 
 
         <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
           <Phone className="w-4 h-4 text-muted-foreground" />
-        </Button>
+        </Button> */}
 
-
+{/* 
         <Button
           variant="outline"
           size="sm"
           className="cursor-pointer h-8 text-xs border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700"
         >
           Mark Resolved
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
