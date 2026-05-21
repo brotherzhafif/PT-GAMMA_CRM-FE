@@ -4,6 +4,7 @@ import MessageInput from "./message-input";
 import EscalationDivider from "./escalation-divider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { useEffect, useRef } from "react";
 
 import { useChatMessages } from "../../hooks/useChatMessages.hook";
 
@@ -14,6 +15,13 @@ export default function ChatArea({
 }) {
   const { messages, loading } =
     useChatMessages(chat?.phone);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   if (!chat) {
     return (
@@ -33,12 +41,15 @@ export default function ChatArea({
             />
           </svg>
         </div>
+
         <div>
           <p className="font-medium text-foreground">
             No conversation selected
           </p>
+
           <p className="text-sm text-muted-foreground mt-1">
-            Pick a chat from the inbox to start messaging
+            Pick a chat from the inbox to
+            start messaging
           </p>
         </div>
       </div>
@@ -49,8 +60,12 @@ export default function ChatArea({
     <div className="flex flex-col h-full w-full">
       <ChatHeader
         chat={chat}
-        onToggleProfile={onToggleProfile}
-        showProfilePanel={showProfilePanel}
+        onToggleProfile={
+          onToggleProfile
+        }
+        showProfilePanel={
+          showProfilePanel
+        }
       />
 
       {loading && (
@@ -77,9 +92,14 @@ export default function ChatArea({
                   {msg.isEscalation && (
                     <EscalationDivider />
                   )}
-                  <MessageBubble msg={msg} />
+
+                  <MessageBubble
+                    msg={msg}
+                  />
                 </div>
               ))}
+
+              <div ref={bottomRef} />
             </div>
           </div>
         </ScrollArea>

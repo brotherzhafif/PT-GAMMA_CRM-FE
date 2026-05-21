@@ -63,12 +63,18 @@ export default function ChatItem({ chat, isSelected, onClick }) {
             {chat.time}
           </span>
         </div>
-        <div className="flex items-center gap-1 min-w-0">
-          <p className="text-xs text-muted-foreground truncate flex-1 min-w-0">
-            {chat.last}
+        <div className="flex items-center gap-2 min-w-0">
+          <p
+            className="text-xs text-muted-foreground truncate flex-1 min-w-0"
+            title={chat.last}
+          >
+            {chat.last?.length > 45
+              ? `${chat.last.slice(0, 30)}...`
+              : chat.last}
           </p>
+
           {chat.unread > 0 && (
-            <Badge className="h-4 w-4 p-0 flex items-center justify-center bg-green-500 hover:bg-green-500 text-white text-[10px] rounded-full flex-shrink-0">
+            <Badge className="h-4 min-w-4 px-1 flex items-center justify-center bg-green-500 hover:bg-green-500 text-white text-[10px] rounded-full flex-shrink-0">
               {chat.unread}
             </Badge>
           )}

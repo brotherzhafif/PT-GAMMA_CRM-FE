@@ -9,9 +9,7 @@ import { useUnifiedInbox } from "../../hooks/useUnifiendInbox.hooks";
 
 export default function InboxList({ onSelect, selectedId }) {
   const [search, setSearch] = useState("");
-
   const [activeFilter, setActiveFilter] = useState("all");
-
   const { chats, loading, error } = useUnifiedInbox();
 
   const filtered = chats.filter((chat) => {
