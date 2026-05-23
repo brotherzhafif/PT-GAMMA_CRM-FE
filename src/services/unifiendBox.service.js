@@ -1,5 +1,7 @@
 import { api } from "@/lib/axios";
 
+const SSE_BASE_URL = "https://ai-crm.brotherzhafif.my.id/api/messages";
+
 export const getPatients = async () => {
   const res = await api.get("/api/patients");
   return res.data;
@@ -66,4 +68,13 @@ export const createReplyHandoffByPhoneNumber = async (
 ) => {
   const res = await api.post(`/api/handoff/${phone_number}/reply`, payload);
   return res.data;
+};
+
+// stream function
+export const getLatestMessagesStream = (limit = 50) => {
+  return new EventSource(`${SSE_BASE_URL}/latest?limit=${limit}`);
+};
+
+export const getChatMessagesStream = (phone_number) => {
+  return new EventSource(`${SSE_BASE_URL}/${phone_number}`);
 };

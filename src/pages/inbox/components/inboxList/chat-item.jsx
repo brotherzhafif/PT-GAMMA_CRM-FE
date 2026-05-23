@@ -30,11 +30,14 @@ const channelDotColor = {
 export default function ChatItem({ chat, isSelected, onClick }) {
   const badge = statusConfig[chat.status];
 
+  const isHumanHandled = chat.status === "needs-human" || chat.status === "human";
+  const showUnread = chat.unread > 0 && isHumanHandled;
+
   return (
     <div
       onClick={() => onClick(chat)}
       className={`flex items-start gap-3 px-4 py-2 cursor-pointer shadow-sm border-b border-gray-300 transition-colors overflow-hidden
-    ${isSelected ? "bg-secondary" : "hover:bg-muted/50"}`}
+    ${isSelected ? "bg-green-50" : "hover:bg-muted/50"}`}
     >
       <div className="relative flex-shrink-0 mt-0.5">
         <Avatar className="h-10 w-10">
@@ -56,25 +59,25 @@ export default function ChatItem({ chat, isSelected, onClick }) {
 
       <div className="flex-1 min-w-0 overflow-hidden">
         <div className="flex items-center gap-1 min-w-0">
-          <p className="font-medium text-sm truncate flex-1 min-w-0">
+          <p className={`font-medium text-sm truncate flex-1 min-w-0 ${showUnread ? "text-gray-900 font-bold" : ""}`}>
             {chat.name}
           </p>
-          <span className="text-xs text-muted-foreground flex-shrink-0 whitespace-nowrap">
+          <span className={`text-xs flex-shrink-0 whitespace-nowrap ${showUnread ? "text-green-600 font-bold" : "text-muted-foreground"}`}>
             {chat.time}
           </span>
         </div>
         <div className="flex items-center gap-2 min-w-0">
           <p
-            className="text-xs text-muted-foreground truncate flex-1 min-w-0"
+            className={`text-xs truncate flex-1 min-w-0 ${showUnread ? "text-gray-800 font-medium" : "text-muted-foreground"}`}
             title={chat.last}
           >
-            {chat.last?.length > 45
-              ? `${chat.last.slice(0, 30)}...`
+            {chat.last?.length > 23
+              ? `${chat.last.slice(0, 23)}......`
               : chat.last}
           </p>
 
-          {chat.unread > 0 && (
-            <Badge className="h-4 min-w-4 px-1 flex items-center justify-center bg-green-500 hover:bg-green-500 text-white text-[10px] rounded-full flex-shrink-0">
+          {showUnread && (
+            <Badge className="h-4 min-w-4 px-1 flex items-center justify-center bg-green-500 hover:bg-green-500 text-white text-[10px] rounded-full flex-shrink-0 animate-pulse">
               {chat.unread}
             </Badge>
           )}
