@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
 
-const SSE_BASE_URL = "https://ai-crm.brotherzhafif.my.id/api/messages";
+const SSE_BASE_URL = `${import.meta.env.VITE_API_URL}/api/messages`;
 
 export const getPatients = async () => {
   const res = await api.get("/api/patients");
