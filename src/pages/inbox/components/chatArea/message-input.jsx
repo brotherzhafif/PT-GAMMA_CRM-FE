@@ -4,18 +4,21 @@ import { Paperclip, Send, LayoutTemplate, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { createReplyHandoffByPhoneNumber } from "@/services/unifiendBox.service";
 
-export default function MessageInput({ chat }) {
-  const [value, setValue] = useState("");
+export default function MessageInput({ chat, value, onChange }) {
+  // const [value, setValue] = useState("");
   const [isSending, setIsSending] = useState(false);
 
   const handleSend = async () => {
-    if (!value.trim() || !chat?.phone) return;
-    
+    if (!value?.trim() || !chat?.phone) return;
+
     try {
       setIsSending(true);
-      await createReplyHandoffByPhoneNumber(chat.phone, { message: value.trim() });
-      
-      setValue(""); 
+
+      await createReplyHandoffByPhoneNumber(chat.phone, {
+        message: value.trim(),
+      });
+
+      onChange("");
     } catch (error) {
       console.error("Gagal mengirim pesan", error);
     } finally {
@@ -31,18 +34,25 @@ export default function MessageInput({ chat }) {
   };
 
   const handleChange = (e) => {
-    setValue(e.target.value);
+    onChange(e.target.value);
   };
 
   return (
     <div className="px-4 py-3 border-t border-gray-400">
       <div className="flex items-end gap-2 border border-gray-400 rounded-xl px-3 py-1 bg-background focus-within:ring-1 focus-within:ring-ring transition">
-        
         <div className="flex gap-1 mb-0.5">
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
             <Paperclip className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
             <LayoutTemplate className="w-4 h-4" />
           </Button>
         </div>
@@ -63,7 +73,11 @@ export default function MessageInput({ chat }) {
           disabled={!value.trim() || isSending}
           onClick={handleSend}
         >
-          {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          {isSending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,15 @@ import {
   RefreshCw,
   FileText,
   Info,
-  ChevronDown,
+  // ChevronDown,
 } from "lucide-react";
+import { usePatientProfile } from "../../hooks/usePatientProfile.hook";
+import PatientEditModal from "./patientsEditModal";
 
 export default function ProfilePanel({ chat }) {
+  const { patient } = usePatientProfile(chat?.phone);
+  const [openEdit, setOpenEdit] = useState(false);
+
   if (!chat) return null;
 
   return (
@@ -23,11 +29,19 @@ export default function ProfilePanel({ chat }) {
           <Avatar className="w-20 h-20">
             <AvatarImage src="/avatar.png" />
             <AvatarFallback className="text-lg font-semibold">
-              {chat.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+              {(patient?.name || chat.name)
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
             </AvatarFallback>
           </Avatar>
-          <h2 className="mt-3 font-semibold text-base">{chat.name}</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{chat.phone || "+62 812-3456-7890"}</p>
+          <h2 className="mt-3 font-semibold text-base">
+            {patient?.name || chat.name}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {patient?.phone_number || chat.phone}
+          </p>{" "}
           <div className="flex gap-2 mt-2">
             {chat.isVip && (
               <Badge
@@ -58,14 +72,20 @@ export default function ProfilePanel({ chat }) {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground text-sm">Intent Detected</span>
-              <span className="font-semibold text-foreground text-xs">Book Appointment</span>
+              <span className="text-muted-foreground text-sm">
+                Intent Detected
+              </span>
+              <span className="font-semibold text-foreground text-xs">
+                Book Appointment
+              </span>
             </div>
 
             <div>
               <div className="flex items-center justify-between text-sm mb-1.5">
                 <span className="text-muted-foreground">Confidence Score</span>
-                <span className="font-semibold text-green-600 text-xs">98%</span>
+                <span className="font-semibold text-green-600 text-xs">
+                  98%
+                </span>
               </div>
               <Progress value={98} className="h-1.5 [&>div]:bg-green-500" />
             </div>
@@ -74,7 +94,8 @@ export default function ProfilePanel({ chat }) {
               <div className="flex gap-2">
                 <Info className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-blue-700 leading-relaxed">
-                  Patient mentioned toothache. Recommended action: Assign to dentist with endodontic specialty.
+                  Patient mentioned toothache. Recommended action: Assign to
+                  dentist with endodontic specialty.
                 </p>
               </div>
             </div>
@@ -118,33 +139,59 @@ export default function ProfilePanel({ chat }) {
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Patient Details
             </h3>
-            <Button variant="ghost" size="sm" className="h-6 text-xs text-green-600 hover:text-green-700 px-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs text-green-600 hover:text-green-700 px-2"
+              onClick={() => setOpenEdit(true)}
+            >
               Edit
             </Button>
+            <PatientEditModal
+              open={openEdit}
+              onOpenChange={setOpenEdit}
+              patient={patient}
+            />
           </div>
 
           <div className="space-y-2.5 text-sm">
             {[
-              { label: "Date of Birth", value: "12 Maret 1990" },
-              { label: "Last Visit", value: "10 Apr 2025" },
-              { label: "Dentist", value: "Dr. Hari Susanto" },
-              { label: "Package", value: "Standard" },
+              {
+                label: "No RM",
+                value: patient?.rme_patient_id || "-",
+              },
+              {
+                label: "Tanggal Lahir",
+                value: patient?.tanggalLahir || "-",
+              },
+              {
+                label: "Jenis Kelamin",
+                value: patient?.jenisKelamin?.replace("_", " ") || "-",
+              },
+              {
+                label: "NIK",
+                value: patient?.nik ? `****${patient.nik.slice(-4)}` : "-",
+              },
             ].map((item) => (
               <div key={item.label} className="flex justify-between">
-                <span className="text-muted-foreground text-xs">{item.label}</span>
-                <span className="font-medium text-right text-xs">{item.value}</span>
+                <span className="text-muted-foreground text-xs">
+                  {item.label}
+                </span>
+                <span className="font-medium text-right text-xs">
+                  {item.value}
+                </span>
               </div>
             ))}
           </div>
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className="w-full cursor-pointer mt-3 text-xs text-muted-foreground hover:text-foreground gap-1"
           >
             <ChevronDown className="w-3.5 h-3.5" />
             Show more
-          </Button>
+          </Button> */}
         </div>
       </div>
     </ScrollArea>

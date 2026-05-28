@@ -1,26 +1,6 @@
 import { api } from "@/lib/axios";
 
-const SSE_BASE_URL = "https://ai-crm.brotherzhafif.my.id/api/messages";
-
-export const getPatients = async () => {
-  const res = await api.get("/api/patients");
-  return res.data;
-};
-
-export const createPatient = async (payload) => {
-  const res = await api.post("/api/patients", payload);
-  return res.data;
-};
-
-export const updatePatient = async (phone_number, payload) => {
-  const res = await api.put(`/api/patients/${phone_number}`, payload);
-  return res.data;
-};
-
-export const deletePatient = async (phone_number) => {
-  const res = await api.delete(`/api/patients/${phone_number}`);
-  return res.data;
-};
+const SSE_BASE_URL = `${import.meta.env.VITE_API_URL}/api/messages`;
 
 export const getMessages = async () => {
   const res = await api.get("/api/messages");
