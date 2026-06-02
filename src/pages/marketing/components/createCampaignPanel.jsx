@@ -1,12 +1,16 @@
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import {
-  CalendarDays,
   SendHorizonal,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 
 import MessagePreview from "./messagePreview";
@@ -14,7 +18,11 @@ import ProgressBar from "./progressBar";
 import CampaignDatePicker from "./campaignDatePicker";
 import TemplateSelector from "./templateSelector";
 
-export default function CreateCampaignPanel() {
+export default function CreateCampaignPanel({
+  onCreateCampaign,
+  onUpdateCampaign,
+  selectedCampaign,
+}) {
   const [campaignName, setCampaignName] =
     useState("");
 
@@ -27,6 +35,27 @@ export default function CreateCampaignPanel() {
   const [message, setMessage] = useState(
     "Hello John, enjoy our exclusive dental whitening promotion with up to 25% discount this week. Book your appointment today."
   );
+
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  useEffect(() => {
+    if (!selectedCampaign) return;
+
+    setCampaignName(selectedCampaign.name);
+
+    setMessage(
+      selectedCampaign.description || ""
+    );
+
+    setSelectedDate(
+      selectedCampaign.raw?.schedule_date
+        ? new Date(
+            selectedCampaign.raw.schedule_date
+          )
+        : null
+    );
+  }, [selectedCampaign]);
 
   const characterCount = message.length;
 
@@ -49,6 +78,79 @@ export default function CreateCampaignPanel() {
     message,
   ]);
 
+  const resetForm = () => {
+    setCampaignName("");
+
+    setSelectedSegment("VIP Patients");
+
+    setSelectedDate(null);
+
+    setMessage(
+      "Hello John, enjoy our exclusive dental whitening promotion with up to 25% discount this week. Book your appointment today."
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (
+      !campaignName.trim() ||
+      !selectedDate ||
+      !message.trim()
+    ) {
+      alert(
+        "Please complete all required fields."
+      );
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        campaign_name: campaignName,
+        schedule_date:
+          selectedDate.toISOString(),
+        campaign_message: message,
+        attachment_url: "",
+        filename: "",
+        status: "scheduled",
+      };
+
+      let success = false;
+
+      if (selectedCampaign) {
+        success =
+          await onUpdateCampaign(
+            selectedCampaign.raw
+              .campaign_name,
+            payload
+          );
+      } else {
+        success =
+          await onCreateCampaign(payload);
+      }
+
+      if (success) {
+        alert(
+          selectedCampaign
+            ? "Campaign updated successfully!"
+            : "Campaign created successfully!"
+        );
+
+        resetForm();
+      }
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        selectedCampaign
+          ? "Failed to update campaign."
+          : "Failed to create campaign."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="sticky top-4 rounded-2xl border border-gray-200 bg-white overflow-hidden">
       {/* HEADER */}
@@ -56,23 +158,30 @@ export default function CreateCampaignPanel() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">
-              Create Campaign
+              {selectedCampaign
+                ? "Edit Campaign"
+                : "Create Campaign"}
             </h3>
 
             <p className="text-sm text-muted-foreground">
-              Configure and launch marketing campaign.
+              {selectedCampaign
+                ? "Update campaign information."
+                : "Configure and launch marketing campaign."}
             </p>
           </div>
 
           <div className="flex items-center justify-center w-11 h-11 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600">
-            <Sparkles className="w-5 h-5" />
+            {selectedCampaign ? (
+              <Pencil className="w-5 h-5" />
+            ) : (
+              <Sparkles className="w-5 h-5" />
+            )}
           </div>
         </div>
       </div>
 
       {/* FORM */}
       <div className="flex flex-col gap-5 p-5">
-        {/* CAMPAIGN NAME */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">
             Campaign Name
@@ -88,7 +197,6 @@ export default function CreateCampaignPanel() {
           />
         </div>
 
-        {/* AUDIENCE */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">
             Audience Segment
@@ -108,7 +216,6 @@ export default function CreateCampaignPanel() {
           </select>
         </div>
 
-        {/* DATE PICKER */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">
             Schedule Date
@@ -120,12 +227,10 @@ export default function CreateCampaignPanel() {
           />
         </div>
 
-        {/* TEMPLATE */}
         <TemplateSelector
           onSelectTemplate={setMessage}
         />
 
-        {/* MESSAGE */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">
@@ -149,7 +254,6 @@ export default function CreateCampaignPanel() {
           />
         </div>
 
-        {/* PROGRESS */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium">
@@ -164,16 +268,26 @@ export default function CreateCampaignPanel() {
           <ProgressBar value={progressValue} />
         </div>
 
-        {/* PREVIEW */}
         <MessagePreview
           message={message}
           campaignName={campaignName}
         />
 
-        {/* BUTTON */}
-        <Button className="w-full">
+        <Button
+          type="button"
+          className="w-full"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
           <SendHorizonal className="w-4 h-4 mr-2" />
-          Launch Campaign
+
+          {isSubmitting
+            ? selectedCampaign
+              ? "Updating..."
+              : "Launching..."
+            : selectedCampaign
+            ? "Update Campaign"
+            : "Launch Campaign"}
         </Button>
       </div>
     </div>

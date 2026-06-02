@@ -4,10 +4,12 @@ import CampaignSegmentBadge from "./campaignSegmentBadge";
 import {
   ChevronRight,
   MousePointerClick,
+  Pencil,
 } from "lucide-react";
 
 export default function CampaignRow({
   campaign,
+  onEdit,
 }) {
   return (
     <tr className="group cursor-pointer border-b border-gray-200 transition hover:bg-muted/30">
@@ -71,14 +73,29 @@ export default function CampaignRow({
 
       {/* DATE */}
       <td className="px-6 py-5">
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium">
-            {campaign.date}
-          </span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium">
+              {campaign.date}
+            </span>
 
-          <span className="text-xs text-muted-foreground">
-            Scheduled Campaign
-          </span>
+            <span className="text-xs text-muted-foreground">
+              Scheduled Campaign
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+
+              onEdit?.(campaign);
+            }}
+            className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Edit
+          </button>
         </div>
       </td>
     </tr>
