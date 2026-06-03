@@ -4,8 +4,11 @@ import { Progress } from "@/components/ui/progress";
 import { GitBranch } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
-export default function HybridAI() {
+export default function HybridAI({ settings, onChange, disabled }) {
+  const threshold = Number(settings.handoff_threshold) || 0;
+
   return (
     <Card className="flex flex-col gap-8 border border-gray-300 shadow-md pt-0">
       <CardHeader className="relative pt-4 gap-0 flex flex-col items-start border-b bg-secondary border-gray-300">
@@ -29,17 +32,29 @@ export default function HybridAI() {
         <Field className="w-full">
             <FieldLabel htmlFor="confidenceThreshold">
                 <span>Confidence Escalation Threshold</span>
-                <span className="ml-auto text-primary">86%</span>
+                <span className="ml-auto text-primary">{threshold}%</span>
             </FieldLabel>
 
-            <Progress value={86} className="h-2 rounded-md" />
+            <Progress value={threshold} className="h-2 rounded-md" />
+            <Input
+              id="confidenceThreshold"
+              type="range"
+              min="0"
+              max="100"
+              value={threshold}
+              disabled={disabled}
+              onChange={(event) =>
+                onChange("handoff_threshold", Number(event.target.value))
+              }
+              className="h-2 cursor-pointer border-0 px-0 shadow-none"
+            />
             <div className="flex flex-row items-start justify-between">
                 <div className="flex flex-col gap-1 items-start">
-                    <span className="text-red-500 text-xs">0 - 85% Confidence</span>
+                    <span className="text-red-500 text-xs">0 - {Math.max(threshold - 1, 0)}% Confidence</span>
                     <span className="text-xs">Will be escalated to a human immediately</span>
                 </div>
                 <div className="flex flex-col gap-1 items-start">
-                    <span className="text-green-500 text-xs">86 - 100% Confidence</span>
+                    <span className="text-green-500 text-xs">{threshold} - 100% Confidence</span>
                     <span className="text-xs">Will be handled by the AI</span>
                 </div>
             </div>
@@ -51,7 +66,17 @@ export default function HybridAI() {
             <FieldLabel htmlFor="escalationMessage">
                 <span className="font-semibold">Escalation Message (Sent to Patient)</span>
             </FieldLabel>
-            <Textarea id="escalationMessage" placeholder="Enter the message that will be sent to the patient when their query is escalated to a human admin. This message should inform them that their request is being transferred and provide any relevant instructions or information." className="w-full border-gray-300 shadow-sm" rows={4} />
+            <Textarea
+              id="escalationMessage"
+              value={settings.handoff_message}
+              disabled={disabled}
+              onChange={(event) =>
+                onChange("handoff_message", event.target.value)
+              }
+              placeholder="Enter the message that will be sent to the patient when their query is escalated to a human admin. This message should inform them that their request is being transferred and provide any relevant instructions or information."
+              className="w-full border-gray-300 shadow-sm"
+              rows={4}
+            />
             <span className="text-xs">This message is sent right before routing the conversation to the "Needs Human" inbox.</span>
         </Field>
       </CardContent>

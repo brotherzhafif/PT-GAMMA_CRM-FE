@@ -3,7 +3,7 @@ import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 
-export default function Transparancy() {
+export default function Transparancy({ settings, onChange, disabled }) {
   return (
     <Card className="flex flex-col gap-8 border border-gray-300 shadow-md">
       <CardHeader className="gap-0 flex flex-col items-start border-b border-gray-300">
@@ -23,12 +23,26 @@ export default function Transparancy() {
                     Automatically add an AI badge to the first message sent in a new conversation.
                 </FieldDescription>
             </FieldContent>
-            <Switch id="includeDisclaimer" />
+            <Switch
+              id="includeDisclaimer"
+              checked={settings.ai_badge_enabled}
+              disabled={disabled}
+              onCheckedChange={(value) => onChange("ai_badge_enabled", value)}
+            />
         </Field>
 
         <Field>
             <FieldLabel htmlFor="disclaimerText">Disclaimer Text</FieldLabel>
-            <Input id="disclaimerText" placeholder="Enter the disclaimer text that will be included in the AI badge. This should inform patients that they are interacting with an AI assistant and provide any necessary disclaimers or information about the AI's capabilities and limitations." className="w-full border-gray-300 shadow-sm" />
+            <Input
+              id="disclaimerText"
+              value={
+                settings.ai_badge_enabled
+                  ? "AI badge is enabled for new conversations."
+                  : "AI badge is disabled for new conversations."
+              }
+              disabled
+              className="w-full border-gray-300 shadow-sm"
+            />
         </Field>
 
       </CardContent>
