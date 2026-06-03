@@ -40,6 +40,8 @@ const normalizeConnection = (payload) => {
         : "Connection stream reports an inactive session.",
       phoneNumber: "-",
       quality: "-",
+      hasQr: false,
+      qrCode: null,
       updatedAt: new Date().toISOString(),
     };
   }
@@ -82,6 +84,16 @@ const normalizeConnection = (payload) => {
       data.telepon ||
       "-",
     quality: data.quality_rating || data.qualityRating || data.quality || "-",
+    hasQr: Boolean(data.has_qr || data.hasQr || data.qr || data.qr_code || data.qrCode),
+    qrCode:
+      data.qr ||
+      data.qr_code ||
+      data.qrCode ||
+      data.qr_image ||
+      data.qrImage ||
+      data.qr_url ||
+      data.qrUrl ||
+      null,
     updatedAt:
       data.updated_at ||
       data.updatedAt ||

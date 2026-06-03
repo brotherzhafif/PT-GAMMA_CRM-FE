@@ -8,7 +8,7 @@ export const useUnifiedInbox = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const es = getLatestMessagesStream(50); 
+    const es = getLatestMessagesStream(); 
 
     es.onopen = () => {
       console.log("INBOX SSE CONNECTED");

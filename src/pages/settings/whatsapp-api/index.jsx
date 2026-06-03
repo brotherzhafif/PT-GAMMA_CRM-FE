@@ -1,7 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Activity, Database, Phone, Server } from "lucide-react";
-import ApiCredential from "./components/api-credential";
+import {
+  Activity,
+  CheckCircle2,
+  Database,
+  Phone,
+  QrCode,
+  Server,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useConnectionStatus } from "./hooks/useConnectionStatus";
 
@@ -57,6 +63,90 @@ const ConnectionSummary = ({ icon: Icon, title, connection }) => (
     />
   </div>
 );
+
+const getQrImageSource = (qrCode) => {
+  if (!qrCode) return null;
+
+  if (
+    qrCode.startsWith("data:") ||
+    qrCode.startsWith("http://") ||
+    qrCode.startsWith("https://")
+  ) {
+    return qrCode;
+  }
+
+  if (qrCode.trim().startsWith("<svg")) {
+    return `data:image/svg+xml;utf8,${encodeURIComponent(qrCode)}`;
+  }
+
+  return `data:image/png;base64,${qrCode}`;
+};
+
+const WhatsAppQrCard = ({ connection }) => {
+  const qrImageSource = getQrImageSource(connection.qrCode);
+  const showQr = !connection.connected && connection.hasQr;
+
+  return (
+    <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300">
+      <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300">
+        <div className="flex flex-col items-start">
+          <h3 className="font-semibold text-lg">WhatsApp QR Code</h3>
+          <span className="text-xs text-muted-foreground">
+            {showQr
+              ? "Scan QR untuk menghubungkan ulang sesi WhatsApp."
+              : "Sesi WhatsApp sudah aktif."}
+          </span>
+        </div>
+
+        <StatusBadge
+          connected={connection.connected}
+          label={connection.connected ? "Connected" : "QR Available"}
+        />
+      </div>
+
+      <div className="flex flex-col items-center justify-center rounded-md bg-muted/40 border border-dashed border-gray-300 min-h-[260px] p-6">
+        {showQr && qrImageSource ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="bg-white rounded-md p-3 shadow-sm border border-gray-200">
+              <img
+                src={qrImageSource}
+                alt="WhatsApp connection QR code"
+                className="h-52 w-52 object-contain"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              QR tersedia dari connection stream.
+            </p>
+          </div>
+        ) : showQr ? (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-md bg-white border border-gray-200 shadow-sm">
+              <QrCode className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold">Menunggu QR code</p>
+              <p className="text-xs text-muted-foreground">
+                Status sudah disconnected, QR belum diterima dari stream.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-md bg-green-100">
+              <CheckCircle2 className="h-12 w-12 text-green-600" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold">WhatsApp connected</p>
+              <p className="text-xs text-muted-foreground">
+                QR code akan tampil saat status WhatsApp disconnected.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 export default function WhatsapApi() {
   const {
@@ -125,6 +215,8 @@ export default function WhatsapApi() {
               Status updates are streamed from the API in real time.
             </div>
           </Card>
+
+          <WhatsAppQrCard connection={whatsappConnection} />
 
           {/* <ApiCredential /> */}
         </div>
