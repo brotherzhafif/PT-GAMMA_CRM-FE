@@ -1,5 +1,12 @@
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
+import { getAccessToken } from "@/services/auth.service";
 
 // pages
 import Dashboard from "@/pages/dashboard";
@@ -15,79 +22,97 @@ import ChatbotSettings from "./pages/settings/chatbot-settings";
 import UserRoles from "./pages/settings/user-roles";
 import Security from "./pages/settings/security";
 import Feedback from "./pages/feedback";
+import LoginPage from "./pages/auth/login";
+
+function ProtectedRoute() {
+  const location = useLocation();
+
+  if (!getAccessToken()) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  return <Outlet />;
+}
 
 const router = createBrowserRouter([
   {
-    element: <MainLayout />,
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
-        element: <Navigate to="/dashboard" replace />,
-      },
-      {
-        path: "/dashboard",
-        element: <Dashboard />,
-        handle: { title: "Operational Overview" },
-      },
-      {
-        path: "/inbox",
-        element: <Inbox />,
-        handle: { title: "Inbox & Conversations" },
-      },
-      {
-        path: "/patients",
-        element: <Patients />,
-        handle: { title: "Patients Database" },
-      },
-      {
-        path: "/appointments",
-        element: <Appointments />,
-        handle: { title: "Appointments Schedule" },
-      },
-      {
-        path: "/marketing",
-        element: <Marketing />,
-        handle: { title: "Marketing & Campaigns" },
-      },
-      {
-        path: "/loyalty",
-        element: <Loyalty />,
-        handle: { title: "Point & Rewards" },
-      },
-      {
-        path: "/feedback",
-        element: <Feedback />,
-        handle: { title: "Feedback & Support" },
-      },
-      {
-        path: "/settings",
-        element: <Settings />,
-        handle: { title: "Settings" },
-
+        element: <MainLayout />,
         children: [
           {
-            index: true,
-            element: <General />,
+            path: "/",
+            element: <Navigate to="/dashboard" replace />,
           },
           {
-            path: "/settings/whatsapp-api",
-            element: <WhatsapApi />,
+            path: "/dashboard",
+            element: <Dashboard />,
+            handle: { title: "Operational Overview" },
           },
           {
-            path: "/settings/chatbot-settings",
-            element: <ChatbotSettings />,
+            path: "/inbox",
+            element: <Inbox />,
+            handle: { title: "Inbox & Conversations" },
           },
           {
-            path: "/settings/user-roles",
-            element: <UserRoles />,
+            path: "/patients",
+            element: <Patients />,
+            handle: { title: "Patients Database" },
           },
           {
-            path: "/settings/security",
-            element: <Security />,
-          }
-        ]
+            path: "/appointments",
+            element: <Appointments />,
+            handle: { title: "Appointments Schedule" },
+          },
+          {
+            path: "/marketing",
+            element: <Marketing />,
+            handle: { title: "Marketing & Campaigns" },
+          },
+          {
+            path: "/loyalty",
+            element: <Loyalty />,
+            handle: { title: "Point & Rewards" },
+          },
+          {
+            path: "/feedback",
+            element: <Feedback />,
+            handle: { title: "Feedback & Support" },
+          },
+          {
+            path: "/settings",
+            element: <Settings />,
+            handle: { title: "Settings" },
 
-        
+            children: [
+              {
+                index: true,
+                element: <General />,
+              },
+              {
+                path: "/settings/whatsapp-api",
+                element: <WhatsapApi />,
+              },
+              {
+                path: "/settings/chatbot-settings",
+                element: <ChatbotSettings />,
+              },
+              {
+                path: "/settings/user-roles",
+                element: <UserRoles />,
+              },
+              {
+                path: "/settings/security",
+                element: <Security />,
+              },
+            ],
+          }
+        ],
       },
     ],
   },
