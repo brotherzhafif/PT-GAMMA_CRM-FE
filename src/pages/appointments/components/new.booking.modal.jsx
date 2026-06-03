@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { appointmentService } from "@/services/appointment.service";
 import { getPatients } from "@/services/patients.service";
 
-// 1. KOMPONEN MODAL DENGAN INTEGRASI API POST (BUAT JANJI TEMU)
-export function BookingModal({ open, onOpenChange, onRefresh }) {
+export function BookingModal({ open, onOpenChange, onConfirm }) {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [jadwalId, setJadwalId] = useState(""); // Dikosongkan agar Anda harus mengisi UUID yang valid
+  const [jadwalId, setJadwalId] = useState("");
   const [catatan, setCatatan] = useState("");
+  const [tanggalKunjungan, setTanggalKunjungan] = useState("");
+  const [jenisKunjunganBpjs, setJenisKunjunganBpjs] = useState("NORMAL");
+  const [noRujukanFktp, setNoRujukanFktp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // State untuk menyimpan daftar pasien dari API
@@ -48,29 +49,36 @@ export function BookingModal({ open, onOpenChange, onRefresh }) {
       return;
     }
 
+    if (!jadwalId.trim()) {
+      alert("ID Jadwal dokter wajib diisi!");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await appointmentService.createAppointmentModal({
+      await onConfirm({
         phone_number: phoneNumber,
         jadwalId: jadwalId,
-        tanggalKunjungan: todayDate,
+        tanggalKunjungan: tanggalKunjungan || todayDate,
         catatan: catatan || "Pendaftaran via Admin Dashboard",
-        // Sesuai permintaan dari validasi backend Anda
-        jenisKunjunganBpjs: "NORMAL", 
-        noRujukanFktp: ""
+        jenisKunjunganBpjs,
+        noRujukanFktp,
       });
 
       alert("Janji temu berhasil dibuat!");
       
       // Bersihkan form
       setPhoneNumber("");
+      setJadwalId("");
       setCatatan("");
+      setTanggalKunjungan("");
+      setJenisKunjunganBpjs("NORMAL");
+      setNoRujukanFktp("");
       
       // Tutup modal dan refresh data pada tabel utama
       onOpenChange(false);
-      if (onRefresh) onRefresh();
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      alert(`Error: ${err.response?.data?.message || err.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -111,6 +119,15 @@ export function BookingModal({ open, onOpenChange, onRefresh }) {
               value={jadwalId}
               onChange={(e) => setJadwalId(e.target.value)}
               placeholder="Masukkan ID Jadwal"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal Kunjungan</label>
+            <Input
+              type="date"
+              value={tanggalKunjungan || todayDate}
+              onChange={(e) => setTanggalKunjungan(e.target.value)}
             />
           </div>
           <div>
@@ -119,6 +136,22 @@ export function BookingModal({ open, onOpenChange, onRefresh }) {
               placeholder="Keluhan awal / Catatan admin"
               value={catatan} 
               onChange={(e) => setCatatan(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Jenis Kunjungan BPJS</label>
+            <Input
+              value={jenisKunjunganBpjs}
+              onChange={(e) => setJenisKunjunganBpjs(e.target.value)}
+              placeholder="NORMAL"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">No Rujukan FKTP</label>
+            <Input
+              value={noRujukanFktp}
+              onChange={(e) => setNoRujukanFktp(e.target.value)}
+              placeholder="Opsional"
             />
           </div>
 

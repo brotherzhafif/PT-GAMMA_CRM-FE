@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Table,
   TableBody,
@@ -11,14 +10,38 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { 
-  Bot, 
   User, 
   AlertCircle, 
   Eye, 
   Edit, 
+  Trash2,
 } from "lucide-react";
 
-export function TodaySchedule({ appointments = [] }) {
+export function TodaySchedule({ appointments = [], loading, error, onDelete }) {
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-sm text-slate-500 border border-dashed rounded-lg">
+        Memuat daftar appointment...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (appointments.length === 0) {
+    return (
+      <div className="text-center py-10 text-sm text-slate-400 border border-dashed rounded-lg">
+        Tidak ada appointment yang ditemukan.
+      </div>
+    );
+  }
+
   return (
     <div className="w-full space-y-4">
 
@@ -40,7 +63,7 @@ export function TodaySchedule({ appointments = [] }) {
                 STATUS
               </TableHead>
               <TableHead className="text-[11px] font-bold text-slate-400 tracking-wider text-right pr-6">
-                SOURCE
+                NO. ANTREAN
               </TableHead>
               <TableHead className="text-[11px] font-bold text-slate-400 tracking-wider text-center pr-6">
                 ACTION
@@ -50,7 +73,7 @@ export function TodaySchedule({ appointments = [] }) {
           <TableBody>
             {appointments.map((apt, index) => (
               <TableRow
-                key={index}
+                key={apt.id || index}
                 className={`group relative border-b border-gray-200 last:border-0 ${
                   apt.hasHighlight ? "bg-orange-50/30" : "hover:bg-slate-50/50"
                 }`}
@@ -63,14 +86,14 @@ export function TodaySchedule({ appointments = [] }) {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8 border border-gray-200 shadow-sm flex-shrink-0">
-                      <AvatarImage src={apt.patient.img} />
+                      <AvatarImage src={apt.patient?.img} />
                       <AvatarFallback className="bg-slate-100">
                         <User className="w-4 h-4 text-slate-400" />
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-800 text-[13px] truncate">{apt.patient.name}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{apt.patient.type}</div>
+                      <div className="font-bold text-slate-800 text-[13px] truncate">{apt.patient?.name}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{apt.patient?.type}</div>
                     </div>
                   </div>
                 </TableCell>
@@ -99,14 +122,9 @@ export function TodaySchedule({ appointments = [] }) {
                 </TableCell>
 
                 <TableCell className="text-right pr-6">
-                  <div className="flex items-center justify-end gap-1.5 text-[11px] font-medium text-slate-400 whitespace-nowrap">
-                    {apt.source === "AI Chat" ? (
-                      <Bot size={13} className="text-emerald-500" />
-                    ) : (
-                      <User size={13} className="text-orange-400" />
-                    )}
-                    {apt.source}
-                  </div>
+                  <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold">
+                    {apt.queueNumber || String(index + 1).padStart(3, "0")}
+                  </Badge>
                 </TableCell>
 
                 <TableCell className="text-center pr-6">
@@ -116,6 +134,15 @@ export function TodaySchedule({ appointments = [] }) {
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700">
                       <Edit size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => onDelete?.(apt.id)}
+                      disabled={!apt.id}
+                    >
+                      <Trash2 size={16} />
                     </Button>
                   </div>
                 </TableCell>

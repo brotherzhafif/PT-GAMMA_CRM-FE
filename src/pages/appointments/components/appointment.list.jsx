@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
@@ -12,7 +11,7 @@ function AppointmentItem({ appointment, onCancel }) {
           {appointment.patient?.name || appointment.namaPasien || "Nama Tidak Tersedia"}
         </p>
         <p className="text-sm text-slate-500">
-          {appointment.doctor || appointment.namaDokter || "Dokter Umum"} • {appointment.catatan || appointment.patient?.type || "Konsultasi"}
+          {appointment.doctor || appointment.namaDokter || "Dokter Umum"} - {appointment.catatan || appointment.patient?.type || "Konsultasi"}
         </p>
       </div>
       
