@@ -13,7 +13,7 @@ export default function Security() {
       </div>
 
       <div className="flex flex-col gap-5 pr-4">
-        <AccountSecurity />
+        {/* <AccountSecurity /> */}
         <RecentLogin />
         <SystemAuditLog />
       </div>

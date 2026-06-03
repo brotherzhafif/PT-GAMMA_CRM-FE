@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Bell, Search, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getStoredUser, logout } from "@/services/auth.service";
+import { useActivityNotifications } from "@/hooks/useActivityNotifications";
 
 export default function MainLayout() {
   const matches = useMatches();
@@ -125,14 +126,22 @@ function MobileSearch() {
 
 function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const {
+    error,
+    loading,
+    markAllRead,
+    markRead,
+    notifications,
+    unreadCount,
+  } = useActivityNotifications();
 
-  const notifications = [
-    { id: 1, title: "Pasien baru terdaftar", time: "2 menit lalu", unread: true },
-    { id: 2, title: "Janji temu hari ini", time: "10 menit lalu", unread: true },
-    { id: 3, title: "Promo berhasil dikirim", time: "1 jam lalu", unread: false },
-  ];
+  const handleNotificationClick = async (notification) => {
+    if (notification.unread) {
+      await markRead(notification.id);
+    }
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+    setOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -154,20 +163,52 @@ function NotificationBell() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 mt-3 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-card rounded-xl shadow-lg p-2 z-50">
-            <p className="text-sm font-semibold px-2 py-1">Notifikasi</p>
-            <div className="flex flex-col gap-1 mt-1">
-              {notifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  onClick={() => setOpen(false)}
-                  className={`p-2 rounded-lg text-sm cursor-pointer hover:bg-muted transition-colors ${
-                    notif.unread ? "bg-muted/50" : ""
-                  }`}
+            <div className="flex items-center justify-between px-2 py-1">
+              <p className="text-sm font-semibold">Notifikasi</p>
+              {unreadCount > 0 && (
+                <button
+                  className="text-xs text-primary hover:underline"
+                  onClick={markAllRead}
                 >
-                  <p className="text-foreground">{notif.title}</p>
-                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                  Tandai dibaca
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col gap-1 mt-1">
+              {loading ? (
+                <div className="p-2 text-sm text-muted-foreground">
+                  Loading notifications...
                 </div>
-              ))}
+              ) : error ? (
+                <div className="p-2 text-sm text-red-500">{error}</div>
+              ) : notifications.length === 0 ? (
+                <div className="p-2 text-sm text-muted-foreground">
+                  Belum ada notifikasi.
+                </div>
+              ) : (
+                notifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={`p-2 rounded-lg text-sm cursor-pointer hover:bg-muted transition-colors ${
+                      notif.unread ? "bg-muted/50" : ""
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-foreground font-medium">{notif.title}</p>
+                      {notif.unread && (
+                        <span className="mt-1 h-2 w-2 rounded-full bg-red-500" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <span className="text-xs text-muted-foreground">
+                      {notif.time}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </>
