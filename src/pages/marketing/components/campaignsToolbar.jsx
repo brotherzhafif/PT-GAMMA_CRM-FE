@@ -7,7 +7,7 @@ import {
   Search,
   Filter,
   Download,
-  Plus,
+  RefreshCw,
 } from "lucide-react";
 
 export default function CampaignsToolbar({
@@ -15,8 +15,10 @@ export default function CampaignsToolbar({
   onSearchChange,
   selectedStatus,
   onStatusChange,
+  onRefresh,
 }) {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] =
+    useState(false);
 
   return (
     <div className="flex flex-col gap-4 border-b border-gray-200 p-5">
@@ -41,9 +43,13 @@ export default function CampaignsToolbar({
             Export
           </Button>
 
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New Campaign
+          <Button
+            variant="outline"
+            className="border-gray-300"
+            onClick={onRefresh}
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
           </Button>
         </div>
       </div>
@@ -51,7 +57,6 @@ export default function CampaignsToolbar({
       {/* SEARCH & FILTER */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          {/* SEARCH */}
           <div className="relative w-full lg:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
@@ -65,7 +70,6 @@ export default function CampaignsToolbar({
             />
           </div>
 
-          {/* FILTER BUTTON */}
           <Button
             variant="outline"
             className="border-gray-300 w-full lg:w-auto"
@@ -78,7 +82,6 @@ export default function CampaignsToolbar({
           </Button>
         </div>
 
-        {/* FILTER PANEL */}
         {showFilters && (
           <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-muted/20 p-4 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-2">
@@ -97,16 +100,16 @@ export default function CampaignsToolbar({
                   All Status
                 </option>
 
-                <option value="Active">
-                  Active
+                <option value="Draft">
+                  Draft
                 </option>
 
                 <option value="Scheduled">
                   Scheduled
                 </option>
 
-                <option value="Draft">
-                  Draft
+                <option value="Sent">
+                  Sent
                 </option>
               </select>
             </div>

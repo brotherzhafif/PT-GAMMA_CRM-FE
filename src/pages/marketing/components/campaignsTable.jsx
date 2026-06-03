@@ -3,9 +3,11 @@ import { useMemo, useState } from "react";
 import CampaignsToolbar from "./campaignsToolbar";
 import CampaignRow from "./campaignRow";
 
-import { dummyCampaigns } from "../data/dummyCampaigns";
-
-export default function CampaignsTable() {
+export default function CampaignsTable({
+  campaigns = [],
+  onEdit,
+  onRefresh,
+}) {
   const [searchValue, setSearchValue] =
     useState("");
 
@@ -13,10 +15,10 @@ export default function CampaignsTable() {
     useState("All");
 
   const filteredCampaigns = useMemo(() => {
-    return dummyCampaigns.filter((campaign) => {
+    return campaigns.filter((campaign) => {
       const matchesSearch =
         campaign.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchValue.toLowerCase());
 
       const matchesStatus =
@@ -25,7 +27,11 @@ export default function CampaignsTable() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchValue, selectedStatus]);
+  }, [
+    campaigns,
+    searchValue,
+    selectedStatus,
+  ]);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
@@ -34,6 +40,8 @@ export default function CampaignsTable() {
         onSearchChange={setSearchValue}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
+        onRefresh={onRefresh}
+
       />
 
       <div className="overflow-x-auto">
@@ -68,6 +76,7 @@ export default function CampaignsTable() {
                 <CampaignRow
                   key={campaign.id}
                   campaign={campaign}
+                  onEdit={onEdit}
                 />
               ))
             ) : (
