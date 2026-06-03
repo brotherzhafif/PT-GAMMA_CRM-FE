@@ -38,6 +38,9 @@ const getStatusClassName = (status = "") =>
     ? "bg-red-100 text-red-800"
     : "bg-green-100 text-green-800";
 
+const truncateText = (text = "", maxLength = 50) =>
+  text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+
 export default function RecentLogin() {
   const { error, loading, logs } = useLoginLogs();
 
@@ -87,13 +90,19 @@ export default function RecentLogin() {
           ) : (
             logs.map((log) => {
               const DeviceIcon = getDeviceIcon(log.device);
+              const deviceBrowser = `${log.device} - (${log.browser})`;
 
               return (
                 <TableRow key={log.id} className="border-none shadow-sm">
                   <TableCell className="px-6 py-4 font-semibold text-xs">
-                    <div className="flex items-center gap-2">
-                      <DeviceIcon className="w-4 h-4" />
-                      {log.device} - ({log.browser})
+                    <div
+                      className="flex items-center gap-2 max-w-[360px]"
+                      title={deviceBrowser}
+                    >
+                      <DeviceIcon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">
+                        {truncateText(deviceBrowser)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="flex flex-col gap-1 px-6 py-4 items-start">

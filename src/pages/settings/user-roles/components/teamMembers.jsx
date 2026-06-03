@@ -98,13 +98,13 @@ export default function TeamMembers() {
           </div>
         )}
 
-        <Table>
+        <Table className="table-fixed">
           <TableHeader className="border-none shadow-sm">
             <TableRow className="border-none">
-              <TableHead className="px-6 text-gray-500">User</TableHead>
-              <TableHead className="px-6 text-gray-500">Role</TableHead>
-              <TableHead className="px-6 text-gray-500">Status</TableHead>
-              <TableHead className="px-6 text-gray-500">Actions</TableHead>
+              <TableHead className="px-6 text-gray-500 w-[46%]">User</TableHead>
+              <TableHead className="px-6 text-gray-500 w-[24%]">Role</TableHead>
+              <TableHead className="px-6 text-gray-500 w-[16%]">Status</TableHead>
+              <TableHead className="px-6 text-gray-500 w-[14%]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -132,7 +132,8 @@ export default function TeamMembers() {
 
                 return (
                   <TableRow key={user.id} className="border-none shadow-sm">
-                    <TableCell className="px-6 flex flex-row gap-3 items-center py-4">
+                    <TableCell className="px-6 py-4">
+                      <div className="flex flex-row gap-3 items-center min-w-0">
                       <Avatar className="h-10 min-w-10 border border-gray-100 shadow-sm flex-shrink-0">
                         <AvatarImage src={user.avatar || user.image} />
                         <AvatarFallback className="bg-slate-100 flex items-center justify-center border border-gray-100 text-xs font-semibold">
@@ -141,29 +142,38 @@ export default function TeamMembers() {
                       </Avatar>
 
                       <div className="flex flex-col items-start gap-0 min-w-0">
-                        <h4 className="text-sm font-semibold truncate max-w-[260px]">
+                        <h4
+                          className="text-sm font-semibold truncate max-w-full"
+                          title={user.name || "-"}
+                        >
                           {user.name || "-"}
                         </h4>
-                        <p className="text-xs text-gray-500 truncate max-w-[260px]">
+                        <p
+                          className="text-xs text-gray-500 truncate max-w-full"
+                          title={user.email || "-"}
+                        >
                           {user.email || "-"}
                         </p>
                       </div>
+                      </div>
                     </TableCell>
 
-                    <TableCell className="px-6">
+                    <TableCell className="px-6 min-w-0">
                       <Badge
                         variant="secondary"
-                        className="text-xs font-medium px-2 py-1"
+                        className="text-xs font-medium px-2 py-1 max-w-full"
+                        title={user.role || "-"}
                       >
-                        {user.role || "-"}
+                        <span className="block truncate">{user.role || "-"}</span>
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-6">
+                    <TableCell className="px-6 min-w-0">
                       <Badge
                         variant="secondary"
-                        className={`text-xs font-medium px-2 py-1 ${status.className}`}
+                        className={`text-xs font-medium px-2 py-1 max-w-full ${status.className}`}
+                        title={status.label}
                       >
-                        {status.label}
+                        <span className="block truncate">{status.label}</span>
                       </Badge>
                     </TableCell>
                     <TableCell className="px-6">
