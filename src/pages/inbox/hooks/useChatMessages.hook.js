@@ -1,10 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { formatChatTime } from "@/utils/formatTime";
-import { getChatMessagesStream } from "@/services/unifiendBox.service"; 
+import { getChatMessagesStream } from "@/services/unifiendBox.service";
 
 export function useChatMessages(phone_number) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [draftMessage, setDraftMessage] = useState("");
+
+  const quickTemplates = {
+    booking: `Halo Bapak/Ibu 😊
+
+Mohon lengkapi data berikut untuk pendaftaran:
+
+ Nama Lengkap:
+ NIK:
+ Tanggal Lahir (DD/MM/YYYY):
+ Keluhan:
+ Tanggal Kunjungan:
+
+Terima kasih 🙏`,
+  };
+
+  const applyQuickTemplate = (type) => {
+    const template = quickTemplates[type];
+
+    if (!template) return;
+
+    setDraftMessage(template);
+  };
 
   const mapMessages = (data) => {
     return (data || [])
@@ -16,17 +39,23 @@ export function useChatMessages(phone_number) {
         time: msg.created_at ? formatChatTime(msg.created_at) : "",
         createdAt: msg.created_at,
         isEscalation: msg.is_escalation || false,
-        isBotReturn: msg.is_bot_return || false, 
+        isBotReturn: msg.is_bot_return || false,
       }))
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
   };
 
   useEffect(() => {
     if (!phone_number) return;
-    setLoading(true);
-    setMessages([]);
 
-    const es = getChatMessagesStream(phone_number); 
+    const es = getChatMessagesStream(phone_number);
+
+    startTransition(() => {
+      setLoading(true);
+      setMessages([]);
+    });
 
     es.onopen = () => {
       console.log("CHAT SSE CONNECTED");
@@ -35,10 +64,10 @@ export function useChatMessages(phone_number) {
     const handleChatStream = (e) => {
       try {
         const data = JSON.parse(e.data);
-        
+
         if (!data || (Array.isArray(data) && data.length === 0)) {
-           setLoading(false);
-           return;
+          setLoading(false);
+          return;
         }
 
         if (Array.isArray(data)) {
@@ -46,9 +75,13 @@ export function useChatMessages(phone_number) {
           setLoading(false);
         } else {
           const newMsg = mapMessages([data])[0];
+
           setMessages((prev) => {
-             if (prev.some(msg => msg.id === newMsg.id)) return prev;
-             return [...prev, newMsg];
+            if (prev.some((msg) => msg.id === newMsg.id)) {
+              return prev;
+            }
+
+            return [...prev, newMsg];
           });
         }
       } catch (err) {
@@ -60,8 +93,10 @@ export function useChatMessages(phone_number) {
     es.addEventListener("update", handleChatStream);
     es.addEventListener("message", handleChatStream);
     es.addEventListener("new_message", handleChatStream);
+
     es.onerror = (err) => {
       console.error("CHAT SSE ERROR:", err);
+      setLoading(false);
     };
 
     return () => {
@@ -69,5 +104,11 @@ export function useChatMessages(phone_number) {
     };
   }, [phone_number]);
 
-  return { messages, loading };
+  return {
+    messages,
+    loading,
+    draftMessage,
+    setDraftMessage,
+    applyQuickTemplate,
+  };
 }
