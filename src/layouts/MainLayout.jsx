@@ -14,16 +14,19 @@ import {
   SidebarTrigger,
 } from "../components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Outlet } from "react-router-dom";
-import { useMatches } from "react-router-dom";
+import { Outlet, useMatches, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getStoredUser, logout } from "@/services/auth.service";
 
 export default function MainLayout() {
   const matches = useMatches();
   const currentMatch = matches[matches.length - 1];
   const title = currentMatch?.handle?.title || "Default Title";
+  const user = getStoredUser();
+  const userName = user?.name || user?.email || "Admin";
+  const userRole = user?.role || "Admin";
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -65,11 +68,13 @@ export default function MainLayout() {
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="hidden sm:flex flex-col items-start leading-tight">
                       <h4 className="text-sm font-medium text-foreground whitespace-nowrap">
-                        Dr. John Doe
+                        {userName}
                       </h4>
-                      <span className="text-xs text-muted-foreground">Admin</span>
+                      <span className="text-xs text-muted-foreground">
+                        {userRole}
+                      </span>
                     </div>
-                    <UserAvatar />
+                    <UserAvatar user={user} />
                   </div>
                 </div>
               </div>
@@ -171,20 +176,25 @@ function NotificationBell() {
   );
 }
 
-function UserAvatar() {
-  const user = { name: "Dr. John Doe", image: "" };
-  const initials = user.name
+function UserAvatar({ user }) {
+  const navigate = useNavigate();
+  const displayName = user?.name || user?.email || "Admin";
+  const initials = displayName
     .split(" ")
     .map((n) => n[0])
     .join("")
     .slice(0, 2);
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button>
           <Avatar className="cursor-pointer w-8 h-8 sm:w-10 sm:h-10">
-            <AvatarImage src={user.image} />
+            <AvatarImage src={user?.image || user?.avatar} />
             <AvatarFallback className="text-xs sm:text-sm">{initials}</AvatarFallback>
           </Avatar>
         </button>
@@ -192,7 +202,9 @@ function UserAvatar() {
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem>Profile</DropdownMenuItem>
         <DropdownMenuSeparator className="bg-gray-300" />
-        <DropdownMenuItem className="text-red-500">Logout</DropdownMenuItem>
+        <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
