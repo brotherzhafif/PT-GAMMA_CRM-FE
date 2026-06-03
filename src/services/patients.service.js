@@ -14,6 +14,7 @@ export const getPatientByPhoneNumber = async (phoneNumber) => {
   const res = await api.get("/api/patients/by-phone", {
     params: {
       phone: phoneNumber,
+      phone_number: phoneNumber,
     },
   });
 

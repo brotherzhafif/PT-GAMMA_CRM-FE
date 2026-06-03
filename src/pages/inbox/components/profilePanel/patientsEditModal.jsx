@@ -52,7 +52,9 @@ export default function PatientEditModal({
     console.log("PATIENT ID:", patient?.id);
     console.log("RME PATIENT ID:", patient?.rme_patient_id);
 
-    if (!patient?.rme_patient_id) {
+    const patientId = patient?.id || patient?.rme_patient_id;
+
+    if (!patientId) {
       console.error("Patient ID not found");
       return;
     }
@@ -60,7 +62,7 @@ export default function PatientEditModal({
     try {
       setLoading(true);
 
-      await updatePatient(patient.rme_patient_id, form);
+      await updatePatient(patientId, form);
 
       onSuccess?.();
       onOpenChange(false);

@@ -1,13 +1,28 @@
 import { useEffect, useState, startTransition } from "react";
-import { getPatientByPhoneNumber } from "@/services/patients.service";
+import {
+  getPatientById,
+  getPatientByPhoneNumber,
+} from "@/services/patients.service";
 
-export function usePatientProfile(phoneNumber) {
+const unwrapResponse = (response) => response?.data || response;
+
+const getResolvedPatientId = (patient) =>
+  patient?.rme_patient_id ||
+  patient?.rmePatientId ||
+  patient?.rme_patients_id ||
+  patient?.patient_id ||
+  patient?.patientId ||
+  patient?.id;
+
+export function usePatientProfile({ patientId, phoneNumber }) {
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] =
     useState(false);
 
   useEffect(() => {
-    if (!phoneNumber) return;
+    if (!patientId && !phoneNumber) return;
+
+    let isActive = true;
 
     const fetchPatient =
       async () => {
@@ -16,29 +31,60 @@ export function usePatientProfile(phoneNumber) {
             setLoading(true);
           });
 
+          const patientLookup = patientId
+            ? null
+            : unwrapResponse(
+                await getPatientByPhoneNumber(
+                  phoneNumber
+                )
+              );
+
+          const resolvedPatientId =
+            patientId ||
+            getResolvedPatientId(patientLookup);
+
+          if (!resolvedPatientId) {
+            if (isActive) {
+              setPatient(null);
+            }
+            return;
+          }
+
           const data =
-            await getPatientByPhoneNumber(
-              phoneNumber
+            unwrapResponse(
+              await getPatientById(
+                resolvedPatientId
+              )
             );
 
-          setPatient(data);
+          if (isActive) {
+            setPatient(data);
+          }
         } catch (error) {
           console.error(
             "Failed get patient:",
             error
           );
 
-          setPatient(null);
+          if (isActive) {
+            setPatient(null);
+          }
         } finally {
-          setLoading(false);
+          if (isActive) {
+            setLoading(false);
+          }
         }
       };
 
     fetchPatient();
-  }, [phoneNumber]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [patientId, phoneNumber]);
 
   return {
-    patient,
-    loading,
+    patient: patientId || phoneNumber ? patient : null,
+    loading: patientId || phoneNumber ? loading : false,
   };
 }

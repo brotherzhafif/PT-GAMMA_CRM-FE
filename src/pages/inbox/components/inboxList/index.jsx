@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Filter, Edit } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { Filter, Edit } from "lucide-react";
 import ChatItem from "./chat-item";
 import FilterTabs from "./filter-tabs";
 import { useUnifiedInbox } from "../../hooks/useUnifiendInbox.hooks";
@@ -42,7 +42,7 @@ export default function InboxList({ onSelect, selectedId }) {
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-semibold text-lg">Inbox</h2>
 
-          <div className="flex gap-1">
+          {/* <div className="flex gap-1">
             <Button
               variant="ghost"
               size="icon"
@@ -58,7 +58,7 @@ export default function InboxList({ onSelect, selectedId }) {
             >
               <Edit className="w-4 h-4 text-muted-foreground" />
             </Button>
-          </div>
+          </div> */}
         </div>
 
         <div className="relative">

@@ -4,7 +4,7 @@ import {
   getCampaigns,
   createCampaign,
   updateCampaign,
-} from "@/services/marketingService";
+} from "@/services/marketing.service";
 
 import MarketingHeader from "./components/marketingHeader";
 import MarketingStats from "./components/marketingStats";

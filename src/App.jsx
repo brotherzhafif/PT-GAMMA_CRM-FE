@@ -14,6 +14,7 @@ import WhatsapApi from "./pages/settings/whatsapp-api";
 import ChatbotSettings from "./pages/settings/chatbot-settings";
 import UserRoles from "./pages/settings/user-roles";
 import Security from "./pages/settings/security";
+import Feedback from "./pages/feedback";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,11 @@ const router = createBrowserRouter([
         path: "/loyalty",
         element: <Loyalty />,
         handle: { title: "Point & Rewards" },
+      },
+      {
+        path: "/feedback",
+        element: <Feedback />,
+        handle: { title: "Feedback & Support" },
       },
       {
         path: "/settings",

@@ -82,12 +82,19 @@ const data = {
       ),
     },
     {
-      title: "Loyalty & Rewards",
-      url: "/loyalty",
+      title: "Feedback",
+      url: "/feedback",
       icon: (
-        <Star />
+        <HelpCircle />
       ),
     },
+    // {
+    //   title: "Loyalty & Rewards",
+    //   url: "/loyalty",
+    //   icon: (
+    //     <Star />
+    //   ),
+    // },
   ],
   projects: [
     {
