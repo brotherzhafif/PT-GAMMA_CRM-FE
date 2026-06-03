@@ -82,7 +82,7 @@ const data = {
       ),
     },
     {
-      title: "Loyalty",
+      title: "Loyalty & Rewards",
       url: "/loyalty",
       icon: (
         <Star />
