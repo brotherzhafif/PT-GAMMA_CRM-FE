@@ -93,22 +93,27 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <General />,
+                handle: { title: "General Settings" },
               },
               {
                 path: "/settings/whatsapp-api",
                 element: <WhatsapApi />,
+                handle: { title: "General Settings" },
               },
               {
                 path: "/settings/chatbot-settings",
                 element: <ChatbotSettings />,
+                handle: { title: "General Settings" },
               },
               {
                 path: "/settings/user-roles",
                 element: <UserRoles />,
+                handle: { title: "General Settings" },
               },
               {
                 path: "/settings/security",
                 element: <Security />,
+                handle: { title: "General Settings" },
               },
             ],
           }
