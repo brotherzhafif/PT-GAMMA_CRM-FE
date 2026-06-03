@@ -70,7 +70,7 @@ const router = createBrowserRouter([
             element: <General />,
           },
           {
-            path: "/settings/whatsapp-Api",
+            path: "/settings/whatsapp-api",
             element: <WhatsapApi />,
           },
           {
