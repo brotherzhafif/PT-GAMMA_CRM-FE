@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import {
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { ComputerIcon, Laptop, Smartphone } from "lucide-react";
 import { useLoginLogs } from "../hooks/useSecurityActivity";
+import { logoutAllDevices } from "@/services/auth.service";
 
 const getDeviceIcon = (device = "") => {
   const normalizedDevice = device.toLowerCase();
@@ -42,7 +45,21 @@ const truncateText = (text = "", maxLength = 50) =>
   text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 
 export default function RecentLogin() {
+  const navigate = useNavigate();
   const { error, loading, logs } = useLoginLogs();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogoutAllDevices = async () => {
+    const confirmed = window.confirm(
+      "Log out all devices? You will need to sign in again.",
+    );
+
+    if (!confirmed) return;
+
+    setLoggingOut(true);
+    await logoutAllDevices();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <Card className="flex flex-col gap-8 shadow-md border border-gray-300">
@@ -54,8 +71,14 @@ export default function RecentLogin() {
           </span>
         </div>
 
-        <Button variant="link" size="sm" className="cursor-pointer shadow-md">
-          Log Out All Devices
+        <Button
+          disabled={loggingOut}
+          onClick={handleLogoutAllDevices}
+          variant="link"
+          size="sm"
+          className="cursor-pointer shadow-md text-red-500 hover:text-red-600"
+        >
+          {loggingOut ? "Logging out..." : "Log Out All Devices"}
         </Button>
       </CardHeader>
 

@@ -71,6 +71,23 @@ export const logout = async () => {
   }
 };
 
+export const logoutAllDevices = async () => {
+  try {
+    await authApi.post("/api/auth/logout-all", null, {
+      headers: getAccessToken()
+        ? { Authorization: `Bearer ${getAccessToken()}` }
+        : undefined,
+    });
+  } catch (error) {
+    console.error(
+      "Logout all devices request failed:",
+      error.response?.data || error.message,
+    );
+  } finally {
+    clearAuthSession();
+  }
+};
+
 export const refreshAuthToken = async () => {
   const refresh_token = getRefreshToken();
 
