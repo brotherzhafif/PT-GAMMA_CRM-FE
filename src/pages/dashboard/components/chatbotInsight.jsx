@@ -1,25 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Bot, BrainCircuit, UserPlus } from "lucide-react";
+import { AlertTriangle, Bot, UserPlus } from "lucide-react";
 
-const intents = [
-  { label: "Book Appointment", value: 482, percent: 80 },
-  { label: "Operating Hours", value: 215, percent: 45 },
-  { label: "Pricing Inquiry", value: 156, percent: 35 },
-];
+const EmptyInsight = ({ children }) => (
+  <p className="text-sm text-muted-foreground">{children}</p>
+);
 
-const lowConfidence = [
-  { label: "Insurance Claims", percent: 32, count: 45 },
-  { label: "Complex Symptoms", percent: 28, count: 38 },
-];
-
-const escalated = [
-  { label: "Billing Dispute", count: 120 },
-  { label: "Reschedule Request", count: 85 },
-];
-
-export default function ChatbotInsight() {
+export default function ChatbotInsight({
+  intents: intentItems = [],
+  lowConfidence: lowConfidenceItems = [],
+  escalated: escalatedItems = [],
+  notes = [],
+}) {
   return (
     <Card className="w-full h-full flex flex-col">
       
@@ -36,15 +28,19 @@ export default function ChatbotInsight() {
             Top Detected Intents
           </h4>
 
-          {intents.map((item, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <div className="flex justify-between text-sm">
-                <span>{item.label}</span>
-                <span className="text-muted-foreground">{item.value}</span>
+          {intentItems.length > 0 ? (
+            intentItems.map((item) => (
+              <div key={item.label} className="flex flex-col gap-1">
+                <div className="flex justify-between text-sm">
+                  <span>{item.label}</span>
+                  <span className="text-muted-foreground">{item.value}</span>
+                </div>
+                <Progress value={item.percent} />
               </div>
-              <Progress value={item.percent} />
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyInsight>Belum ada intent terdeteksi.</EmptyInsight>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -53,17 +49,19 @@ export default function ChatbotInsight() {
             Low Confidence Intents
           </h4>
 
-          {lowConfidence.map((item, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center text-sm bg-yellow-50 shadow-sm rounded-md px-3 py-2"
-            >
-              <span>{item.label}</span>
-              <span className="text-yellow-600">
-                {item.percent}% conf. ({item.count})
-              </span>
-            </div>
-          ))}
+          {lowConfidenceItems.length > 0 ? (
+            lowConfidenceItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex justify-between items-center text-sm bg-yellow-50 shadow-sm rounded-md px-3 py-2"
+              >
+                <span>{item.label}</span>
+                <span className="text-yellow-600">{item.count}</span>
+              </div>
+            ))
+          ) : (
+            <EmptyInsight>Tidak ada intent low confidence.</EmptyInsight>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -72,27 +70,38 @@ export default function ChatbotInsight() {
             Frequently Escalated
           </h4>
 
-          {escalated.map((item, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center text-sm bg-red-50  rounded-md px-3 py-2 shadow-sm"
-            >
-              <span>{item.label}</span>
-              <span className="text-red-500">
-                {item.count} handoffs
-              </span>
-            </div>
-          ))}
+          {escalatedItems.length > 0 ? (
+            escalatedItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex justify-between items-center text-sm bg-red-50 rounded-md px-3 py-2 shadow-sm"
+              >
+                <span>{item.label}</span>
+                <span className="text-red-500">{item.count} handoffs</span>
+              </div>
+            ))
+          ) : (
+            <EmptyInsight>Tidak ada eskalasi berulang.</EmptyInsight>
+          )}
         </div>
 
+        {notes.length > 0 && (
+          <div className="flex flex-col gap-1 border-t pt-3">
+            {notes.map((note) => (
+              <p key={note} className="text-xs text-muted-foreground">
+                {note}
+              </p>
+            ))}
+          </div>
+        )}
       </CardContent>
 
-      <CardFooter className="mt-auto pt-4">
+      {/* <CardFooter className="mt-auto pt-4">
         <Button className="w-full border-none text-primary cursor-pointer hover:bg-secondary" variant="outline">
             <BrainCircuit />
           Train Chatbot
         </Button>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }

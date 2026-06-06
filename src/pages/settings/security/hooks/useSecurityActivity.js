@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getAuditLogs, getLoginLogs } from "@/services/activity.service";
+import { getAuditLogs, getLoginLogs } from "@/services/notification.service";
 
 const normalizeList = (data) => (Array.isArray(data) ? data : data?.data || []);
 

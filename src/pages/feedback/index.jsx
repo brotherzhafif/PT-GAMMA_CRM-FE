@@ -11,7 +11,7 @@ export default function Feedback() {
     feedbacks,
     dashboardStats,
     loading,
-    error,
+    // error,
     addFeedback,
     addReplyLocal,
     updateStatusLocal

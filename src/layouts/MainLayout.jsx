@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  // DropdownMenuSe parator,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "../components/ui/separator";
 import {
@@ -241,8 +241,8 @@ function UserAvatar({ user }) {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-gray-300" />
+        {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
+        {/* <DropdownMenuSeparator className="bg-gray-300" /> */}
         <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
           Logout
         </DropdownMenuItem>

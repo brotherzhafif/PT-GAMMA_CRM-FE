@@ -16,7 +16,7 @@ import Appointments from "@/pages/appointments";
 import Marketing from "@/pages/marketing";
 import Loyalty from "@/pages/loyalty";
 import Settings from "@/pages/settings";
-import General from "./pages/settings/general";
+// import General from "./pages/settings/general";
 import WhatsapApi from "./pages/settings/whatsapp-api";
 import ChatbotSettings from "./pages/settings/chatbot-settings";
 import UserRoles from "./pages/settings/user-roles";
@@ -90,13 +90,14 @@ const router = createBrowserRouter([
             handle: { title: "Settings" },
 
             children: [
+              // {
+              //   index: false,
+              //   element: <General />,
+              //   handle: { title: "General Settings" },
+              // },
               {
                 index: true,
-                element: <General />,
-                handle: { title: "General Settings" },
-              },
-              {
-                path: "/settings/whatsapp-api",
+                // path: "/settings/whatsapp-api",
                 element: <WhatsapApi />,
                 handle: { title: "General Settings" },
               },

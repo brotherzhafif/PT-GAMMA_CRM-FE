@@ -3,7 +3,7 @@ import {
   getActivityNotifications,
   markActivityRead,
   markAllActivityRead,
-} from "@/services/activity.service";
+} from "@/services/notification.service";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
 
 const normalizeList = (data) => (Array.isArray(data) ? data : data?.data || []);
