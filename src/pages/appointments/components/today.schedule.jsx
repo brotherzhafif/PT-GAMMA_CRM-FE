@@ -132,13 +132,13 @@ export function TodaySchedule({ appointments = [], loading, error, onDelete }) {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:text-emerald-700">
                       <Eye size={16} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700">
+                    <Button variant="ghost" size="icon" className="hidden h-8 w-8 text-blue-600 hover:text-blue-700">
                       <Edit size={16} />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      className="hidden h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => onDelete?.(apt.id)}
                       disabled={!apt.id}
                     >
