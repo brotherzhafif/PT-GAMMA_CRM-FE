@@ -33,7 +33,11 @@ export default function FeedbackDetail({
 
   // Reset reply text when feedback item changes
   useEffect(() => {
-    setReplyMessage("");
+    const timer = window.setTimeout(() => {
+      setReplyMessage("");
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [feedback?.id]);
 
   if (!feedback) {

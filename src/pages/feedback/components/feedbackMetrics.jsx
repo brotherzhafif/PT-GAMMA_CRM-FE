@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Star, MessageSquare, AlertCircle, Sparkles, Smile, Meh, Frown, ClipboardCheck } from "lucide-react";
+import { Star, MessageSquare, AlertCircle, Smile, Meh, Frown, ClipboardCheck } from "lucide-react";
 
 export default function FeedbackMetrics({ feedbacks, dashboardStats }) {
   const total = feedbacks.length;
@@ -15,18 +15,10 @@ export default function FeedbackMetrics({ feedbacks, dashboardStats }) {
   const pendingCount = feedbacks.filter(f => f.status === "Pending").length;
   
   // Total survey metrics
-  const totalSurveys = dashboardStats?.total_survey_terkirim ?? (total + 8);
+  const totalSurveys = dashboardStats?.total_survey_terkirim ?? total;
   const filledCount = dashboardStats?.total_ngisi ?? total;
-  const ignoreCount = dashboardStats?.total_gak_ngisi ?? (totalSurveys - filledCount);
+  const ignoreCount = dashboardStats?.total_gak_ngisi ?? Math.max(totalSurveys - filledCount, 0);
   const responseRate = totalSurveys > 0 ? Math.round((filledCount / totalSurveys) * 100) : 0;
-
-  // NPS Calculation (simplified for 5-star scale)
-  // Promoters: 5 stars, Detractors: 1-3 stars
-  const promoters = feedbacks.filter(f => f.rating === 5).length;
-  const detractors = feedbacks.filter(f => f.rating <= 3).length;
-  const npsScore = total > 0 
-    ? Math.round(((promoters - detractors) / total) * 100) 
-    : 0;
 
   // Sentiment percentages
   const positiveCount = feedbacks.filter(f => f.sentiment === "Positive").length;
