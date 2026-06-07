@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { getFeedbacks, createFeedback, getFeedbackDashboard } from "@/services/feedback.service";
-import { dummyFeedbacks } from "../data/dummyFeedback";
 
 const toArray = (value) => {
   if (Array.isArray(value)) return value;
@@ -9,18 +8,18 @@ const toArray = (value) => {
 };
 
 const mapBackendFeedback = (item, idx) => {
-  const patientName = item?.nama || item?.patientName || "Anonymous";
+  const patientName = item?.nama || item?.patientName || "Pasien";
   const phone = item?.no_hp || item?.phone || "";
-  const rating = Number(item?.rating) || 5;
+  const rating = Number(item?.rating) || 0;
   const comment = item?.ulasan || item?.comment || "";
   const id = item?.id || item?._id || idx + 1;
   const avatar = patientName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "P";
-  const email = item?.email || "N/A";
-  const category = item?.category || item?.kategori || "Service";
+  const email = item?.email || "-";
+  const category = item?.category || item?.kategori || "-";
   const sentiment = item?.sentiment || (rating >= 4 ? "Positive" : rating <= 2 ? "Negative" : "Neutral");
-  const source = item?.source || item?.sumber || "Walk-in";
+  const source = item?.source || item?.sumber || "-";
   const status = item?.status || "Pending";
-  const date = item?.date || item?.tanggal || new Date().toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+  const date = item?.date || item?.tanggal || "-";
   const replies = item?.replies || [];
 
   return {
@@ -59,17 +58,11 @@ export function useFeedback() {
       // Handle response structures: backend might return wrapped `{ data: [...] }` or raw array
       const rawData = response?.data || response;
       const list = toArray(rawData);
-      
-      if (list.length === 0) {
-        // Fallback to dummy feedbacks if empty
-        setFeedbacks(dummyFeedbacks);
-      } else {
-        setFeedbacks(list);
-      }
+
+      setFeedbacks(list);
     } catch (err) {
-      console.warn("Feedback API failed, falling back to dummy data:", err);
-      // Fallback
-      setFeedbacks(dummyFeedbacks);
+      console.warn("Feedback API failed:", err);
+      setFeedbacks([]);
       setError(err.response?.data?.message || err.message || "Failed to fetch feedbacks");
     } finally {
       setLoading(false);
@@ -84,7 +77,6 @@ export function useFeedback() {
       setDashboardStats(stats);
     } catch (err) {
       console.warn("Feedback dashboard stats API failed:", err);
-      // Compute fallback statistics from dummy/current feedbacks
       setDashboardStats(null);
     }
   }, []);
@@ -112,8 +104,6 @@ export function useFeedback() {
       return response;
     } catch (err) {
       console.error("Failed to post feedback:", err);
-      // Local addition fallback so the UI still works even if offline
-      setFeedbacks((prev) => [payload, ...prev]);
       return null;
     } finally {
       setLoading(false);
@@ -159,8 +149,12 @@ export function useFeedback() {
 
   // Initialize
   useEffect(() => {
-    fetchFeedbacks();
-    fetchDashboardStats();
+    const timer = window.setTimeout(() => {
+      fetchFeedbacks();
+      fetchDashboardStats();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [fetchFeedbacks, fetchDashboardStats]);
 
   return {
