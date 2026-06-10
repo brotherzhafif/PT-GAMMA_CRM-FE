@@ -21,7 +21,7 @@ export function DailySummaryCard({ appointments = [] }) {
   const reminderSent = appointments.filter((a) => a.reminderSent === true).length;
 
   return (
-    <Card className="mb-4 bg-white shadow-sm border-gray-200">
+    <Card className="bg-white shadow-xl border-gray-200">
       <CardHeader className="pb-2 pt-4 px-5">
         <CardTitle className="text-sm font-bold text-slate-800">
           Ringkasan Harian
