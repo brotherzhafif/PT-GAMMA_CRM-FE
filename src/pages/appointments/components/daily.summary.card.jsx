@@ -1,24 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CheckCircle, XCircle, UserX, BellRing } from "lucide-react";
+import { Activity, CheckCircle, Clock3, Users, XCircle } from "lucide-react";
 
 export function DailySummaryCard({ appointments = [] }) {
-  // Kalkulasi statistik dari data yang diberikan (array sudah terfilter per hari)
   const total = appointments.length;
-  
-  const confirmed = appointments.filter(
-    (a) => a.status?.toLowerCase() === "confirmed" || a.status?.toLowerCase() === "konfirmasi"
-  ).length;
-  
-  const cancelled = appointments.filter(
-    (a) => a.status?.toLowerCase() === "cancelled" || a.status?.toLowerCase() === "batal"
-  ).length;
-  
-  const noShow = appointments.filter(
-    (a) => a.status?.toLowerCase() === "no show" || a.status?.toLowerCase() === "tidak hadir"
-  ).length;
-  
-  // Menghitung status reminder yang telah terkirim
-  const reminderSent = appointments.filter((a) => a.reminderSent === true).length;
+  const waiting = appointments.filter((a) => a.status === "MENUNGGU").length;
+  const inProgress = appointments.filter((a) => a.status === "DIPERIKSA").length;
+  const done = appointments.filter((a) => a.status === "SELESAI" || a.status === "COMPLETED").length;
+  const cancelled = appointments.filter((a) => a.status === "BATAL" || a.status === "CANCELLED").length;
 
   return (
     <Card className="bg-white shadow-xl border-gray-200">
@@ -38,10 +26,24 @@ export function DailySummaryCard({ appointments = [] }) {
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-emerald-500">
-              <CheckCircle className="w-4 h-4" />
-              <span className="text-xs font-semibold">Konfirmasi</span>
+              <Clock3 className="w-4 h-4" />
+              <span className="text-xs font-semibold">Menunggu</span>
             </div>
-            <span className="text-lg font-bold text-slate-800">{confirmed}</span>
+            <span className="text-lg font-bold text-slate-800">{waiting}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-blue-500">
+              <Activity className="w-4 h-4" />
+              <span className="text-xs font-semibold">Diperiksa</span>
+            </div>
+            <span className="text-lg font-bold text-slate-800">{inProgress}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-slate-500">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-xs font-semibold">Selesai</span>
+            </div>
+            <span className="text-lg font-bold text-slate-800">{done}</span>
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 text-rose-500">
@@ -49,20 +51,6 @@ export function DailySummaryCard({ appointments = [] }) {
               <span className="text-xs font-semibold">Batal</span>
             </div>
             <span className="text-lg font-bold text-slate-800">{cancelled}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-amber-500">
-              <UserX className="w-4 h-4" />
-              <span className="text-xs font-semibold">Tidak Hadir</span>
-            </div>
-            <span className="text-lg font-bold text-slate-800">{noShow}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-blue-500">
-              <BellRing className="w-4 h-4" />
-              <span className="text-xs font-semibold">Reminder Terkirim</span>
-            </div>
-            <span className="text-lg font-bold text-slate-800">{reminderSent}</span>
           </div>
         </div>
       </CardContent>

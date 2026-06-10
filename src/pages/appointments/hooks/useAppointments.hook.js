@@ -13,6 +13,7 @@ const toArray = (value) => {
 };
 
 const unwrapAppointments = (response) => {
+  if (Array.isArray(response?.data?.data)) return response.data.data;
   return toArray(response?.data ?? response);
 };
 
@@ -20,13 +21,20 @@ const getAppointmentId = (appointment) => {
   return appointment?.id || appointment?._id || appointment?.appointment_id || appointment?.uuid;
 };
 
-const getTodayDate = () => {
-  return new Date().toISOString().split("T")[0];
+export const formatDateForApi = (date) => {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 };
 
 const getPatientName = (appointment) => {
   return (
     appointment?.patient?.name ||
+    appointment?.pasien?.namaLengkap ||
     appointment?.pasien?.nama ||
     appointment?.namaPasien ||
     appointment?.nama_pasien ||
@@ -39,6 +47,8 @@ const getPatientPhone = (appointment) => {
   return (
     appointment?.patient?.phone_number ||
     appointment?.patient?.phone ||
+    appointment?.pasien?.noTelepon ||
+    appointment?.pasien?.phone ||
     appointment?.phone_number ||
     appointment?.no_hp ||
     appointment?.nomorTelepon ||
@@ -71,6 +81,7 @@ const getAppointmentTime = (appointment) => {
 const getQueueNumber = (appointment) => {
   return (
     appointment?.nomorAntrean ||
+    appointment?.noAntrian ||
     appointment?.nomor_antrean ||
     appointment?.noAntrean ||
     appointment?.no_antrean ||
@@ -85,13 +96,25 @@ const getQueueNumber = (appointment) => {
 export const mapAppointmentForSchedule = (appointment) => {
   const status = appointment?.status || appointment?.appointment_status || "CONFIRMED";
   const catatan = appointment?.catatan || appointment?.keluhan || "Konsultasi";
+  const doctorName =
+    appointment?.doctor ||
+    appointment?.namaDokter ||
+    appointment?.dokter?.nama ||
+    appointment?.jadwal?.dokter?.namaLengkap ||
+    "Dokter Umum";
+  const specialty = appointment?.jadwal?.dokter?.spesialis || appointment?.spesialis || "";
+  const session = appointment?.jadwal?.sesi || appointment?.sesi || "";
+  const startTime = appointment?.jadwal?.jamMulai || appointment?.jamMulai || appointment?.time || "";
+  const endTime = appointment?.jadwal?.jamSelesai || appointment?.jamSelesai || "";
 
   return {
     ...appointment,
     id: getAppointmentId(appointment),
     time: getAppointmentTime(appointment),
-    duration: appointment?.duration || appointment?.durasi || "30m",
-    doctor: appointment?.doctor || appointment?.namaDokter || appointment?.dokter?.nama || "Dokter Umum",
+    duration: endTime ? `${startTime} - ${endTime}` : appointment?.duration || appointment?.durasi || "30m",
+    doctor: doctorName,
+    specialty,
+    session,
     status,
     source: appointment?.source || appointment?.sumber || "Admin",
     queueNumber: getQueueNumber(appointment),
@@ -101,17 +124,24 @@ export const mapAppointmentForSchedule = (appointment) => {
       name: getPatientName(appointment),
       type: catatan,
       phone: getPatientPhone(appointment),
+      noRm: appointment?.pasien?.noRm || appointment?.patient?.medicalRecord || appointment?.noRm || "",
+      birthDate: appointment?.pasien?.tanggalLahir || appointment?.patient?.birthDate || "",
+      allergies: appointment?.pasien?.alergi || appointment?.patient?.allergies || [],
     },
     statusColor:
       appointment?.statusColor ||
-      (status === "COMPLETED"
-        ? "bg-slate-100 text-slate-500 border-slate-200"
-        : "bg-emerald-50 text-emerald-600 border-emerald-100"),
+      (status === "SELESAI" || status === "COMPLETED"
+        ? "bg-slate-100 text-slate-600 border-slate-200"
+        : status === "DIPERIKSA"
+          ? "bg-blue-50 text-blue-700 border-blue-100"
+          : status === "BATAL" || status === "CANCELLED"
+            ? "bg-rose-50 text-rose-700 border-rose-100"
+            : "bg-emerald-50 text-emerald-700 border-emerald-100"),
     tanggalKunjungan: getAppointmentDate(appointment),
   };
 };
 
-export function useAppointments() {
+export function useAppointments(selectedDate = new Date()) {
   const [appointments, setAppointments] = useState([]);
   const [searchPhone, setSearchPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -122,13 +152,14 @@ export function useAppointments() {
     return appointments.map(mapAppointmentForSchedule);
   }, [appointments]);
 
-  const fetchAppointments = useCallback(async () => {
+  const fetchAppointments = useCallback(async (date = selectedDate) => {
     setLoading(true);
     setError(null);
     setSearchPhone("");
+    setAppointments([]);
 
     try {
-      const response = await getAppointments({ tanggal: getTodayDate() });
+      const response = await getAppointments({ tanggal: formatDateForApi(date) });
       setAppointments(unwrapAppointments(response));
     } catch (err) {
       setAppointments([]);
@@ -136,7 +167,7 @@ export function useAppointments() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedDate]);
 
   const searchAppointmentsByPhone = useCallback(
     async (event) => {
@@ -189,11 +220,11 @@ export function useAppointments() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      fetchAppointments();
+      fetchAppointments(selectedDate);
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [fetchAppointments]);
+  }, [fetchAppointments, selectedDate]);
 
   return {
     appointments: normalizedAppointments,
