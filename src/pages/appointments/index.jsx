@@ -15,7 +15,7 @@ export default function Appointments() {
   const [viewMode, setViewMode] = useState("Daily");
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+   const [selectedDate, setSelectedDate] = useState(new Date());
   const {
     appointments,
     loading,
