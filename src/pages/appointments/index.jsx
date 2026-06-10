@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Plus } from "lucide-react";
+import { Plus, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AppointmentCalendar } from "./components/appointment.calendar";
 import { DoctorsCard } from "./components/doctors.card";
 import { InsightsCard } from "./components/insights.card";
 import { TodaySchedule } from "./components/today.schedule";
 import { BookingModal } from "./components/new.booking.modal";
 import { AppointmentSearch } from "./components/appointment.search";
+import { DailySummaryCard } from "./components/daily.summary.card";
 import { useAppointments } from "./hooks/useAppointments.hook";
 
 export default function Appointments() {
   const [viewMode, setViewMode] = useState("Daily");
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+   const [selectedDate, setSelectedDate] = useState(new Date());
   const {
     appointments,
     loading,
@@ -61,8 +63,10 @@ export default function Appointments() {
 
   // Filter appointments secara lokal tanpa memanggil API untuk menjaga fungsi network tetap utuh
   const filteredAppointments = appointments.filter((apt) => {
-    if (!apt.date) return true; // Tampilkan semua jika field 'date' belum ada di objek data Anda
-    const aptDate = new Date(apt.date);
+    // Gunakan tanggalKunjungan hasil normalisasi hook agar sinkron dengan data network
+    const dateString = apt.tanggalKunjungan || apt.date;
+    if (!dateString) return true; 
+    const aptDate = new Date(dateString);
     return (
       aptDate.getDate() === selectedDate.getDate() &&
       aptDate.getMonth() === selectedDate.getMonth() &&
@@ -124,6 +128,19 @@ export default function Appointments() {
                 Weekly
               </Button>
             </div>
+            
+            {/* Tombol Mata untuk memunculkan Daily Summary Card */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" className="bg-white border-gray-300 text-slate-600 hover:text-emerald-600 h-9 w-9 shadow-sm" title="Lihat Ringkasan Harian">
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[750px] max-w-[90vw] p-0 border-none shadow-none bg-transparent" align="end" sideOffset={8}>
+                <DailySummaryCard appointments={filteredAppointments} />
+              </PopoverContent>
+            </Popover>
+
             <Button 
               onClick={() => setIsBookingModalOpen(true)}
               className="hidden bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-9 px-4 font-bold shadow-md"
