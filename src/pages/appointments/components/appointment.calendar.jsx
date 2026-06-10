@@ -1,10 +1,11 @@
 import { Calendar } from "@/components/ui/calendar";
 
-export function AppointmentCalendar() {
+export function AppointmentCalendar(props) {
   return (
     <Calendar
       mode="single"
-      className="rounded-xl shadow-sm border border-gray-300 bg-white w-full"
+      className="w-full rounded-lg border border-gray-300 bg-white p-2 shadow-sm [--cell-size:--spacing(7)]"
+      {...props}
     />
   );
 }
