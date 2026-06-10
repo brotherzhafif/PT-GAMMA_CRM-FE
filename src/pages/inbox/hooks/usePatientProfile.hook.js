@@ -1,5 +1,5 @@
 import { useEffect, useState, startTransition } from "react";
-import { getPatientByPhoneNumber } from "@/services/patients.service";
+import { getPatientByPhoneNumber } from "@/services/patientService";
 
 export function usePatientProfile(phoneNumber) {
   const [patient, setPatient] = useState(null);

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 
 import { Loader2 } from "lucide-react";
-import { updatePatient } from "@/services/patients.service";
+import { updatePatient } from "@/services/patientService";
 
 export default function PatientEditModal({
   open,
