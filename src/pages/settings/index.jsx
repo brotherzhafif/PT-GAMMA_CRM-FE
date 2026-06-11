@@ -1,11 +1,21 @@
 import { Card } from "@/components/ui/card";
-import { Bot, LayoutDashboard, MessageCircle, Shield, Users } from "lucide-react";
+import {
+  Bot,
+  // LayoutDashboard,
+  MessageCircle,
+  Shield,
+  Users,
+} from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const menus = [
-  { label: "General", path: "/settings", icon: LayoutDashboard },
-  { label: "WhatsApp API", path: "/settings/whatsapp-api", icon: MessageCircle },
+  // { label: "General", path: "/settings", icon: LayoutDashboard },
+  {
+    label: "WhatsApp API",
+    path: "/settings",
+    icon: MessageCircle,
+  },
   { label: "Chatbot Settings", path: "/settings/chatbot-settings", icon: Bot },
   { label: "Users & Roles", path: "/settings/user-roles", icon: Users },
   { label: "Security", path: "/settings/security", icon: Shield },
@@ -14,7 +24,6 @@ const menus = [
 export default function Settings() {
   return (
     <div className="flex flex-col w-full gap-6 h-[81vh] overflow-hidden">
-      
       <div className="flex flex-col gap-1">
         <h3 className="font-semibold text-lg">CRM Configuration</h3>
         <p className="text-gray-500 text-sm">
@@ -23,7 +32,6 @@ export default function Settings() {
       </div>
 
       <Card className="w-full flex flex-row flex-1 overflow-hidden border border-gray-300 shadow-md">
-        
         <div className="w-[240px] border-r border-gray-300 p-4 flex flex-col gap-2">
           {menus.map((item) => (
             <NavLink
@@ -49,7 +57,6 @@ export default function Settings() {
             <Outlet />
           </ScrollArea>
         </div>
-
       </Card>
     </div>
   );

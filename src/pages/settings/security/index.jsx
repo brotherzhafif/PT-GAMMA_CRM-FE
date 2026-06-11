@@ -1,4 +1,4 @@
-import AccountSecurity from "./components/accountSecurity";
+// import AccountSecurity from "./components/accountSecurity";
 import RecentLogin from "./components/recentLogin";
 import SystemAuditLog from "./components/systemAuditLog";
 
@@ -13,7 +13,7 @@ export default function Security() {
       </div>
 
       <div className="flex flex-col gap-5 pr-4">
-        <AccountSecurity />
+        {/* <AccountSecurity /> */}
         <RecentLogin />
         <SystemAuditLog />
       </div>

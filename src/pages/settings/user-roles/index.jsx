@@ -1,4 +1,4 @@
-import RolePermissions from "./components/rolePermissions";
+// import RolePermissions from "./components/rolePermissions";
 import TeamMembers from "./components/teamMembers";
 
 export default function UserRoles() {
@@ -13,7 +13,7 @@ export default function UserRoles() {
 
       <div className="flex flex-col gap-5 pr-4">
         <TeamMembers />
-        <RolePermissions />
+        {/* <RolePermissions /> */}
       </div>
     </div>
   );

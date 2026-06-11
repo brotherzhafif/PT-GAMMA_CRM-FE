@@ -51,8 +51,9 @@ export const createReplyHandoffByPhoneNumber = async (
 };
 
 // stream function
-export const getLatestMessagesStream = (limit = 50) => {
-  return new EventSource(`${SSE_BASE_URL}/latest?limit=${limit}`);
+export const getLatestMessagesStream = (limit) => {
+  const url = limit ? `${SSE_BASE_URL}/latest?limit=${limit}` : `${SSE_BASE_URL}/latest`;
+  return new EventSource(url);
 };
 
 export const getChatMessagesStream = (phone_number) => {

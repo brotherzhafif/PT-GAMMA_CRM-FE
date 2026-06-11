@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Paperclip, Send, LayoutTemplate, Loader2 } from "lucide-react";
+import { 
+  // Paperclip, 
+  Send, 
+  // LayoutTemplate, 
+  Loader2 
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { createReplyHandoffByPhoneNumber } from "@/services/unifiendBox.service";
 
@@ -40,7 +45,7 @@ export default function MessageInput({ chat, value, onChange }) {
   return (
     <div className="px-4 py-3 border-t border-gray-400">
       <div className="flex items-end gap-2 border border-gray-400 rounded-xl px-3 py-1 bg-background focus-within:ring-1 focus-within:ring-ring transition">
-        <div className="flex gap-1 mb-0.5">
+        {/* <div className="flex gap-1 mb-0.5">
           <Button
             variant="ghost"
             size="icon"
@@ -55,7 +60,7 @@ export default function MessageInput({ chat, value, onChange }) {
           >
             <LayoutTemplate className="w-4 h-4" />
           </Button>
-        </div>
+        </div> */}
 
         <Input
           placeholder="Type a message or press '/' for templates..."

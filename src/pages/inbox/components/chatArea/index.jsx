@@ -42,7 +42,7 @@ export default function ChatArea({ chat, onToggleProfile, showProfilePanel }) {
     loading,
     draftMessage,
     setDraftMessage,
-    applyQuickTemplate,
+    // applyQuickTemplate,
   } = useChatMessages(chat?.phone);
   const bottomRef = useRef(null);
   const [isTyping] = useState(false);
@@ -169,7 +169,7 @@ export default function ChatArea({ chat, onToggleProfile, showProfilePanel }) {
         </ScrollArea>
       </div>
 
-      <div className="px-4 py-2 border-gray-400 border-t flex gap-2 flex-shrink-0 overflow-x-auto">
+      {/* <div className="px-4 py-2 border-gray-400 border-t flex gap-2 flex-shrink-0 overflow-x-auto">
         <button
           onClick={() => applyQuickTemplate("booking")}
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground shadow-md cursor-pointer border-gray-300 rounded-md px-3 py-1.5 hover:bg-muted transition-colors flex-shrink-0"
@@ -185,7 +185,7 @@ export default function ChatArea({ chat, onToggleProfile, showProfilePanel }) {
         <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground shadow-md cursor-pointer border-gray-300 rounded-md px-3 py-1.5 hover:bg-muted transition-colors flex-shrink-0">
           Confirm
         </button>
-      </div>
+      </div> */}
 
       <MessageInput
         chat={chat}

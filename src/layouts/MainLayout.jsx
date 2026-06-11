@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  // DropdownMenuSe parator,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "../components/ui/separator";
 import {
@@ -14,16 +14,20 @@ import {
   SidebarTrigger,
 } from "../components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Outlet } from "react-router-dom";
-import { useMatches } from "react-router-dom";
+import { Outlet, useMatches, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getStoredUser, logout } from "@/services/auth.service";
+import { useActivityNotifications } from "@/hooks/useActivityNotifications";
 
 export default function MainLayout() {
   const matches = useMatches();
   const currentMatch = matches[matches.length - 1];
   const title = currentMatch?.handle?.title || "Default Title";
+  const user = getStoredUser();
+  const userName = user?.name || user?.email || "Admin";
+  const userRole = user?.role || "Admin";
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -65,11 +69,13 @@ export default function MainLayout() {
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="hidden sm:flex flex-col items-start leading-tight">
                       <h4 className="text-sm font-medium text-foreground whitespace-nowrap">
-                        Dr. John Doe
+                        {userName}
                       </h4>
-                      <span className="text-xs text-muted-foreground">Admin</span>
+                      <span className="text-xs text-muted-foreground">
+                        {userRole}
+                      </span>
                     </div>
-                    <UserAvatar />
+                    <UserAvatar user={user} />
                   </div>
                 </div>
               </div>
@@ -120,14 +126,22 @@ function MobileSearch() {
 
 function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const {
+    error,
+    loading,
+    markAllRead,
+    markRead,
+    notifications,
+    unreadCount,
+  } = useActivityNotifications();
 
-  const notifications = [
-    { id: 1, title: "Pasien baru terdaftar", time: "2 menit lalu", unread: true },
-    { id: 2, title: "Janji temu hari ini", time: "10 menit lalu", unread: true },
-    { id: 3, title: "Promo berhasil dikirim", time: "1 jam lalu", unread: false },
-  ];
+  const handleNotificationClick = async (notification) => {
+    if (notification.unread) {
+      await markRead(notification.id);
+    }
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+    setOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -149,20 +163,52 @@ function NotificationBell() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 mt-3 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-card rounded-xl shadow-lg p-2 z-50">
-            <p className="text-sm font-semibold px-2 py-1">Notifikasi</p>
-            <div className="flex flex-col gap-1 mt-1">
-              {notifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  onClick={() => setOpen(false)}
-                  className={`p-2 rounded-lg text-sm cursor-pointer hover:bg-muted transition-colors ${
-                    notif.unread ? "bg-muted/50" : ""
-                  }`}
+            <div className="flex items-center justify-between px-2 py-1">
+              <p className="text-sm font-semibold">Notifikasi</p>
+              {unreadCount > 0 && (
+                <button
+                  className="text-xs text-primary hover:underline"
+                  onClick={markAllRead}
                 >
-                  <p className="text-foreground">{notif.title}</p>
-                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                  Tandai dibaca
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col gap-1 mt-1">
+              {loading ? (
+                <div className="p-2 text-sm text-muted-foreground">
+                  Loading notifications...
                 </div>
-              ))}
+              ) : error ? (
+                <div className="p-2 text-sm text-red-500">{error}</div>
+              ) : notifications.length === 0 ? (
+                <div className="p-2 text-sm text-muted-foreground">
+                  Belum ada notifikasi.
+                </div>
+              ) : (
+                notifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    onClick={() => handleNotificationClick(notif)}
+                    className={`p-2 rounded-lg text-sm cursor-pointer hover:bg-muted transition-colors ${
+                      notif.unread ? "bg-muted/50" : ""
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-foreground font-medium">{notif.title}</p>
+                      {notif.unread && (
+                        <span className="mt-1 h-2 w-2 rounded-full bg-red-500" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <span className="text-xs text-muted-foreground">
+                      {notif.time}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </>
@@ -171,28 +217,35 @@ function NotificationBell() {
   );
 }
 
-function UserAvatar() {
-  const user = { name: "Dr. John Doe", image: "" };
-  const initials = user.name
+function UserAvatar({ user }) {
+  const navigate = useNavigate();
+  const displayName = user?.name || user?.email || "Admin";
+  const initials = displayName
     .split(" ")
     .map((n) => n[0])
     .join("")
     .slice(0, 2);
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button>
           <Avatar className="cursor-pointer w-8 h-8 sm:w-10 sm:h-10">
-            <AvatarImage src={user.image} />
+            <AvatarImage src={user?.image || user?.avatar} />
             <AvatarFallback className="text-xs sm:text-sm">{initials}</AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-gray-300" />
-        <DropdownMenuItem className="text-red-500">Logout</DropdownMenuItem>
+        {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
+        {/* <DropdownMenuSeparator className="bg-gray-300" /> */}
+        <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

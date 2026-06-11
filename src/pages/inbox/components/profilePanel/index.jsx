@@ -2,25 +2,41 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+// import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
-  Bot,
-  UserPlus,
-  RefreshCw,
-  FileText,
-  Info,
+  // Bot,
+  // UserPlus,
+  // RefreshCw,
+  // FileText,
+  // Info,
   // ChevronDown,
 } from "lucide-react";
 import { usePatientProfile } from "../../hooks/usePatientProfile.hook";
 import PatientEditModal from "./patientsEditModal";
 
+const formatDate = (date) => {
+  if (!date) return "-";
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
+};
+
 export default function ProfilePanel({ chat }) {
-  const { patient } = usePatientProfile(chat?.phone);
+  const { patient } = usePatientProfile({
+    patientId: chat?.patientId,
+    phoneNumber: chat?.phone,
+  });
   const [openEdit, setOpenEdit] = useState(false);
 
   if (!chat) return null;
+
+  const patientName = patient?.namaLengkap || patient?.name || chat.name;
+  const patientPhone = patient?.telepon || patient?.phone_number || chat.phone;
 
   return (
     <ScrollArea className="h-full">
@@ -29,7 +45,7 @@ export default function ProfilePanel({ chat }) {
           <Avatar className="w-20 h-20">
             <AvatarImage src="/avatar.png" />
             <AvatarFallback className="text-lg font-semibold">
-              {(patient?.name || chat.name)
+              {patientName
                 ?.split(" ")
                 .map((n) => n[0])
                 .join("")
@@ -37,10 +53,10 @@ export default function ProfilePanel({ chat }) {
             </AvatarFallback>
           </Avatar>
           <h2 className="mt-3 font-semibold text-base">
-            {patient?.name || chat.name}
+            {patientName}
           </h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {patient?.phone_number || chat.phone}
+            {patientPhone}
           </p>{" "}
           <div className="flex gap-2 mt-2">
             {chat.isVip && (
@@ -60,9 +76,9 @@ export default function ProfilePanel({ chat }) {
           </div>
         </div>
 
-        <Separator />
+        {/* <Separator /> */}
 
-        <div>
+        {/* <div>
           <div className="flex items-center gap-1.5 mb-3">
             <Bot className="w-4 h-4 text-green-600" />
             <h3 className="text-xs font-semibold uppercase  text-muted-foreground">
@@ -100,12 +116,12 @@ export default function ProfilePanel({ chat }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <Separator />
+        {/* <Separator /> */}
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        {/* <div className="grid grid-cols-2 gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -130,7 +146,7 @@ export default function ProfilePanel({ chat }) {
             <FileText className="w-4 h-4 text-muted-foreground" />
             Add Internal Note
           </Button>
-        </div>
+        </div> */}
 
         <Separator />
 
@@ -158,11 +174,11 @@ export default function ProfilePanel({ chat }) {
             {[
               {
                 label: "No RM",
-                value: patient?.rme_patient_id || "-",
+                value: patient?.noRm || "-",
               },
               {
                 label: "Tanggal Lahir",
-                value: patient?.tanggalLahir || "-",
+                value: formatDate(patient?.tanggalLahir),
               },
               {
                 label: "Jenis Kelamin",
@@ -170,7 +186,7 @@ export default function ProfilePanel({ chat }) {
               },
               {
                 label: "NIK",
-                value: patient?.nik ? `****${patient.nik.slice(-4)}` : "-",
+                value: patient?.nik || "-",
               },
             ].map((item) => (
               <div key={item.label} className="flex justify-between">

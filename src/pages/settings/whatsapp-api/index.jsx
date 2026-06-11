@@ -1,13 +1,163 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Phone } from "lucide-react";
-import ApiCredential from "./components/api-credential";
+import {
+  Activity,
+  CheckCircle2,
+  Database,
+  Phone,
+  QrCode,
+  Server,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useConnectionStatus } from "./hooks/useConnectionStatus";
+
+const StatusBadge = ({ connected, label }) => (
+  <Badge
+    className={`text-xs flex items-center gap-2 ${
+      connected
+        ? "text-green-600 bg-green-100"
+        : "text-red-600 bg-red-100"
+    }`}
+  >
+    <div
+      className={`w-2 h-2 rounded-full ${
+        connected ? "bg-green-500" : "bg-red-500"
+      }`}
+    />
+    {label}
+  </Badge>
+);
+
+const ConnectionSummary = ({ icon: Icon, title, connection }) => (
+  <div className="flex flex-row items-center justify-between gap-4">
+    <div className="flex flex-row gap-3 items-center min-w-0">
+      <div
+        className={`flex w-10 h-10 rounded-md items-center justify-center ${
+          connection.connected ? "bg-green-100" : "bg-red-100"
+        }`}
+      >
+        <Icon
+          className={`w-6 h-6 ${
+            connection.connected ? "text-green-600" : "text-red-600"
+          }`}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 items-start min-w-0">
+        <h4 className="font-semibold">{title}</h4>
+        <h3 className="font-semibold truncate max-w-[360px]">
+          {connection.phoneNumber}
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          Quality Rating: {connection.quality}
+        </p>
+        <p className="text-xs text-muted-foreground truncate max-w-[420px]">
+          {connection.message}
+        </p>
+      </div>
+    </div>
+
+    <StatusBadge
+      connected={connection.connected}
+      label={connection.status}
+    />
+  </div>
+);
+
+const getQrImageSource = (qrCode) => {
+  if (!qrCode) return null;
+
+  if (
+    qrCode.startsWith("data:") ||
+    qrCode.startsWith("http://") ||
+    qrCode.startsWith("https://")
+  ) {
+    return qrCode;
+  }
+
+  if (qrCode.trim().startsWith("<svg")) {
+    return `data:image/svg+xml;utf8,${encodeURIComponent(qrCode)}`;
+  }
+
+  return `data:image/png;base64,${qrCode}`;
+};
+
+const WhatsAppQrCard = ({ connection }) => {
+  const qrImageSource = getQrImageSource(connection.qrCode);
+  const showQr = !connection.connected && connection.hasQr;
+
+  return (
+    <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300">
+      <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300">
+        <div className="flex flex-col items-start">
+          <h3 className="font-semibold text-lg">WhatsApp QR Code</h3>
+          <span className="text-xs text-muted-foreground">
+            {showQr
+              ? "Scan QR untuk menghubungkan ulang sesi WhatsApp."
+              : "Sesi WhatsApp sudah aktif."}
+          </span>
+        </div>
+
+        <StatusBadge
+          connected={connection.connected}
+          label={connection.connected ? "Connected" : "QR Available"}
+        />
+      </div>
+
+      <div className="flex flex-col items-center justify-center rounded-md bg-muted/40 border border-dashed border-gray-300 min-h-[260px] p-6">
+        {showQr && qrImageSource ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="bg-white rounded-md p-3 shadow-sm border border-gray-200">
+              <img
+                src={qrImageSource}
+                alt="WhatsApp connection QR code"
+                className="h-52 w-52 object-contain"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              QR tersedia dari connection stream.
+            </p>
+          </div>
+        ) : showQr ? (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-md bg-white border border-gray-200 shadow-sm">
+              <QrCode className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold">Menunggu QR code</p>
+              <p className="text-xs text-muted-foreground">
+                Status sudah disconnected, QR belum diterima dari stream.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-md bg-green-100">
+              <CheckCircle2 className="h-12 w-12 text-green-600" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold">WhatsApp connected</p>
+              <p className="text-xs text-muted-foreground">
+                QR code akan tampil saat status WhatsApp disconnected.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 export default function WhatsapApi() {
+  const {
+    apiHealthy,
+    health,
+    rmeConnection,
+    whatsappConnection,
+  } = useConnectionStatus();
+
   return (
     <div className="flex flex-col gap-5 h-full mb-10">
-      
       <div className="flex flex-col gap-1">
         <h3 className="text-xl font-semibold">WhatsApp API Settings</h3>
         <p className="text-xs text-gray-500">
@@ -18,44 +168,57 @@ export default function WhatsapApi() {
 
       <ScrollArea className="flex-1">
         <div className="flex flex-col gap-5 pr-4">
-
           <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300 ">
             <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300" >
               <div className="flex flex-col items-start">
                 <h3 className="font-semibold text-lg">Connection Status</h3>
                 <span className="text-xs text-muted-foreground">
-                  Your WhatsApp Business account integration status.
+                  Live service health and integration status.
                 </span>
               </div>
 
-              <Badge className="text-xs flex items-center gap-2 text-green-500 bg-green-100">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                Connected
+              <StatusBadge
+                connected={apiHealthy}
+                label={apiHealthy ? "API Healthy" : "API Unavailable"}
+              />
+            </div>
+
+            <div className="flex flex-row items-center justify-between gap-4 rounded-md bg-muted/40 p-3">
+              <div className="flex flex-row gap-3 items-center min-w-0">
+                <Server className="w-5 h-5 text-muted-foreground" />
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm">API Health Check</h4>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {health?.message || "Checking API health."}
+                  </p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                {health?.docs || "/docs"}
               </Badge>
             </div>
 
-            <div className="flex flex-row items-center justify-between">
-              <div className="flex flex-row gap-3 items-center">
-                <div className="flex w-10 h-10 bg-green-100 rounded-md items-center justify-center">
-                  <Phone className="w-6 h-6 text-green-600" />
-                </div>
+            <ConnectionSummary
+              icon={Phone}
+              title="WhatsApp Business Connection"
+              connection={whatsappConnection}
+            />
 
-                <div className="flex flex-col gap-1 items-start">
-                  <h4 className="font-semibold">Connected Phone Number</h4>
-                  <h3 className="font-semibold">+62 123 456 789</h3>
-                  <p className="text-xs">Quality Rating: High</p>
-                </div>
-              </div>
+            <ConnectionSummary
+              icon={Database}
+              title="SmartClinic RME Connection"
+              connection={rmeConnection}
+            />
 
-              <Badge variant="destructive" className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500" />
-                Disconnected
-              </Badge>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Activity className="w-4 h-4" />
+              Status updates are streamed from the API in real time.
             </div>
           </Card>
 
-          <ApiCredential />
+          <WhatsAppQrCard connection={whatsappConnection} />
 
+          {/* <ApiCredential /> */}
         </div>
       </ScrollArea>
     </div>

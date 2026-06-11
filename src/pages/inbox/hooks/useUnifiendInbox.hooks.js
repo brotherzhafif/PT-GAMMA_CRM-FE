@@ -8,7 +8,7 @@ export const useUnifiedInbox = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const es = getLatestMessagesStream(50); 
+    const es = getLatestMessagesStream(); 
 
     es.onopen = () => {
       console.log("INBOX SSE CONNECTED");
@@ -25,6 +25,11 @@ export const useUnifiedInbox = () => {
           id: msg.sender_number,
           name: msg.name || msg.sender_number,
           phone: msg.sender_number,
+          patientId:
+            msg.rme_patient_id ||
+            msg.patient_id ||
+            msg.patient?.rme_patient_id ||
+            msg.patient?.id,
           last: msg.message_text || "Belum ada pesan",
           time: formatChatTime(msg.created_at),
           createdAt: msg.created_at,
