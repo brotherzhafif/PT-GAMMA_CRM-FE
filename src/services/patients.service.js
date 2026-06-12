@@ -1,12 +1,7 @@
 import { api } from "@/lib/axios";
 
 export const getPatients = async () => {
-  const res = await api.get("/api/patients", {
-    params: {
-      page: 1,
-      // limit: 100,
-    },
-  });
+  const res = await api.get("/api/patients");
   return res.data;
 };
 
