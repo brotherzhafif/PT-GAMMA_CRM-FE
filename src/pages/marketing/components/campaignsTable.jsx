@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import {
   ChevronLeft,
@@ -39,7 +40,7 @@ export default function CampaignsTable({
       const matchesStatus =
         selectedStatus === "All" ||
         campaign.status ===
-          selectedStatus;
+        selectedStatus;
 
       return (
         matchesSearch &&
@@ -56,7 +57,7 @@ export default function CampaignsTable({
     () =>
       Math.ceil(
         filteredCampaigns.length /
-          ITEMS_PER_PAGE
+        ITEMS_PER_PAGE
       ),
     [filteredCampaigns.length]
   );
@@ -93,7 +94,7 @@ export default function CampaignsTable({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-300 bg-white overflow-hidden">
+    <div className="h-full flex flex-col rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
       <CampaignsToolbar
         searchValue={searchValue}
         onSearchChange={
@@ -109,7 +110,7 @@ export default function CampaignsTable({
         onCreate={onCreate}
       />
 
-      <div className="overflow-x-auto">
+      <ScrollArea className="w-full">
         <table className="w-full">
           <thead className="border-b border-gray-300 bg-muted/40">
             <tr className="text-left">
@@ -137,7 +138,7 @@ export default function CampaignsTable({
 
           <tbody>
             {paginatedCampaigns.length >
-            0 ? (
+              0 ? (
               paginatedCampaigns.map(
                 (campaign) => (
                   <CampaignRow
@@ -165,7 +166,7 @@ export default function CampaignsTable({
             )}
           </tbody>
         </table>
-      </div>
+      </ScrollArea>
 
       {/* PAGINATION */}
       <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
@@ -174,12 +175,12 @@ export default function CampaignsTable({
           {filteredCampaigns.length === 0
             ? 0
             : (currentPage - 1) *
-                ITEMS_PER_PAGE +
-              1}{" "}
+            ITEMS_PER_PAGE +
+            1}{" "}
           to{" "}
           {Math.min(
             currentPage *
-              ITEMS_PER_PAGE,
+            ITEMS_PER_PAGE,
             filteredCampaigns.length
           )}{" "}
           of{" "}
@@ -215,7 +216,7 @@ export default function CampaignsTable({
                   key={page}
                   variant={
                     page ===
-                    currentPage
+                      currentPage
                       ? "default"
                       : "outline"
                   }
@@ -249,6 +250,6 @@ export default function CampaignsTable({
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

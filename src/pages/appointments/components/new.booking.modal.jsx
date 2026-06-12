@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { getPatients } from "@/services/patientService"; 
+import { getPatients } from "@/services/patients.service"; 
 
 export function BookingModal({ open, onOpenChange, onConfirm }) {
   const [phoneNumber, setPhoneNumber] = useState("");

@@ -3,7 +3,7 @@ import { useEffect, useState, startTransition } from "react";
 import {
   getPatientById,
   getPatientByPhoneNumber,
-} from "@/services/patientService";
+} from "@/services/patients.service";
 
 const unwrapResponse = (response) => response?.data || response;
 
