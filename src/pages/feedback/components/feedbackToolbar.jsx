@@ -40,12 +40,12 @@ export default function FeedbackToolbar({
               <FilterX className="w-4 h-4" /> Reset Filters
             </Button>
           )}
-          <Button 
+          {/* <Button 
             onClick={onAddClick}
             className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-1.5 h-9 font-bold shadow-md cursor-pointer transition duration-150"
           >
             <Plus className="w-4 h-4 stroke-[3px]" /> Add Feedback
-          </Button>
+          </Button> */}
         </div>
       </div>
 
