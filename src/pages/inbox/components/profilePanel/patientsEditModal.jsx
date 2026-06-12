@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,9 @@ export default function PatientEditModal({
 
     if (!patientId) {
       console.error("Patient ID not found");
+      toast.error("Pasien tidak bisa disimpan", {
+        description: "ID pasien tidak ditemukan.",
+      });
       return;
     }
 
@@ -66,8 +70,14 @@ export default function PatientEditModal({
 
       onSuccess?.();
       onOpenChange(false);
+      toast.success("Data pasien diperbarui", {
+        description: `${form.namaLengkap || "Pasien"} berhasil disimpan.`,
+      });
     } catch (error) {
       console.error("Update patient failed:", error);
+      toast.error("Gagal memperbarui pasien", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setLoading(false);
     }

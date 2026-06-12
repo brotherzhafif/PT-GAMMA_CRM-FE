@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { LogOut } from "lucide-react";
+import { AlertWithMedia } from "@/components/ui/alert-with-media";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -9,17 +12,24 @@ import { logoutAllDevices } from "@/services/auth.service";
 export default function AccountSecurity() {
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
   const handleLogoutAllDevices = async () => {
-    const confirmed = window.confirm(
-      "Log out all devices? You will need to sign in again.",
-    );
-
-    if (!confirmed) return;
-
     setLoggingOut(true);
-    await logoutAllDevices();
-    navigate("/login", { replace: true });
+    try {
+      await logoutAllDevices();
+      toast.success("Semua perangkat logout", {
+        description: "Silakan login kembali untuk melanjutkan.",
+      });
+      navigate("/login", { replace: true });
+    } catch (error) {
+      toast.error("Gagal logout semua perangkat", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
+    } finally {
+      setLoggingOut(false);
+      setConfirmLogoutOpen(false);
+    }
   };
 
   return (
@@ -72,7 +82,7 @@ export default function AccountSecurity() {
           <Button
             className="cursor-pointer sm:shrink-0"
             disabled={loggingOut}
-            onClick={handleLogoutAllDevices}
+            onClick={() => setConfirmLogoutOpen(true)}
             size="sm"
             variant="destructive"
           >
@@ -80,6 +90,16 @@ export default function AccountSecurity() {
           </Button>
         </div>
       </CardContent>
+      <AlertWithMedia
+        open={confirmLogoutOpen}
+        onOpenChange={setConfirmLogoutOpen}
+        icon={LogOut}
+        title="Logout semua perangkat?"
+        description="Sesi aktif akan diakhiri dan kamu perlu login kembali untuk mengakses CRM."
+        cancelLabel="Batal"
+        actionLabel={loggingOut ? "Logging out..." : "Log out all devices"}
+        onAction={handleLogoutAllDevices}
+      />
     </Card>
   );
 }

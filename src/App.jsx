@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 import { getAccessToken } from "@/services/auth.service";
+import { Toaster } from "@/components/ui/sonner";
 
 // pages
 import Dashboard from "@/pages/dashboard";
@@ -125,7 +126,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster richColors position="top-right" />
+    </>
+  );
 }
 
 export default App;

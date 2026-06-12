@@ -5,6 +5,7 @@ import {
   getUsers,
   updateUserById,
 } from "@/services/users.service";
+import { toast } from "sonner";
 
 const emptyForm = {
   name: "",
@@ -106,6 +107,9 @@ export function useTeamMembers() {
           role: form.role,
           is_active: form.is_active,
         });
+        toast.success("User diperbarui", {
+          description: `${form.name} berhasil disimpan.`,
+        });
       } else {
         await createUser({
           name: form.name,
@@ -113,27 +117,38 @@ export function useTeamMembers() {
           password: form.password,
           role: form.role,
         });
+        toast.success("User berhasil dibuat", {
+          description: `${form.email} sudah bisa mengakses CRM.`,
+        });
       }
 
       setDialogOpen(false);
       await loadUsers();
     } catch (err) {
-      setError(getErrorMessage(err, "Gagal menyimpan user."));
+      const message = getErrorMessage(err, "Gagal menyimpan user.");
+      setError(message);
+      toast.error("Gagal menyimpan user", {
+        description: message,
+      });
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (user) => {
-    const confirmed = window.confirm(`Hapus user ${user.name || user.email}?`);
-    if (!confirmed) return;
-
     try {
       setError("");
       await deleteUserById(user.id);
       await loadUsers();
+      toast.success("User dihapus", {
+        description: `${user.name || user.email} sudah dihapus dari team.`,
+      });
     } catch (err) {
-      setError(getErrorMessage(err, "Gagal menghapus user."));
+      const message = getErrorMessage(err, "Gagal menghapus user.");
+      setError(message);
+      toast.error("Gagal menghapus user", {
+        description: message,
+      });
     }
   };
 

@@ -3,6 +3,7 @@ import {
   getChatbotSettings,
   updateChatbotSettings,
 } from "@/services/settings.service";
+import { toast } from "sonner";
 
 const initialSettings = {
   ai_name: "",
@@ -31,6 +32,9 @@ export function useChatbotSettings() {
       } catch (error) {
         console.error("Failed get chatbot settings:", error);
         setStatusMessage("Unable to load chatbot settings.");
+        toast.error("Gagal memuat pengaturan chatbot", {
+          description: error.response?.data?.message || error.message || "Coba muat ulang halaman.",
+        });
       } finally {
         setLoading(false);
       }
@@ -66,9 +70,15 @@ export function useChatbotSettings() {
         ...(response?.data || response || payload),
       });
       setStatusMessage("Settings saved.");
+      toast.success("Pengaturan chatbot disimpan", {
+        description: "Perubahan konfigurasi AI sudah aktif.",
+      });
     } catch (error) {
       console.error("Failed update chatbot settings:", error);
       setStatusMessage("Unable to save chatbot settings.");
+      toast.error("Gagal menyimpan pengaturan", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setSaving(false);
     }

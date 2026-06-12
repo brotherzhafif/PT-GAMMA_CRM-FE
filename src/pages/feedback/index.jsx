@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import FeedbackMetrics from "./components/feedbackMetrics";
 import FeedbackToolbar from "./components/feedbackToolbar";
 import FeedbackList from "./components/feedbackList";
@@ -64,15 +65,31 @@ export default function Feedback() {
 
   const handleAddReply = (feedbackId, replyText, channel) => {
     addReplyLocal(feedbackId, replyText, channel);
+    toast.success("Balasan ditambahkan", {
+      description: `Feedback sudah ditandai dibalas via ${channel}.`,
+    });
   };
 
   const handleUpdateStatus = (feedbackId, newStatus) => {
     updateStatusLocal(feedbackId, newStatus);
+    toast.info("Status feedback diperbarui", {
+      description: `Status berubah menjadi ${newStatus}.`,
+    });
   };
 
   const handleAddFeedback = async (newFeedbackPayload) => {
-    await addFeedback(newFeedbackPayload);
+    const response = await addFeedback(newFeedbackPayload);
+    if (!response) {
+      toast.error("Gagal menambahkan feedback", {
+        description: "Feedback belum tersimpan. Coba beberapa saat lagi.",
+      });
+      return;
+    }
+
     setIsAddModalOpen(false);
+    toast.success("Feedback ditambahkan", {
+      description: `${newFeedbackPayload.patientName} berhasil masuk ke daftar feedback.`,
+    });
   };
 
   return (

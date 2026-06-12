@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
 import PatientsToolbar from "./components/patientsToolbar";
 import PatientsTable from "./components/patientsTable";
 import PatientDetailPanel from "./components/detail/patientDetailPanel";
 import PatientFormModal from "./components/patientFormModal";
 import { usePatients } from "./hooks/usePatients.hook";
+import { AlertWithMedia } from "@/components/ui/alert-with-media";
 
 export default function PatientsPage() {
   const navigate = useNavigate();
@@ -13,6 +16,8 @@ export default function PatientsPage() {
   const [showDetailPanel, setShowDetailPanel] = useState(false);
   const [formPatient, setFormPatient] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState(null);
+  const [deletingPatient, setDeletingPatient] = useState(false);
   const {
     patients,
     allPatients,
@@ -65,36 +70,73 @@ export default function PatientsPage() {
 
   const handleSubmitPatient = async (payload) => {
     if (formPatient) {
-      const response = await editPatient(formPatient.rmePatientId || formPatient.id, payload);
-      const updatedPatient = response?.data || response || payload;
+      try {
+        const response = await editPatient(formPatient.rmePatientId || formPatient.id, payload);
+        const updatedPatient = response?.data || response || payload;
 
-      setSelectedPatient((prev) =>
-        prev?.id === formPatient.id
-          ? {
-              ...prev,
-              ...updatedPatient,
-              nik: updatedPatient.nik || payload.nik,
-              name: updatedPatient.namaLengkap || payload.namaLengkap,
-              phone: updatedPatient.telepon || payload.telepon,
-              birthDate: updatedPatient.tanggalLahir || payload.tanggalLahir,
-              gender: (updatedPatient.jenisKelamin || payload.jenisKelamin) === "PEREMPUAN" ? "Female" : "Male",
-            }
-          : prev,
-      );
+        setSelectedPatient((prev) =>
+          prev?.id === formPatient.id
+            ? {
+                ...prev,
+                ...updatedPatient,
+                nik: updatedPatient.nik || payload.nik,
+                name: updatedPatient.namaLengkap || payload.namaLengkap,
+                phone: updatedPatient.telepon || payload.telepon,
+                birthDate: updatedPatient.tanggalLahir || payload.tanggalLahir,
+                gender: (updatedPatient.jenisKelamin || payload.jenisKelamin) === "PEREMPUAN" ? "Female" : "Male",
+              }
+            : prev,
+        );
+        toast.success("Data pasien diperbarui", {
+          description: `${payload.namaLengkap || formPatient.name} berhasil disimpan.`,
+        });
+      } catch (error) {
+        toast.error("Gagal memperbarui pasien", {
+          description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+        });
+        throw error;
+      }
       return;
     }
 
-    await addPatient(payload);
+    try {
+      await addPatient(payload);
+      toast.success("Pasien berhasil dibuat", {
+        description: `${payload.namaLengkap} sudah masuk ke database pasien.`,
+      });
+    } catch (error) {
+      toast.error("Gagal membuat pasien", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
+      throw error;
+    }
   };
 
-  const handleDeletePatient = async (patient) => {
-    const confirmed = window.confirm(`Hapus pasien ${patient.name}?`);
-    if (!confirmed) return;
+  const handleDeletePatient = (patient) => {
+    setPatientToDelete(patient);
+  };
 
-    await removePatient(patient.rmePatientId || patient.id);
+  const handleConfirmDeletePatient = async () => {
+    if (!patientToDelete) return;
 
-    if (selectedPatient?.id === patient.id) {
-      handleCloseDetail();
+    try {
+      setDeletingPatient(true);
+      await removePatient(patientToDelete.rmePatientId || patientToDelete.id);
+
+      if (selectedPatient?.id === patientToDelete.id) {
+        handleCloseDetail();
+      }
+
+      toast.success("Pasien dihapus", {
+        description: `${patientToDelete.name} sudah dihapus dari database.`,
+      });
+      setPatientToDelete(null);
+    } catch (error) {
+      toast.error("Gagal menghapus pasien", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
+    } finally {
+      setDeletingPatient(false);
     }
   };
 
@@ -133,6 +175,9 @@ export default function PatientsPage() {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+    toast.success("Export CSV selesai", {
+      description: `${exportPatients.length} data pasien berhasil diunduh.`,
+    });
   };
 
   return (
@@ -185,6 +230,16 @@ export default function PatientsPage() {
         patient={formPatient}
         onOpenChange={setFormOpen}
         onSubmit={handleSubmitPatient}
+      />
+      <AlertWithMedia
+        open={Boolean(patientToDelete)}
+        onOpenChange={(open) => !open && setPatientToDelete(null)}
+        icon={Trash2}
+        title="Hapus pasien?"
+        description={`Data ${patientToDelete?.name || "pasien ini"} akan dihapus dari database pasien.`}
+        cancelLabel="Batal"
+        actionLabel={deletingPatient ? "Menghapus..." : "Hapus pasien"}
+        onAction={handleConfirmDeletePatient}
       />
     </div>
   );

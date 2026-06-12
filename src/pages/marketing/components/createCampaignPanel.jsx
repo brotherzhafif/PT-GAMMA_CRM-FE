@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -68,7 +69,9 @@ export default function CreateCampaignPanel({
 
   const handleSubmit = async () => {
     if (!campaignName.trim() || !selectedDate || !message.trim()) {
-      alert("Please complete all required fields.");
+      toast.warning("Lengkapi campaign", {
+        description: "Nama, jadwal, dan pesan campaign wajib diisi.",
+      });
       return;
     }
 
@@ -89,20 +92,16 @@ export default function CreateCampaignPanel({
         : await onCreateCampaign(payload);
 
       if (success) {
-        alert(
-          selectedCampaign
-            ? "Campaign updated successfully!"
-            : "Campaign created successfully!",
-        );
+        toast.success(selectedCampaign ? "Campaign diperbarui" : "Campaign dibuat", {
+          description: `${campaignName} berhasil disimpan.`,
+        });
         resetForm();
       }
     } catch (error) {
       console.error(error);
-      alert(
-        selectedCampaign
-          ? "Failed to update campaign."
-          : "Failed to create campaign.",
-      );
+      toast.error(selectedCampaign ? "Gagal memperbarui campaign" : "Gagal membuat campaign", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setIsSubmitting(false);
     }

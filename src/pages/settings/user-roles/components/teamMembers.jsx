@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertWithMedia } from "@/components/ui/alert-with-media";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -28,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MoreHorizontalIcon, UserPlus } from "lucide-react";
+import { MoreHorizontalIcon, Trash2, UserPlus } from "lucide-react";
 import { useTeamMembers } from "../hooks/useTeamMembers";
 
 const getInitials = (name = "") =>
@@ -54,6 +56,7 @@ const getStatus = (user) => {
 };
 
 export default function TeamMembers() {
+  const [userToDelete, setUserToDelete] = useState(null);
   const {
     dialogOpen,
     error,
@@ -69,6 +72,13 @@ export default function TeamMembers() {
     setDialogOpen,
     sortedUsers,
   } = useTeamMembers();
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    await handleDelete(userToDelete);
+    setUserToDelete(null);
+  };
 
   return (
     <>
@@ -197,7 +207,7 @@ export default function TeamMembers() {
                           <DropdownMenuSeparator className="bg-gray-300" />
                           <DropdownMenuItem
                             variant="destructive"
-                            onClick={() => handleDelete(user)}
+                            onClick={() => setUserToDelete(user)}
                           >
                             Delete
                           </DropdownMenuItem>
@@ -315,6 +325,17 @@ export default function TeamMembers() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertWithMedia
+        open={Boolean(userToDelete)}
+        onOpenChange={(open) => !open && setUserToDelete(null)}
+        icon={Trash2}
+        title="Hapus user?"
+        description={`${userToDelete?.name || userToDelete?.email || "User ini"} tidak akan bisa mengakses CRM setelah dihapus.`}
+        cancelLabel="Batal"
+        actionLabel="Hapus user"
+        onAction={confirmDelete}
+      />
     </>
   );
 }

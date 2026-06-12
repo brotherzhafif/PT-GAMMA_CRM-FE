@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { 
   // Paperclip, 
@@ -24,8 +25,14 @@ export default function MessageInput({ chat, value, onChange }) {
       });
 
       onChange("");
+      toast.success("Pesan terkirim", {
+        description: `Balasan ke ${chat.name || chat.phone} sudah dikirim.`,
+      });
     } catch (error) {
       console.error("Gagal mengirim pesan", error);
+      toast.error("Gagal mengirim pesan", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setIsSending(false);
     }

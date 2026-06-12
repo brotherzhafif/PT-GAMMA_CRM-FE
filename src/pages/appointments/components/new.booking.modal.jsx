@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,9 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
           if (Array.isArray(resData)) setPatients(resData);
         } catch (error) {
           console.error("Gagal memuat daftar pasien", error);
+          toast.error("Gagal memuat pasien", {
+            description: error.response?.data?.message || error.message || "Coba buka ulang modal.",
+          });
         } finally {
           setIsLoadingPatients(false);
         }
@@ -39,12 +43,12 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!phoneNumber.trim()) {
-      alert("Nomor telepon wajib diisi!");
+      toast.warning("Nomor telepon wajib diisi");
       return;
     }
 
     if (!jadwalId.trim()) {
-      alert("ID Jadwal dokter wajib diisi!");
+      toast.warning("ID jadwal dokter wajib diisi");
       return;
     }
 
@@ -59,7 +63,9 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
         noRujukanFktp,
       });
 
-      alert("Janji temu berhasil dibuat!");
+      toast.success("Janji temu dibuat", {
+        description: "Appointment baru berhasil disimpan.",
+      });
       setPhoneNumber("");
       setJadwalId("");
       setCatatan("");
@@ -69,7 +75,9 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
       
       onOpenChange(false);
     } catch (err) {
-      alert(`Error: ${err.response?.data?.message || err.message}`);
+      toast.error("Gagal membuat janji temu", {
+        description: err.response?.data?.message || err.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setIsSubmitting(false);
     }

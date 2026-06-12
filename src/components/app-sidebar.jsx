@@ -13,9 +13,20 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { AudioLinesIcon, TerminalIcon, Settings2Icon, Activity, LayoutDashboardIcon, MessageSquare, Users, Calendar, Megaphone, Star, HelpCircle } from "lucide-react"
+import { 
+  AudioLinesIcon, 
+  TerminalIcon, 
+  Settings2Icon, 
+  Activity, 
+  LayoutDashboardIcon, 
+  MessageSquare, 
+  Users, 
+  Calendar, 
+  Megaphone, 
+  // Star, 
+  HelpCircle 
+} from "lucide-react"
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",

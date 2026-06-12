@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import {
   getCampaigns,
@@ -61,9 +62,15 @@ export default function MarketingPage() {
       await fetchCampaigns();
 
       setIsModalOpen(false);
+      toast.success("Campaign dibuat", {
+        description: `${payload.campaign_name} berhasil dijadwalkan.`,
+      });
       return true;
     } catch (error) {
       console.error("Failed to create campaign:", error);
+      toast.error("Gagal membuat campaign", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
 
       return false;
     }
@@ -76,9 +83,15 @@ export default function MarketingPage() {
 
       setSelectedCampaign(null);
       setIsModalOpen(false);
+      toast.success("Campaign diperbarui", {
+        description: `${payload.campaign_name} berhasil disimpan.`,
+      });
       return true;
     } catch (error) {
       console.error("Failed to update campaign:", error);
+      toast.error("Gagal memperbarui campaign", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
 
       return false;
     }
@@ -101,6 +114,9 @@ export default function MarketingPage() {
 
   const handleRefresh = async () => {
     await fetchCampaigns();
+    toast.success("Campaign diperbarui", {
+      description: "Daftar campaign sudah dimuat ulang.",
+    });
   };
 
   useEffect(() => {

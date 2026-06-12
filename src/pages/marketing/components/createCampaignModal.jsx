@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +40,13 @@ export default function CreateCampaignModal({
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!campaignName.trim() || !message.trim() || !scheduleDate) {
+      toast.warning("Lengkapi campaign", {
+        description: "Nama, jadwal, dan pesan campaign wajib diisi.",
+      });
+      return;
+    }
+
     const payload = {
       campaign_name: campaignName,
       campaign_message: message,

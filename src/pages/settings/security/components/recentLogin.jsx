@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { AlertWithMedia } from "@/components/ui/alert-with-media";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import {
@@ -10,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ComputerIcon, Laptop, Smartphone } from "lucide-react";
+import { ComputerIcon, Laptop, LogOut, Smartphone } from "lucide-react";
 import { useLoginLogs } from "../hooks/useSecurityActivity";
 import { logoutAllDevices } from "@/services/auth.service";
 
@@ -48,17 +50,24 @@ export default function RecentLogin() {
   const navigate = useNavigate();
   const { error, loading, logs } = useLoginLogs();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
   const handleLogoutAllDevices = async () => {
-    const confirmed = window.confirm(
-      "Log out all devices? You will need to sign in again.",
-    );
-
-    if (!confirmed) return;
-
     setLoggingOut(true);
-    await logoutAllDevices();
-    navigate("/login", { replace: true });
+    try {
+      await logoutAllDevices();
+      toast.success("Semua perangkat logout", {
+        description: "Silakan login kembali untuk melanjutkan.",
+      });
+      navigate("/login", { replace: true });
+    } catch (logoutError) {
+      toast.error("Gagal logout semua perangkat", {
+        description: logoutError.response?.data?.message || logoutError.message || "Coba beberapa saat lagi.",
+      });
+    } finally {
+      setLoggingOut(false);
+      setConfirmLogoutOpen(false);
+    }
   };
 
   return (
@@ -73,7 +82,7 @@ export default function RecentLogin() {
 
         <Button
           disabled={loggingOut}
-          onClick={handleLogoutAllDevices}
+          onClick={() => setConfirmLogoutOpen(true)}
           variant="link"
           size="sm"
           className="cursor-pointer shadow-md text-red-500 hover:text-red-600"
@@ -148,6 +157,16 @@ export default function RecentLogin() {
           )}
         </TableBody>
       </Table>
+      <AlertWithMedia
+        open={confirmLogoutOpen}
+        onOpenChange={setConfirmLogoutOpen}
+        icon={LogOut}
+        title="Logout semua perangkat?"
+        description="Sesi aktif akan diakhiri dan kamu perlu login kembali untuk mengakses CRM."
+        cancelLabel="Batal"
+        actionLabel={loggingOut ? "Logging out..." : "Log out all devices"}
+        onAction={handleLogoutAllDevices}
+      />
     </Card>
   );
 }

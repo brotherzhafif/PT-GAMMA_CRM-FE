@@ -8,6 +8,7 @@ import {
   // DropdownMenuSe parator,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "../components/ui/separator";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   SidebarInset,
   SidebarProvider,
@@ -20,6 +21,7 @@ import { Bell, Search, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getStoredUser, logout } from "@/services/auth.service";
 import { useActivityNotifications } from "@/hooks/useActivityNotifications";
+import { toast } from "sonner";
 
 export default function MainLayout() {
   const matches = useMatches();
@@ -159,57 +161,65 @@ function NotificationBell() {
       {open && (
         <>
           <div
-            className="fixed inset-0 z-40 sm:hidden"
+            className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 mt-3 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-card rounded-xl shadow-lg p-2 z-50">
-            <div className="flex items-center justify-between px-2 py-1">
+          <div className="absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-gray-200 bg-white p-2 shadow-lg dark:bg-card z-50">
+            <div className="flex items-center justify-between px-2 py-1.5">
               <p className="text-sm font-semibold">Notifikasi</p>
               {unreadCount > 0 && (
                 <button
                   className="text-xs text-primary hover:underline"
-                  onClick={markAllRead}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    markAllRead();
+                  }}
                 >
                   Tandai dibaca
                 </button>
               )}
             </div>
-            <div className="flex flex-col gap-1 mt-1">
-              {loading ? (
-                <div className="p-2 text-sm text-muted-foreground">
-                  Loading notifications...
-                </div>
-              ) : error ? (
-                <div className="p-2 text-sm text-red-500">{error}</div>
-              ) : notifications.length === 0 ? (
-                <div className="p-2 text-sm text-muted-foreground">
-                  Belum ada notifikasi.
-                </div>
-              ) : (
-                notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    onClick={() => handleNotificationClick(notif)}
-                    className={`p-2 rounded-lg text-sm cursor-pointer hover:bg-muted transition-colors ${
-                      notif.unread ? "bg-muted/50" : ""
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-foreground font-medium">{notif.title}</p>
-                      {notif.unread && (
-                        <span className="mt-1 h-2 w-2 rounded-full bg-red-500" />
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {notif.message}
-                    </p>
-                    <span className="text-xs text-muted-foreground">
-                      {notif.time}
-                    </span>
+            <ScrollArea className="mt-1 h-80 pr-2">
+              <div className="flex flex-col gap-1">
+                {loading ? (
+                  <div className="p-2 text-sm text-muted-foreground">
+                    Loading notifications...
                   </div>
-                ))
-              )}
-            </div>
+                ) : error ? (
+                  <div className="p-2 text-sm text-red-500">{error}</div>
+                ) : notifications.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground">
+                    Belum ada notifikasi.
+                  </div>
+                ) : (
+                  notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      onClick={() => handleNotificationClick(notif)}
+                      className={`rounded-lg p-2 text-sm cursor-pointer hover:bg-muted transition-colors ${
+                        notif.unread ? "bg-muted/50" : ""
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 truncate text-sm font-medium text-foreground">
+                          {notif.title}
+                        </p>
+                        {notif.unread && (
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                        )}
+                      </div>
+                      <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
+                        {notif.message}
+                      </p>
+                      <span className="mt-1 block text-[11px] leading-4 text-muted-foreground">
+                        {notif.time}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+              <ScrollBar orientation="vertical" />
+            </ScrollArea>
           </div>
         </>
       )}
@@ -226,8 +236,17 @@ function UserAvatar({ user }) {
     .join("")
     .slice(0, 2);
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    try {
+      await logout();
+      toast.success("Logout berhasil", {
+        description: "Sesi admin sudah diakhiri.",
+      });
+      navigate("/login", { replace: true });
+    } catch (error) {
+      toast.error("Logout gagal", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
+    }
   };
 
   return (
@@ -243,7 +262,7 @@ function UserAvatar({ user }) {
       <DropdownMenuContent align="end" className="w-40">
         {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
         {/* <DropdownMenuSeparator className="bg-gray-300" /> */}
-        <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
+        <DropdownMenuItem className="cursor-pointer text-red-500" onClick={handleLogout}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

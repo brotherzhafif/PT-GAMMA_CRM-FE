@@ -1,4 +1,5 @@
 import { useState } from "react"; 
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserPlus, Bot } from "lucide-react";
@@ -17,12 +18,21 @@ export default function ChatHeader({ chat, onToggleProfile, showProfilePanel, is
       if (isHandedOff) {
         await deleteHandoffByPhoneNumber(chat.phone);
         setCurrentStatus("ai-handled"); 
+        toast.info("Conversation kembali ke bot", {
+          description: `${chat.name || chat.phone} akan ditangani AI lagi.`,
+        });
       } else {
         await createHandoffByPhoneNumber(chat.phone);
         setCurrentStatus("needs-human"); 
+        toast.success("Conversation di-assign", {
+          description: `${chat.name || chat.phone} sekarang ditangani tim klinik.`,
+        });
       }
     } catch (error) {
       console.error("Gagal mengubah status handoff", error);
+      toast.error("Gagal mengubah handoff", {
+        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+      });
     } finally {
       setLoading(false);
     }
