@@ -4,7 +4,7 @@ export const getPatients = async () => {
   const res = await api.get("/api/patients", {
     params: {
       page: 1,
-      limit: 100,
+      // limit: 100,
     },
   });
   return res.data;

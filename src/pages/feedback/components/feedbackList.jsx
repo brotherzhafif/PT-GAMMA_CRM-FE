@@ -68,8 +68,8 @@ export default function FeedbackList({
   };
 
   return (
-    <Card className="h-full flex flex-col bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
-      <ScrollArea className="flex-1 w-full p-4">
+    <Card className="flex flex-col bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm h-full">
+      <ScrollArea className="flex-1 w-full p-4 overflow-hidden">
         {paginatedData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <span className="text-sm text-muted-foreground font-medium">No feedback matches your filter criteria.</span>
