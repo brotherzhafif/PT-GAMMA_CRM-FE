@@ -51,7 +51,6 @@ export default function CampaignsToolbar({
             onClick={onRefresh}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
           </Button>
 
           <Button
