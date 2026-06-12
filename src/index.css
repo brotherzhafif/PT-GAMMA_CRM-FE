@@ -245,6 +245,7 @@ code {
   --sidebar-ring: #29b5a8;
 }
 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

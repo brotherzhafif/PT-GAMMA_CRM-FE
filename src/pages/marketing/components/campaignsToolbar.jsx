@@ -8,6 +8,7 @@ import {
   Filter,
   Download,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 
 export default function CampaignsToolbar({
@@ -16,45 +17,49 @@ export default function CampaignsToolbar({
   selectedStatus,
   onStatusChange,
   onRefresh,
+  onCreate,
 }) {
   const [showFilters, setShowFilters] =
     useState(false);
 
   return (
-    <div className="flex flex-col gap-4 border-b border-gray-200 p-5">
-      {/* TOP SECTION */}
+    <div className="flex flex-col gap-4 border-b border-gray-300 p-5">
+      {/* HEADER */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h3 className="text-lg font-semibold">
-            Campaign Performance
+            Campaign Management
           </h3>
 
           <p className="text-sm text-muted-foreground">
-            Track campaign engagement and conversion activity.
+            Manage and monitor marketing campaigns.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            className="border-gray-300"
-          >
+            className="cursor-pointer border-gray-300"          >
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
 
           <Button
             variant="outline"
-            className="border-gray-300"
-            onClick={onRefresh}
+            className="cursor-pointer border-gray-300" onClick={onRefresh}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
+
+          <Button onClick={onCreate} className="cursor-pointer transition-all duration-200 hover:scale-[1.03]">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Campaign
+          </Button>
         </div>
       </div>
 
-      {/* SEARCH & FILTER */}
+      {/* SEARCH */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
@@ -63,7 +68,9 @@ export default function CampaignsToolbar({
             <Input
               value={searchValue}
               onChange={(e) =>
-                onSearchChange(e.target.value)
+                onSearchChange(
+                  e.target.value
+                )
               }
               placeholder="Search campaign..."
               className="pl-9 border-gray-300"
@@ -72,9 +79,10 @@ export default function CampaignsToolbar({
 
           <Button
             variant="outline"
-            className="border-gray-300 w-full lg:w-auto"
-            onClick={() =>
-              setShowFilters(!showFilters)
+            className="cursor-pointer border-gray-300" onClick={() =>
+              setShowFilters(
+                !showFilters
+              )
             }
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -82,8 +90,9 @@ export default function CampaignsToolbar({
           </Button>
         </div>
 
+        {/* FILTER PANEL */}
         {showFilters && (
-          <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-muted/20 p-4 lg:flex-row lg:items-center">
+          <div className="flex flex-col gap-3 rounded-2xl border border-gray-300 bg-muted/20 p-4 lg:flex-row lg:items-center">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">
                 Campaign Status
@@ -92,7 +101,9 @@ export default function CampaignsToolbar({
               <select
                 value={selectedStatus}
                 onChange={(e) =>
-                  onStatusChange(e.target.value)
+                  onStatusChange(
+                    e.target.value
+                  )
                 }
                 className="h-10 rounded-xl border border-gray-300 bg-white px-3 text-sm outline-none"
               >
@@ -110,6 +121,10 @@ export default function CampaignsToolbar({
 
                 <option value="Sent">
                   Sent
+                </option>
+
+                <option value="Active">
+                  Active
                 </option>
               </select>
             </div>

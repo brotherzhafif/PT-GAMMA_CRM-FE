@@ -7,18 +7,17 @@ import {
 } from "@/services/marketing.service";
 
 import MarketingHeader from "./components/marketingHeader";
-import MarketingStats from "./components/marketingStats";
 import CampaignsTable from "./components/campaignsTable";
-import CreateCampaignPanel from "./components/createCampaignPanel";
+import CreateCampaignModal from "./components/createCampaignModal";
 
 export default function MarketingPage() {
-  const [campaigns, setCampaigns] =
-    useState([]);
+  const [campaigns, setCampaigns] = useState([]);
 
-  const [
-    selectedCampaign,
-    setSelectedCampaign,
-  ] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] =
+    useState(null);
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
 
   const [loading, setLoading] =
     useState(true);
@@ -43,25 +42,16 @@ export default function MarketingPage() {
             campaign.campaign_message,
 
           status:
-            campaign.status
-              ?.charAt(0)
-              .toUpperCase() +
+            campaign.status?.charAt(0).toUpperCase() +
             campaign.status?.slice(1),
 
           date: new Date(
             campaign.schedule_date
-          ).toLocaleDateString(
-            "id-ID"
-          ),
+          ).toLocaleDateString("id-ID"),
 
           audience: "-",
 
-          performance: "-",
-
-          clicked: "-",
-
-          segment:
-            "All Patients",
+          segment: "All Patients",
 
           raw: campaign,
         })
@@ -83,11 +73,11 @@ export default function MarketingPage() {
   const handleCreateCampaign =
     async (payload) => {
       try {
-        await createCampaign(
-          payload
-        );
+        await createCampaign(payload);
 
         await fetchCampaigns();
+
+        setIsModalOpen(false);
 
         return true;
       } catch (error) {
@@ -113,9 +103,9 @@ export default function MarketingPage() {
 
         await fetchCampaigns();
 
-        setSelectedCampaign(
-          null
-        );
+        setSelectedCampaign(null);
+
+        setIsModalOpen(false);
 
         return true;
       } catch (error) {
@@ -131,19 +121,26 @@ export default function MarketingPage() {
   const handleEditCampaign = (
     campaign
   ) => {
-    console.log(
-      "Selected Campaign:",
-      campaign
-    );
-
     setSelectedCampaign(
       campaign
     );
+
+    setIsModalOpen(true);
+  };
+
+  const handleCreateClick = () => {
+    setSelectedCampaign(null);
+
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedCampaign(null);
+
+    setIsModalOpen(false);
   };
 
   const handleRefresh = async () => {
-    setSelectedCampaign(null);
-
     await fetchCampaigns();
   };
 
@@ -168,38 +165,39 @@ export default function MarketingPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full mb-9">
-      <MarketingHeader />
+    <>
+      <div className="flex flex-col gap-6 w-full mb-9">
+        <MarketingHeader />
 
-      <MarketingStats />
-
-      <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4">
-        <div>
-          <CampaignsTable
-            campaigns={campaigns}
-            onEdit={
-              handleEditCampaign
-            }
-            onRefresh={
-              handleRefresh
-            }
-          />
-        </div>
-
-        <div>
-          <CreateCampaignPanel
-            onCreateCampaign={
-              handleCreateCampaign
-            }
-            onUpdateCampaign={
-              handleUpdateCampaign
-            }
-            selectedCampaign={
-              selectedCampaign
-            }
-          />
-        </div>
+        <CampaignsTable
+          campaigns={campaigns}
+          onEdit={
+            handleEditCampaign
+          }
+          onRefresh={
+            handleRefresh
+          }
+          onCreate={
+            handleCreateClick
+          }
+        />
       </div>
-    </div>
+
+      <CreateCampaignModal
+        open={isModalOpen}
+        onClose={
+          handleCloseModal
+        }
+        selectedCampaign={
+          selectedCampaign
+        }
+        onCreateCampaign={
+          handleCreateCampaign
+        }
+        onUpdateCampaign={
+          handleUpdateCampaign
+        }
+      />
+    </>
   );
 }
