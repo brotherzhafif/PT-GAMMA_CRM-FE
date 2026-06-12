@@ -1,32 +1,17 @@
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  MessageCircle,
-  NotebookPen,
-} from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
-export default function PatientQuickActions() {
+export default function PatientQuickActions({ patient, onMessage }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <Button className="flex flex-col gap-1 h-auto py-3 cursor-pointer shadow-md">
+    <div className="grid grid-cols-1 gap-2">
+      <Button
+        type="button"
+        onClick={() => onMessage?.(patient)}
+        disabled={!patient?.phone}
+        className="flex h-auto cursor-pointer flex-col gap-1 py-3 shadow-md"
+      >
         <MessageCircle className="w-4 h-4" />
         <span className="text-xs">Message</span>
-      </Button>
-
-      <Button
-        variant="ghost"
-        className="flex flex-col gap-1 h-auto py-3 cursor-pointer shadow-md"
-      >
-        <Calendar className="w-4 h-4" />
-        <span className="text-xs">Book</span>
-      </Button>
-
-      <Button
-        variant="default"
-        className="flex flex-col gap-1 h-auto py-3 cursor-pointer shadow-md"
-      >
-        <NotebookPen className="w-4 h-4" />
-        <span className="text-xs">Note</span>
       </Button>
     </div>
   );

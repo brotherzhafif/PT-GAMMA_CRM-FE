@@ -1,14 +1,39 @@
 import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-export default function VisitFilter() {
+export default function VisitFilter({ value, onChange }) {
   return (
-    <Button
-      variant="ghost"
-      className="flex shadow-md items-center gap-2"
-    >
-      <CalendarDays className="w-4 h-4" />
-      Last Visit
-    </Button>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          className="flex shadow-md items-center gap-2"
+        >
+          <CalendarDays className="w-4 h-4" />
+          {value || "Last Visit"}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-64">
+        <div className="grid gap-3">
+          <Input type="date" value={value} onChange={(event) => onChange(event.target.value)} />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange("")}
+            className="border border-gray-300 shadow-sm"
+          >
+            Clear Date
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

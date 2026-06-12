@@ -1,6 +1,18 @@
 import { useEffect, useState, startTransition } from "react";
 import { formatChatTime } from "@/utils/formatTime";
-import { getChatMessagesStream } from "@/services/unifiendBox.service";
+import {
+  getChatMessagesStream,
+  getMessageByPhoneNumber,
+} from "@/services/unifiendBox.service";
+
+const unwrapMessages = (response) => {
+  if (Array.isArray(response?.data?.data)) return response.data.data;
+  if (Array.isArray(response?.data)) return response.data;
+  if (Array.isArray(response)) return response;
+  if (response?.data && typeof response.data === "object") return [response.data];
+  if (response && typeof response === "object") return [response];
+  return [];
+};
 
 export function useChatMessages(phone_number) {
   const [messages, setMessages] = useState([]);
@@ -50,12 +62,34 @@ Terima kasih 🙏`,
   useEffect(() => {
     if (!phone_number) return;
 
-    const es = getChatMessagesStream(phone_number);
-
     startTransition(() => {
       setLoading(true);
       setMessages([]);
     });
+
+    let isActive = true;
+    let es;
+
+    const fetchInitialMessages = async () => {
+      try {
+        const response = await getMessageByPhoneNumber(phone_number);
+        const initialMessages = mapMessages(unwrapMessages(response));
+
+        if (isActive) {
+          setMessages(initialMessages);
+        }
+      } catch (error) {
+        console.error("Failed to fetch chat messages:", error);
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchInitialMessages();
+
+    es = getChatMessagesStream(phone_number);
 
     es.onopen = () => {
       console.log("CHAT SSE CONNECTED");
@@ -100,6 +134,7 @@ Terima kasih 🙏`,
     };
 
     return () => {
+      isActive = false;
       es.close();
     };
   }, [phone_number]);

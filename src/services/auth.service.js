@@ -12,9 +12,12 @@ const authApi = axios.create({
 });
 
 export const getAccessToken = () =>
-  localStorage.getItem("access_token") || localStorage.getItem("token");
+  localStorage.getItem("access_token") ||
+  localStorage.getItem("accessToken") ||
+  localStorage.getItem("token");
 
-export const getRefreshToken = () => localStorage.getItem("refresh_token");
+export const getRefreshToken = () =>
+  localStorage.getItem("refresh_token") || localStorage.getItem("refreshToken");
 
 export const getStoredUser = () => {
   const user = localStorage.getItem("user");
@@ -28,14 +31,21 @@ export const getStoredUser = () => {
   }
 };
 
-export const setAuthSession = ({ access_token, refresh_token, user }) => {
-  if (access_token) {
-    localStorage.setItem("token", access_token);
-    localStorage.setItem("access_token", access_token);
+export const setAuthSession = (session) => {
+  const payload = session?.data || session || {};
+  const accessToken = payload.access_token || payload.accessToken || payload.token;
+  const refreshToken = payload.refresh_token || payload.refreshToken;
+  const user = payload.user;
+
+  if (accessToken) {
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("accessToken", accessToken);
   }
 
-  if (refresh_token) {
-    localStorage.setItem("refresh_token", refresh_token);
+  if (refreshToken) {
+    localStorage.setItem("refresh_token", refreshToken);
+    localStorage.setItem("refreshToken", refreshToken);
   }
 
   if (user) {
@@ -46,7 +56,9 @@ export const setAuthSession = ({ access_token, refresh_token, user }) => {
 export const clearAuthSession = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("access_token");
+  localStorage.removeItem("accessToken");
   localStorage.removeItem("refresh_token");
+  localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
   sessionStorage.clear();
 };

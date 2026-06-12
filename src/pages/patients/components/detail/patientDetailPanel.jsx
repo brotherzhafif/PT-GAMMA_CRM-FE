@@ -2,12 +2,18 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import PatientProfile from "./patientProfile";
-import PatientStats from "./patientStats";
 import PatientQuickActions from "./patientQuickActions";
-import PatientInternalNotes from "./patientInternalNotes";
-import PatientTimeline from "./patientTimeline";
 
-export default function PatientDetailPanel({ patient, onClose }) {
+const detailRows = [
+  ["RME ID", "rmePatientId"],
+  ["NIK", "nik"],
+  ["Nama Lengkap", "name"],
+  ["Tanggal Lahir", "birthDate"],
+  ["Jenis Kelamin", "gender"],
+  ["Telepon", "phone"],
+];
+
+export default function PatientDetailPanel({ patient, onClose, onMessage }) {
   if (!patient) {
     return (
       <div className="bg-white rounded-2xl shadow-sm">
@@ -36,13 +42,21 @@ export default function PatientDetailPanel({ patient, onClose }) {
         <div className="p-5 flex flex-col gap-5">
           <PatientProfile patient={patient} />
 
-          <PatientStats patient={patient} />
+          <PatientQuickActions patient={patient} onMessage={onMessage} />
 
-          <PatientQuickActions />
-
-          <PatientInternalNotes patient={patient} />
-
-          <PatientTimeline patient={patient} />
+            <h4 className="mb-3 text-[11px] font-semibold uppercase text-slate-500">
+              Patient Information
+            </h4>
+            <div className="divide-y divide-slate-200">
+              {detailRows.map(([label, key]) => (
+                <div key={key} className="grid grid-cols-[110px_1fr] gap-3 py-2">
+                  <span className="text-[11px] font-medium text-slate-500">{label}</span>
+                  <span className="min-w-0 break-words text-[12px] font-semibold text-slate-900">
+                    {patient[key] || "-"}
+                  </span>
+                </div>
+              ))}
+          </div>
         </div>
       </ScrollArea>
     </div>

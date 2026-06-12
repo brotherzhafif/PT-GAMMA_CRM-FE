@@ -12,21 +12,15 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
   const [jenisKunjunganBpjs, setJenisKunjunganBpjs] = useState("NORMAL");
   const [noRujukanFktp, setNoRujukanFktp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // State untuk menyimpan daftar pasien dari API
   const [patients, setPatients] = useState([]);
   const [isLoadingPatients, setIsLoadingPatients] = useState(false);
-
-  // Tanggal kunjungan otomatis diset hari ini (YYYY-MM-DD)
   const todayDate = new Date().toISOString().split('T')[0];
 
-  // Menjalankan fetch data pasien setiap kali modal dibuka
   useEffect(() => {
     if (open) {
       const fetchPatients = async () => {
         setIsLoadingPatients(true);
         try {
-          // getPatients sudah langsung mengembalikan res.data dari Axios
           const response = await getPatients();
           const resData = response?.data || response || [];
           if (Array.isArray(resData)) setPatients(resData);
@@ -66,8 +60,6 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
       });
 
       alert("Janji temu berhasil dibuat!");
-      
-      // Bersihkan form
       setPhoneNumber("");
       setJadwalId("");
       setCatatan("");
@@ -75,7 +67,6 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
       setJenisKunjunganBpjs("NORMAL");
       setNoRujukanFktp("");
       
-      // Tutup modal dan refresh data pada tabel utama
       onOpenChange(false);
     } catch (err) {
       alert(`Error: ${err.response?.data?.message || err.message}`);
@@ -105,7 +96,6 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
             >
               <option value="">-- Pilih Pasien Terdaftar --</option>
               {patients.map((p) => (
-                // Sesuaikan 'phone_number' & 'name' dengan response struktur backend Anda
                 <option key={p.id || p.uuid} value={p.phone_number || p.no_hp}>
                   {p.name || p.nama} ({p.phone_number || p.no_hp})
                 </option>

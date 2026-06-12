@@ -13,7 +13,7 @@ export const getLatestMessages = async () => {
 };
 
 export const getMessageByPhoneNumber = async (phone_number) => {
-  const res = await api.get(`/api/messages/${phone_number}`);
+  const res = await api.get(`/api/messages/${encodeURIComponent(phone_number)}`);
   return res.data;
 };
 
@@ -57,5 +57,5 @@ export const getLatestMessagesStream = (limit) => {
 };
 
 export const getChatMessagesStream = (phone_number) => {
-  return new EventSource(`${SSE_BASE_URL}/${phone_number}`);
+  return new EventSource(`${SSE_BASE_URL}/${encodeURIComponent(phone_number)}`);
 };

@@ -1,7 +1,12 @@
 import { api } from "@/lib/axios";
 
 export const getPatients = async () => {
-  const res = await api.get("/api/patients");
+  const res = await api.get("/api/patients", {
+    params: {
+      page: 1,
+      limit: 100,
+    },
+  });
   return res.data;
 };
 
@@ -25,6 +30,8 @@ export const getPatientByRm = async (noRM) => {
   const res = await api.get(`/api/patients/rm/${noRM}`);
   return res.data;
 };
+
+export const getPatientByRmeId = getPatientByRm;
 
 export const getPatientById = async (patientId) => {
   const res = await api.get(`/api/patients/${patientId}`);

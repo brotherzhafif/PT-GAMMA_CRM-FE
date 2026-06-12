@@ -1,14 +1,27 @@
 import { Tags } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function TagsFilter() {
+export default function TagsFilter({ value, options = [], onChange }) {
   return (
-    <Button
-      variant="ghost"
-      className="flex items-center gap-2 shadow-md"
-    >
-      <Tags className="w-4 h-4" />
-      Tags
-    </Button>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-9 min-w-36 shadow-md">
+        <Tags className="w-4 h-4" />
+        <SelectValue placeholder="Tags" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All Tags</SelectItem>
+        {options.map((tag) => (
+          <SelectItem key={tag} value={tag}>
+            {tag}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

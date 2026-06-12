@@ -2,8 +2,28 @@ import axios from "axios";
 import {
   clearAuthSession,
   getAccessToken,
+  getRefreshToken,
   refreshAuthToken,
 } from "@/services/auth.service";
+
+let isRedirectingToLogin = false;
+
+const isUnauthorizedError = (error) => {
+  return error.response?.status === 401 || error.response?.data?.statusCode === 401;
+};
+
+const getSessionAccessToken = (session) => {
+  return session?.access_token || session?.accessToken || session?.token || session?.data?.access_token || session?.data?.accessToken || session?.data?.token;
+};
+
+const redirectToLogin = () => {
+  clearAuthSession();
+
+  if (isRedirectingToLogin || window.location.pathname === "/login") return;
+
+  isRedirectingToLogin = true;
+  window.location.replace("/login");
+};
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -37,26 +57,30 @@ api.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry
-    ) {
+    if (isUnauthorizedError(error) && originalRequest && !originalRequest._retry && getRefreshToken()) {
       originalRequest._retry = true;
 
       try {
         const session = await refreshAuthToken();
-        originalRequest.headers.Authorization = `Bearer ${session.access_token}`;
+        const token = getSessionAccessToken(session);
+
+        if (!token) {
+          return Promise.reject(error);
+        }
+
+        originalRequest.headers.Authorization = `Bearer ${token}`;
         return api(originalRequest);
       } catch (refreshError) {
-        clearAuthSession();
-
-        if (window.location.pathname !== "/login") {
-          window.location.replace("/login");
+        if (isUnauthorizedError(refreshError)) {
+          redirectToLogin();
         }
 
         return Promise.reject(refreshError);
       }
+    }
+
+    if (isUnauthorizedError(error) && !getAccessToken()) {
+      redirectToLogin();
     }
 
     return Promise.reject(error);
