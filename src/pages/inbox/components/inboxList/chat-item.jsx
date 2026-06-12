@@ -27,11 +27,19 @@ const channelDotColor = {
   sms: "bg-blue-500",
 };
 
+const truncateText = (value = "", maxLength) => {
+  if (value.length <= maxLength) return value;
+
+  return `${value.slice(0, maxLength)}...`;
+};
+
 export default function ChatItem({ chat, isSelected, onClick }) {
   const badge = statusConfig[chat.status];
 
   const isHumanHandled = chat.status === "needs-human" || chat.status === "human";
   const showUnread = chat.unread > 0 && isHumanHandled;
+  const displayName = chat.title || chat.name || "-";
+  const displayLastMessage = chat.last || "";
 
   return (
     <div
@@ -57,27 +65,38 @@ export default function ChatItem({ chat, isSelected, onClick }) {
         />
       </div>
 
-      <div className="flex-1 min-w-0 overflow-hidden">
-        <div className="flex items-center gap-1 min-w-0">
-          <p className={`font-medium text-sm truncate flex-1 min-w-0 ${showUnread ? "text-gray-900 font-bold" : ""}`}>
-            {chat.name}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <div className="flex min-w-0 items-center gap-2">
+          <p
+            className={`min-w-0 basis-0 flex-1 truncate text-sm font-medium ${
+              showUnread ? "font-bold text-gray-900" : ""
+            }`}
+            title={displayName}
+          >
+            {truncateText(displayName, 20)}
           </p>
-          <span className={`text-xs flex-shrink-0 whitespace-nowrap ${showUnread ? "text-green-600 font-bold" : "text-muted-foreground"}`}>
+
+          <span
+            className={`shrink-0 whitespace-nowrap text-xs ${
+              showUnread ? "font-bold text-green-600" : "text-muted-foreground"
+            }`}
+          >
             {chat.time}
           </span>
         </div>
-        <div className="flex items-center gap-2 min-w-0">
+
+        <div className="flex min-w-0 items-center gap-2">
           <p
-            className={`text-xs truncate flex-1 min-w-0 ${showUnread ? "text-gray-800 font-medium" : "text-muted-foreground"}`}
-            title={chat.last}
+            className={`min-w-0 basis-0 flex-1 truncate text-xs ${
+              showUnread ? "font-medium text-gray-800" : "text-muted-foreground"
+            }`}
+            title={displayLastMessage}
           >
-            {chat.last?.length > 23
-              ? `${chat.last.slice(0, 23)}......`
-              : chat.last}
+            {truncateText(displayLastMessage, 23)}
           </p>
 
           {showUnread && (
-            <Badge className="h-4 min-w-4 px-1 flex items-center justify-center bg-green-500 hover:bg-green-500 text-white text-[10px] rounded-full flex-shrink-0 animate-pulse">
+            <Badge className="flex h-4 min-w-4 shrink-0 animate-pulse items-center justify-center rounded-full bg-green-500 px-1 text-[10px] text-white hover:bg-green-500">
               {chat.unread}
             </Badge>
           )}

@@ -1,17 +1,66 @@
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import CampaignsToolbar from "./campaignsToolbar";
 import CampaignRow from "./campaignRow";
 
 const ITEMS_PER_PAGE = 10;
+
+const csvHeaders = [
+  "Campaign",
+  "Description",
+  "Audience",
+  "Segment",
+  "Status",
+  "Schedule Date",
+];
+
+const escapeCsvCell = (value) => {
+  const stringValue = value == null ? "" : String(value);
+
+  return `"${stringValue.replace(/"/g, '""')}"`;
+};
+
+const downloadCsv = (campaigns) => {
+  const rows = campaigns.map((campaign) => [
+    campaign.name,
+    campaign.description,
+    campaign.audience,
+    campaign.segment,
+    campaign.status,
+    campaign.date,
+  ]);
+
+  const csv = [csvHeaders, ...rows]
+    .map((row) => row.map(escapeCsvCell).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "marketing-campaigns.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+};
 
 export default function CampaignsTable({
   campaigns = [],
@@ -19,187 +68,133 @@ export default function CampaignsTable({
   onRefresh,
   onCreate,
 }) {
-  const [searchValue, setSearchValue] =
-    useState("");
+  const [searchValue, setSearchValue] = useState("");
 
-  const [selectedStatus, setSelectedStatus] =
-    useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
-  const [currentPage, setCurrentPage] =
-    useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => {
-      const matchesSearch =
-        campaign.name
-          ?.toLowerCase()
-          .includes(
-            searchValue.toLowerCase()
-          );
+      const matchesSearch = campaign.name
+        ?.toLowerCase()
+        .includes(searchValue.toLowerCase());
 
       const matchesStatus =
-        selectedStatus === "All" ||
-        campaign.status ===
-        selectedStatus;
+        selectedStatus === "All" || campaign.status === selectedStatus;
 
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
+      return matchesSearch && matchesStatus;
     });
-  }, [
-    campaigns,
-    searchValue,
-    selectedStatus,
-  ]);
+  }, [campaigns, searchValue, selectedStatus]);
 
   const totalPages = useMemo(
-    () =>
-      Math.ceil(
-        filteredCampaigns.length /
-        ITEMS_PER_PAGE
-      ),
-    [filteredCampaigns.length]
+    () => Math.ceil(filteredCampaigns.length / ITEMS_PER_PAGE),
+    [filteredCampaigns.length],
   );
 
-  const paginatedCampaigns =
-    useMemo(() => {
-      const startIndex =
-        (currentPage - 1) *
-        ITEMS_PER_PAGE;
+  const paginatedCampaigns = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
-      return filteredCampaigns.slice(
-        startIndex,
-        startIndex + ITEMS_PER_PAGE
-      );
-    }, [
-      filteredCampaigns,
-      currentPage,
-    ]);
+    return filteredCampaigns.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredCampaigns, currentPage]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(
-        currentPage - 1
-      );
+      setCurrentPage(currentPage - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(
-        currentPage + 1
-      );
+      setCurrentPage(currentPage + 1);
     }
   };
 
   return (
-    <div className="h-full flex flex-col rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden">
+    <Card className="h-full gap-0 rounded-lg border-gray-200 py-0 shadow-sm">
       <CampaignsToolbar
         searchValue={searchValue}
-        onSearchChange={
-          setSearchValue
-        }
-        selectedStatus={
-          selectedStatus
-        }
-        onStatusChange={
-          setSelectedStatus
-        }
+        onSearchChange={(value) => {
+          setSearchValue(value);
+          setCurrentPage(1);
+        }}
+        selectedStatus={selectedStatus}
+        onStatusChange={(value) => {
+          setSelectedStatus(value);
+          setCurrentPage(1);
+        }}
         onRefresh={onRefresh}
         onCreate={onCreate}
+        onExportCsv={() => downloadCsv(filteredCampaigns)}
       />
 
-      <ScrollArea className="w-full">
-        <table className="w-full">
-          <thead className="border-b border-gray-300 bg-muted/40">
-            <tr className="text-left">
-              <th className="px-6 py-4 text-sm font-medium text-muted-foreground">
+      <CardContent className="px-0">
+        <Table className="[&_td]:align-middle [&_th]:align-middle">
+          <TableHeader className="bg-muted/40 ">
+            <TableRow>
+              <TableHead className="px-4 py-4 text-xs text-muted-foreground">
                 Campaign
-              </th>
+              </TableHead>
 
-              <th className="px-6 py-4 text-sm font-medium text-muted-foreground">
+              <TableHead className="px-4 py-4 text-xs text-muted-foreground">
                 Audience
-              </th>
+              </TableHead>
 
-              <th className="px-6 py-4 text-sm font-medium text-muted-foreground">
+              <TableHead className="px-4 py-4 text-xs text-muted-foreground">
                 Status
-              </th>
+              </TableHead>
 
-              <th className="px-6 py-4 text-sm font-medium text-muted-foreground">
+              <TableHead className="px-4 py-4 text-xs text-muted-foreground">
                 Schedule Date
-              </th>
+              </TableHead>
 
-              <th className="px-6 py-4 text-sm font-medium text-muted-foreground text-center">
+              <TableHead className="px-4 py-4 text-center text-xs text-muted-foreground">
                 Actions
-              </th>
-            </tr>
-          </thead>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody>
-            {paginatedCampaigns.length >
-              0 ? (
-              paginatedCampaigns.map(
-                (campaign) => (
-                  <CampaignRow
-                    key={
-                      campaign.id
-                    }
-                    campaign={
-                      campaign
-                    }
-                    onEdit={
-                      onEdit
-                    }
-                  />
-                )
-              )
+          <TableBody>
+            {paginatedCampaigns.length > 0 ? (
+              paginatedCampaigns.map((campaign) => (
+                <CampaignRow
+                  key={campaign.id}
+                  campaign={campaign}
+                  onEdit={onEdit}
+                />
+              ))
             ) : (
-              <tr>
-                <td
+              <TableRow>
+                <TableCell
                   colSpan={5}
-                  className="px-6 py-10 text-center text-sm text-muted-foreground"
+                  className="px-4 py-10 text-center text-sm text-muted-foreground"
                 >
                   No campaigns found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </ScrollArea>
+          </TableBody>
+        </Table>
+      </CardContent>
 
-      {/* PAGINATION */}
-      <div className="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
+      <CardFooter className="flex items-center justify-between px-4 py-3">
         <div className="text-[11px] text-slate-500">
           Showing{" "}
           {filteredCampaigns.length === 0
             ? 0
-            : (currentPage - 1) *
-            ITEMS_PER_PAGE +
-            1}{" "}
-          to{" "}
-          {Math.min(
-            currentPage *
-            ITEMS_PER_PAGE,
-            filteredCampaigns.length
-          )}{" "}
-          of{" "}
-          {filteredCampaigns.length}{" "}
-          campaigns
+            : (currentPage - 1) * ITEMS_PER_PAGE + 1}{" "}
+          to {Math.min(currentPage * ITEMS_PER_PAGE, filteredCampaigns.length)}{" "}
+          of {filteredCampaigns.length} campaigns
         </div>
 
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={
-                handlePrevPage
-              }
-              disabled={
-                currentPage === 1
-              }
-              className="h-8 px-2"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="h-8 border border-gray-300 px-2 shadow-sm"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -207,26 +202,20 @@ export default function CampaignsTable({
             <div className="flex items-center gap-1">
               {Array.from(
                 {
-                  length:
-                    totalPages,
+                  length: totalPages,
                 },
-                (_, i) => i + 1
+                (_, i) => i + 1,
               ).map((page) => (
                 <Button
                   key={page}
-                  variant={
-                    page ===
-                      currentPage
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={page === currentPage ? "default" : "ghost"}
                   size="sm"
-                  onClick={() =>
-                    setCurrentPage(
-                      page
-                    )
+                  onClick={() => setCurrentPage(page)}
+                  className={
+                    page === currentPage
+                      ? "h-8 w-8 p-0 text-[11px] font-medium"
+                      : "h-8 w-8 border border-gray-300 p-0 text-[11px] font-medium shadow-sm"
                   }
-                  className="h-8 w-8 p-0 text-[11px] font-medium"
                 >
                   {page}
                 </Button>
@@ -234,22 +223,17 @@ export default function CampaignsTable({
             </div>
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={
-                handleNextPage
-              }
-              disabled={
-                currentPage ===
-                totalPages
-              }
-              className="h-8 px-2"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="h-8 border border-gray-300 px-2 shadow-sm"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         )}
-      </div>
-    </div >
+      </CardFooter>
+    </Card>
   );
 }

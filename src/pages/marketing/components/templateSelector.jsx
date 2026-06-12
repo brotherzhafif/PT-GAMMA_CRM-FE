@@ -1,3 +1,6 @@
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 const templates = [
   {
     id: 1,
@@ -9,7 +12,7 @@ const templates = [
     id: 2,
     name: "Routine Checkup",
     message:
-      "Hi John, it’s time for your monthly dental checkup. Schedule your appointment now to maintain your healthy smile.",
+      "Hi John, it's time for your monthly dental checkup. Schedule your appointment now to maintain your healthy smile.",
   },
   {
     id: 3,
@@ -22,34 +25,31 @@ const templates = [
 export default function TemplateSelector({ onSelectTemplate }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium">
-        Campaign Template
-      </label>
+      <Label className="text-xs">Campaign Template</Label>
 
-      <select
-        onChange={(e) => {
-          const selectedId = Number(e.target.value);
-
+      <Select
+        onValueChange={(value) => {
           const selectedTemplate = templates.find(
-            (template) => template.id === selectedId
+            (template) => template.id === Number(value)
           );
 
           if (selectedTemplate) {
             onSelectTemplate?.(selectedTemplate.message);
           }
         }}
-        className="h-10 rounded-xl border border-gray-300 bg-white px-3 text-sm outline-none"
       >
-        <option value="">
-          Choose template
-        </option>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Choose template" />
+        </SelectTrigger>
 
-        {templates.map((template) => (
-          <option key={template.id} value={template.id}>
-            {template.name}
-          </option>
-        ))}
-      </select>
+        <SelectContent>
+          {templates.map((template) => (
+            <SelectItem key={template.id} value={String(template.id)}>
+              {template.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

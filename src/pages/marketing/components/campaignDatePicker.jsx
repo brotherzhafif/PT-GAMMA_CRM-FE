@@ -2,55 +2,63 @@ import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export default function CampaignDatePicker({
-  selectedDate,
-  onDateChange,
-}) {
+const getDateParts = (value) => {
+  if (!value) return null;
+
+  if (value instanceof Date) {
+    return {
+      year: value.getFullYear(),
+      month: value.getMonth() + 1,
+      day: value.getDate(),
+    };
+  }
+
+  const [dateValue] = String(value).split("T");
+  const [year, month, day] = dateValue.split("-").map(Number);
+
+  if (!year || !month || !day) return null;
+
+  return { year, month, day };
+};
+
+const getDateFromValue = (value) => {
+  const parts = getDateParts(value);
+
+  if (!parts) return undefined;
+
+  return new Date(parts.year, parts.month - 1, parts.day);
+};
+
+export default function CampaignDatePicker({ selectedDate, onDateChange }) {
+  const date = getDateFromValue(selectedDate);
+
   const formattedDate = useMemo(() => {
-    if (!selectedDate) {
+    if (!date) {
       return "Select schedule date";
     }
 
-    const [year, month, day] =
-      selectedDate.split("-");
-
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day)
-    ).toLocaleDateString("en-US", {
+    return date.toLocaleDateString("en-US", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-  }, [selectedDate]);
+  }, [date]);
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium">
-        Schedule Date
-      </label>
+      <Label className="text-xs font-medium">Schedule Date</Label>
 
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="h-10 w-full justify-between border-gray-300 font-normal hover:bg-muted/40"
+            className="h-10 w-full justify-between font-normal hover:bg-muted/40"
           >
-            <span
-              className={
-                selectedDate
-                  ? "text-foreground"
-                  : "text-muted-foreground"
-              }
-            >
+            <span className={date ? "text-foreground" : "text-muted-foreground"}>
               {formattedDate}
             </span>
 
@@ -58,43 +66,18 @@ export default function CampaignDatePicker({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent
-          align="start"
-          className="w-auto rounded-2xl border border-gray-200 p-0 shadow-lg"
-        >
+        <PopoverContent align="start" className="w-auto rounded-lg p-0">
           <Calendar
             mode="single"
-            selected={
-              selectedDate
-                ? (() => {
-                    const [year, month, day] =
-                      selectedDate.split("-");
+            selected={date}
+            onSelect={(selected) => {
+              if (!selected) return;
 
-                    return new Date(
-                      Number(year),
-                      Number(month) - 1,
-                      Number(day)
-                    );
-                  })()
-                : undefined
-            }
-            onSelect={(date) => {
-              if (!date) return;
+              const year = selected.getFullYear();
+              const month = String(selected.getMonth() + 1).padStart(2, "0");
+              const day = String(selected.getDate()).padStart(2, "0");
 
-              const year =
-                date.getFullYear();
-
-              const month = String(
-                date.getMonth() + 1
-              ).padStart(2, "0");
-
-              const day = String(
-                date.getDate()
-              ).padStart(2, "0");
-
-              onDateChange?.(
-                `${year}-${month}-${day}`
-              );
+              onDateChange?.(`${year}-${month}-${day}`);
             }}
             initialFocus
           />

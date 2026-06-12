@@ -1,24 +1,16 @@
-export default function CampaignStatusBadge({
-  status,
-}) {
+import { Badge } from "@/components/ui/badge";
+
+export default function CampaignStatusBadge({ status }) {
   const statusClasses = {
-    Draft:
-      "bg-emerald-100 text-emerald-700 border border-emerald-200",
-
-    Scheduled:
-      "bg-blue-100 text-blue-700 border border-blue-200",
-
-    Sent:
-      "bg-amber-100 text-amber-700 border border-amber-200",
+    Draft: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    Scheduled: "border-blue-200 bg-blue-50 text-blue-700",
+    Sent: "border-amber-200 bg-amber-50 text-amber-700",
+    Active: "border-teal-200 bg-teal-50 text-teal-700",
   };
 
   return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-medium ${
-        statusClasses[status]
-      }`}
-    >
+    <Badge variant="outline" className={statusClasses[status]}>
       {status}
-    </span>
+    </Badge>
   );
 }
