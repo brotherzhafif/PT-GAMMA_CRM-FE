@@ -56,7 +56,7 @@ export default function ChatbotInsight({
                 className="flex justify-between items-center text-sm bg-yellow-50 shadow-sm rounded-md px-3 py-2"
               >
                 <span>{item.label}</span>
-                <span className="text-yellow-600">{item.count}</span>
+                <span className="text-yellow-600">{item.value}</span>
               </div>
             ))
           ) : (

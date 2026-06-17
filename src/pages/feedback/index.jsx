@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import FeedbackMetrics from "./components/feedbackMetrics";
 import FeedbackToolbar from "./components/feedbackToolbar";
@@ -8,6 +9,8 @@ import NewFeedbackModal from "./components/newFeedbackModal";
 import { useFeedback } from "./hooks/useFeedback";
 
 export default function Feedback() {
+  const [searchParams] = useSearchParams();
+  const headerSearchQuery = searchParams.get("search");
   const {
     feedbacks,
     dashboardStats,
@@ -26,6 +29,16 @@ export default function Feedback() {
   const [rating, setRating] = useState("all");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
+
+  useEffect(() => {
+    if (headerSearchQuery !== null) {
+      const timer = window.setTimeout(() => {
+        setSearch(headerSearchQuery);
+      }, 0);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [headerSearchQuery]);
 
   // Reset all active filters
   const handleResetFilters = () => {

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  getDashboardActivities,
   getDashboardInsights,
-  getDashboardSummary,
-  getDashboardTimeseries,
+  getDashboardMessagesChart,
+  getDashboardOverview,
+  getDashboardSourceBreakdown,
 } from "@/services/dashboard.service";
 
 const emptyTimeseries = {
@@ -19,6 +21,8 @@ const emptyInsights = {
   escalated: [],
   notes: [],
 };
+
+const emptyActivities = [];
 
 const emptySummaryCards = [
   {
@@ -65,7 +69,7 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(numberValue) ? numberValue : fallback;
 };
 
-const formatDateParam = (date) => {
+const formatDateParts = (date) => {
   if (!date) return undefined;
   const parsedDate = date instanceof Date ? date : new Date(date);
   if (Number.isNaN(parsedDate.getTime())) return undefined;
@@ -74,7 +78,19 @@ const formatDateParam = (date) => {
   const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
   const day = String(parsedDate.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
+  return { year, month, day };
+};
+
+const formatDateRangeParams = (date) => {
+  const parts = formatDateParts(date);
+  if (!parts) return {};
+
+  const dateText = `${parts.year}-${parts.month}-${parts.day}`;
+
+  return {
+    start_date: `${dateText}T00:00:00`,
+    end_date: `${dateText}T23:59:59`,
+  };
 };
 
 const formatBucketLabel = (bucket) => {
@@ -106,6 +122,47 @@ const normalizeTrend = (trend) => {
 };
 
 const normalizeSummaryCards = (summary = {}) => {
+  if (summary.cards) {
+    const cardConfigs = [
+      {
+        key: "total_percakapan",
+        title: "Total Percakapan",
+        source: summary.cards.total_conversations,
+      },
+      {
+        key: "total_respons_chatbot",
+        title: "Total Respons Chatbot",
+        source: summary.cards.chatbot_response,
+      },
+      {
+        key: "total_respons_admin",
+        title: "Total Respons Admin",
+        source: summary.cards.admin_response,
+      },
+      {
+        key: "konversi_booking",
+        title: "Konversi Booking",
+        source: summary.cards.booking_conversion,
+      },
+    ];
+
+    return cardConfigs.map((config) => {
+      const card = config.source ?? {};
+      const trend = normalizeTrend(card.direction);
+      const change = toNumber(card.change_percent);
+      const sign = change > 0 ? "+" : "";
+
+      return {
+        key: config.key,
+        title: config.title,
+        value: formatValue(card.value, card.unit),
+        graph: `${sign}${change.toFixed(1)}%`,
+        trend,
+        subtitle: "dibanding sebelumnya",
+      };
+    });
+  }
+
   const cards = toArray(summary.kartu);
   const sourceCards = cards.length > 0 ? cards : emptySummaryCards;
 
@@ -126,14 +183,32 @@ const normalizeSummaryCards = (summary = {}) => {
 };
 
 const normalizeTimeseries = (timeseries = {}) => {
-  const points = toArray(timeseries.titik);
+  const points = toArray(timeseries.series ?? timeseries.titik);
 
   return {
-    categories: points.map((point) => formatBucketLabel(point.mulai_bucket)),
-    conversations: points.map((point) => toNumber(point.total_percakapan)),
-    handlingCategories: points.map((point) => formatBucketLabel(point.mulai_bucket)),
-    ai: points.map((point) => toNumber(point.total_respons_chatbot)),
-    human: points.map((point) => toNumber(point.total_respons_admin)),
+    categories: points.map((point) => point.label || formatBucketLabel(point.mulai_bucket)),
+    conversations: points.map((point) =>
+      toNumber(point.unique_senders ?? point.inbound ?? point.total_percakapan),
+    ),
+    handlingCategories: [],
+    ai: [],
+    human: [],
+  };
+};
+
+const normalizeSourceBreakdown = (sourceBreakdown = {}) => {
+  const breakdown = toArray(sourceBreakdown.breakdown);
+  const human = breakdown
+    .filter((item) => item.source === "admin")
+    .reduce((sum, item) => sum + toNumber(item.count), 0);
+  const ai = breakdown
+    .filter((item) => item.source !== "admin")
+    .reduce((sum, item) => sum + toNumber(item.count), 0);
+
+  return {
+    handlingCategories: ["AI", "Human"],
+    ai: [ai],
+    human: [human],
   };
 };
 
@@ -150,31 +225,93 @@ const normalizeIntentItems = (items) => {
   return withPercent(
     toArray(items).map((item) => ({
       label: item.intent || item.label || item.nama || "Unknown",
-      value: toNumber(item.jumlah ?? item.nilai ?? item.value),
-      count: toNumber(item.jumlah ?? item.nilai ?? item.count),
+      value: toNumber(item.jumlah ?? item.nilai ?? item.value ?? item.count),
+      count: toNumber(item.jumlah ?? item.nilai ?? item.count ?? item.value),
     })),
   );
 };
 
 const normalizeInsights = (insights = {}) => {
   return {
-    intents: normalizeIntentItems(insights.intent_terdeteksi_teratas),
-    lowConfidence: normalizeIntentItems(insights.intent_kepercayaan_rendah),
-    escalated: normalizeIntentItems(insights.sering_dieskalasi),
+    intents: normalizeIntentItems(
+      insights.top_detected_intents ?? insights.intent_terdeteksi_teratas,
+    ),
+    lowConfidence: withPercent(
+      toArray(
+        insights.low_confidence_intents ?? insights.intent_kepercayaan_rendah,
+      ).map((item) => ({
+        label: item.intent || item.label || "Unknown",
+        value: `${formatValue(item.estimated_confidence ?? item.value ?? item.count, "%")}`,
+        count: toNumber(
+          item.estimated_confidence ?? item.count ?? item.value,
+        ),
+      })),
+    ),
+    escalated: withPercent(
+      toArray(insights.frequently_escalated ?? insights.sering_dieskalasi).map(
+        (item) => ({
+          label: item.topic || item.intent || item.label || "Unknown",
+          value: toNumber(item.handoff_count ?? item.value ?? item.count),
+          count: toNumber(item.handoff_count ?? item.count ?? item.value),
+        }),
+      ),
+    ),
     notes: toArray(insights.catatan),
   };
+};
+
+const formatActivityTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const normalizeActivityType = (category) => {
+  if (category === "appointments") return "booking";
+  if (category === "handoff") return "handoff";
+  if (category === "feedback") return "feedback";
+  if (category === "patients") return "patients";
+  if (category === "auth" || category === "system_config") return "system";
+  if (category === "marketing") return "marketing";
+  return "chat";
+};
+
+const normalizeActivities = (activities = {}) => {
+  return toArray(activities.activities).map((item) => ({
+    id: item.id,
+    type: normalizeActivityType(item.category),
+    title: item.action || item.category || "Aktivitas",
+    desc: item.message || "-",
+    time: formatActivityTime(item.created_at),
+    status: item.category
+      ? {
+          label: item.category,
+          color:
+            item.category === "handoff"
+              ? "yellow"
+              : item.category === "system_config"
+                ? "red"
+                : "green",
+        }
+      : null,
+  }));
 };
 
 export function useDashboardAnalytics({ date } = {}) {
   const [summary, setSummary] = useState({});
   const [timeseries, setTimeseries] = useState(emptyTimeseries);
   const [insights, setInsights] = useState(emptyInsights);
+  const [activities, setActivities] = useState(emptyActivities);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const params = useMemo(() => {
-    const selectedDate = formatDateParam(date);
-    return selectedDate ? { date: selectedDate } : {};
+    return formatDateRangeParams(date);
   }, [date]);
 
   const fetchAnalytics = useCallback(async () => {
@@ -182,16 +319,27 @@ export function useDashboardAnalytics({ date } = {}) {
     setError(null);
 
     try {
-      const [summaryResponse, timeseriesResponse, insightsResponse] =
-        await Promise.all([
-          getDashboardSummary(params),
-          getDashboardTimeseries(params),
-          getDashboardInsights(params),
-        ]);
+      const [
+        overviewResponse,
+        messagesChartResponse,
+        sourceBreakdownResponse,
+        insightsResponse,
+        activitiesResponse,
+      ] = await Promise.all([
+        getDashboardOverview(params),
+        getDashboardMessagesChart({ ...params, group_by: "hour" }),
+        getDashboardSourceBreakdown(params),
+        getDashboardInsights(params),
+        getDashboardActivities({ ...params, limit: 50 }),
+      ]);
 
-      setSummary(unwrap(summaryResponse));
-      setTimeseries(normalizeTimeseries(unwrap(timeseriesResponse)));
+      setSummary(unwrap(overviewResponse));
+      setTimeseries({
+        ...normalizeTimeseries(unwrap(messagesChartResponse)),
+        ...normalizeSourceBreakdown(unwrap(sourceBreakdownResponse)),
+      });
       setInsights(normalizeInsights(unwrap(insightsResponse)));
+      setActivities(normalizeActivities(unwrap(activitiesResponse)));
     } catch (err) {
       console.warn("Dashboard analytics API failed:", err);
       setError(
@@ -202,6 +350,7 @@ export function useDashboardAnalytics({ date } = {}) {
       setSummary({});
       setTimeseries(emptyTimeseries);
       setInsights(emptyInsights);
+      setActivities(emptyActivities);
     } finally {
       setLoading(false);
     }
@@ -218,6 +367,7 @@ export function useDashboardAnalytics({ date } = {}) {
   const kpiCards = useMemo(() => normalizeSummaryCards(summary), [summary]);
 
   return {
+    activities,
     error,
     fetchAnalytics,
     insights,

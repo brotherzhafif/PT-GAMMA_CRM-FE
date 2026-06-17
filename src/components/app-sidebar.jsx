@@ -3,8 +3,9 @@
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
-// import { NavUser } from "@/components/nav-user"
+import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
+import { getStoredUser } from "@/services/auth.service"
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +13,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { 
   AudioLinesIcon, 
   TerminalIcon, 
@@ -121,6 +121,13 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const storedUser = getStoredUser()
+  const user = {
+    name: storedUser?.name || storedUser?.email || data.user.name,
+    email: storedUser?.email || data.user.email,
+    avatar: storedUser?.image || storedUser?.avatar || data.user.avatar,
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -130,12 +137,8 @@ export function AppSidebar({
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
-      <SidebarFooter className="border-t border-gray-300">
-        {/* <NavUser user={data.user} /> */}
-        <Button variant="link" size="sm" className="py-5 w-full flex flex-row items-center justify-start cursor-pointer text-gray-400 gap-2">
-          <HelpCircle />
-          <span>Help & Support</span>
-        </Button>
+      <SidebarFooter className="border-t border-sidebar-border">
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

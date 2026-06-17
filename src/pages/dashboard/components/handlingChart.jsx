@@ -1,80 +1,55 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import ReactApexChart from "react-apexcharts";
 
-const PAGE_SIZE = 6;
-
 export default function HandlingChart({
-  categories = [],
   aiData = [],
   humanData = [],
 }) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const hasData =
-    aiData.some((value) => Number(value) > 0) ||
-    humanData.some((value) => Number(value) > 0);
-  const totalPoints = Math.max(categories.length, aiData.length, humanData.length);
-  const totalPages = Math.max(Math.ceil(totalPoints / PAGE_SIZE), 1);
-  const page = Math.min(currentPage, totalPages - 1);
-  const start = page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const visibleCategories = categories.slice(start, end);
-  const visibleAiData = aiData.slice(start, end);
-  const visibleHumanData = humanData.slice(start, end);
-  const canPaginate = totalPoints > PAGE_SIZE;
-
-  const series = [
-    {
-      name: "AI",
-      data: visibleAiData,
-    },
-    {
-      name: "Human",
-      data: visibleHumanData,
-    },
-  ];
+  const aiTotal = aiData.reduce((sum, value) => sum + Number(value || 0), 0);
+  const humanTotal = humanData.reduce((sum, value) => sum + Number(value || 0), 0);
+  const hasData = aiTotal > 0 || humanTotal > 0;
+  const series = [aiTotal, humanTotal];
 
   const options = {
     chart: {
-      type: "bar",
+      type: "donut",
       width: "100%",
-      stacked: true,
       toolbar: { show: false },
     },
-    plotOptions: {
-      bar: {
-        columnWidth: "40%",
-        borderRadius: 6,
-      },
-    },
+    labels: ["AI", "Human"],
     colors: ["#065f46", "#f59e0b"],
     dataLabels: {
-      enabled: false,
-    },
-    grid: {
-      show: false,
-    },
-    xaxis: {
-      categories: visibleCategories,
-      labels: {
-        style: {
-          colors: "#9ca3af",
-          fontSize: "12px",
-        },
-      },
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-    },
-    yaxis: {
-      show: false,
+      enabled: true,
+      formatter: (value) => `${value.toFixed(1)}%`,
     },
     legend: {
-      show: false,
+      show: true,
+      position: "bottom",
+      fontSize: "12px",
+      markers: {
+        size: 8,
+      },
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: "68%",
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: "Total",
+              formatter: () => `${aiTotal + humanTotal}`,
+            },
+          },
+        },
+      },
     },
     tooltip: {
       theme: "light",
+      y: {
+        formatter: (value) => `${value} respons`,
+      },
     },
   };
 
@@ -86,45 +61,9 @@ export default function HandlingChart({
             Handling (Chatbot vs Human)
           </h3>
 
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col items-start gap-0 text-xs">
-              <div className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-700"></span>
-                <span className="text-muted-foreground">AI</span>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                <span className="text-muted-foreground">Human</span>
-              </div>
-            </div>
-            {canPaginate && (
-              <div className="flex items-center gap-1">
-                <Button
-                  disabled={page === 0}
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                  size="icon-xs"
-                  type="button"
-                  variant="ghost"
-                >
-                  <ChevronLeft />
-                </Button>
-                <span className="w-14 text-center text-xs text-muted-foreground">
-                  {page + 1}/{totalPages}
-                </span>
-                <Button
-                  disabled={page >= totalPages - 1}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
-                  }
-                  size="icon-xs"
-                  type="button"
-                  variant="ghost"
-                >
-                  <ChevronRight />
-                </Button>
-              </div>
-            )}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span>{aiTotal} AI</span>
+            <span>{humanTotal} Human</span>
           </div>
         </div>
       </CardHeader>
@@ -135,7 +74,7 @@ export default function HandlingChart({
             <ReactApexChart
               options={options}
               series={series}
-              type="bar"
+              type="donut"
               height={260}
               width="100%"
             />

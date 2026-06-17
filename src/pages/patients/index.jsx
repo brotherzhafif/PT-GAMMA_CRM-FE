@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
@@ -12,6 +12,8 @@ import { AlertWithMedia } from "@/components/ui/alert-with-media";
 
 export default function PatientsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const headerSearchQuery = searchParams.get("search");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showDetailPanel, setShowDetailPanel] = useState(false);
   const [formPatient, setFormPatient] = useState(null);
@@ -38,6 +40,12 @@ export default function PatientsPage() {
     editPatient,
     removePatient,
   } = usePatients();
+
+  useEffect(() => {
+    if (headerSearchQuery !== null) {
+      setSearchQuery(headerSearchQuery);
+    }
+  }, [headerSearchQuery, setSearchQuery]);
 
   const handleSelectPatient = async (patient) => {
     setSelectedPatient(patient);

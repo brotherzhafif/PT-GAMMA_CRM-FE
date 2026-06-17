@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,8 @@ import { DailySummaryCard } from "./components/daily.summary.card";
 import { formatDateForApi, useAppointments } from "./hooks/useAppointments.hook";
 
 export default function Appointments() {
+  const [searchParams] = useSearchParams();
+  const headerSearchQuery = searchParams.get("search");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -23,6 +26,12 @@ export default function Appointments() {
     setSearchPhone,
     fetchAppointments,
   } = useAppointments(selectedDate);
+
+  useEffect(() => {
+    if (headerSearchQuery !== null) {
+      setSearchPhone(headerSearchQuery);
+    }
+  }, [headerSearchQuery, setSearchPhone]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);

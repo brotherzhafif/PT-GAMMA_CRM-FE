@@ -2,7 +2,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Calendar, AlertCircle, UserRound } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Megaphone,
+  MessageCircle,
+  Settings,
+  Star,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 const getIcon = (type) => {
   switch (type) {
@@ -12,6 +21,14 @@ const getIcon = (type) => {
       return <Calendar className="text-green-500" size={18} />;
     case "handoff":
       return <UserRound className="text-yellow-500" size={18} />;
+    case "feedback":
+      return <Star className="text-yellow-500" size={18} />;
+    case "patients":
+      return <Users className="text-green-500" size={18} />;
+    case "marketing":
+      return <Megaphone className="text-green-500" size={18} />;
+    case "system":
+      return <Settings className="text-red-500" size={18} />;
     case "error":
       return <AlertCircle className="text-red-500" size={18} />;
     default:
@@ -52,6 +69,14 @@ const getIconWrapper = (type) => {
       return "bg-green-100 text-green-600";
     case "handoff":
       return "bg-yellow-100 text-yellow-600";
+    case "feedback":
+      return "bg-yellow-100 text-yellow-600";
+    case "patients":
+      return "bg-green-100 text-green-600";
+    case "marketing":
+      return "bg-green-100 text-green-600";
+    case "system":
+      return "bg-red-100 text-red-600";
     case "error":
       return "bg-red-100 text-red-600";
     default:
@@ -71,13 +96,13 @@ export default function LiveActivity({ activities = [] }) {
           </div>
         </CardTitle>
 
-        <Button
+        {/* <Button
           variant="ghost"
           size="sm"
           className="text-sm text-primary cursor-pointer"
         >
           View All
-        </Button>
+        </Button> */}
       </CardHeader>
 
       <CardContent className="p-0">
@@ -86,9 +111,9 @@ export default function LiveActivity({ activities = [] }) {
             <div className="flex flex-col gap-4">
               {activities.map((item) => (
                 <div
-                  key={`${item.title}-${item.time}`}
+                  key={item.id || `${item.title}-${item.time}`}
                   className={`flex gap-3 p-3 rounded-lg shadow-md border ${
-                    item.type === "error"
+                    item.type === "error" || item.type === "system"
                       ? "bg-red-50 border-red-200"
                       : "bg-white border-slate-200"
                   }`}
@@ -105,7 +130,9 @@ export default function LiveActivity({ activities = [] }) {
                     <div className="flex justify-between items-start">
                       <h4
                         className={`text-sm font-semibold ${
-                          item.type === "error" ? "text-red-600" : ""
+                          item.type === "error" || item.type === "system"
+                            ? "text-red-600"
+                            : ""
                         }`}
                       >
                         {item.title}

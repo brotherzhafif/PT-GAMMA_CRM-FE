@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -68,11 +69,24 @@ export default function CampaignsTable({
   onRefresh,
   onCreate,
 }) {
+  const [searchParams] = useSearchParams();
+  const headerSearchQuery = searchParams.get("search");
   const [searchValue, setSearchValue] = useState("");
 
   const [selectedStatus, setSelectedStatus] = useState("All");
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    if (headerSearchQuery !== null) {
+      const timer = window.setTimeout(() => {
+        setSearchValue(headerSearchQuery);
+        setCurrentPage(1);
+      }, 0);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [headerSearchQuery]);
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => {

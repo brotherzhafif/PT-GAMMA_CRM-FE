@@ -27,6 +27,7 @@ export default function Inbox() {
   const [targetChat, setTargetChat] = useState(null);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const targetPhone = location.state?.phone || searchParams.get("phone");
+  const initialSearch = searchParams.get("search") || "";
   const activeChat = selectedChat || targetChat;
 
   const handleSelectChat = (chat) => {
@@ -101,7 +102,11 @@ export default function Inbox() {
   return (
     <div className="flex gap-2 h-[81vh] overflow-y-hidden w-full bg-background">
       <Card className="w-[300px] flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden">
-        <InboxList onSelect={handleSelectChat} selectedId={activeChat?.id} />
+        <InboxList
+          initialSearch={initialSearch}
+          onSelect={handleSelectChat}
+          selectedId={activeChat?.id}
+        />
       </Card>
 
       <Card className="flex-1 flex flex-col rounded-lg">

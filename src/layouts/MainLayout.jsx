@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppSidebar } from "../components/app-sidebar";
 import {
   DropdownMenu,
@@ -22,6 +22,97 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getStoredUser, logout } from "@/services/auth.service";
 import { useActivityNotifications } from "@/hooks/useActivityNotifications";
 import { toast } from "sonner";
+
+const searchDestinations = [
+  {
+    title: "Dashboard",
+    description: "Operational overview, KPI, analytics",
+    path: "/dashboard",
+    keywords: "dashboard overview analytics kpi conversation chatbot",
+  },
+  {
+    title: "Inbox",
+    description: "Conversations and WhatsApp messages",
+    path: "/inbox",
+    keywords: "inbox conversation chat whatsapp message unified box",
+  },
+  {
+    title: "Patients",
+    description: "Patient database, RME, phone, NIK",
+    path: "/patients",
+    keywords: "patients pasien patient database phone nik rme",
+  },
+  {
+    title: "Appointments",
+    description: "Schedule, booking, doctors",
+    path: "/appointments",
+    keywords: "appointments appointment schedule booking doctor queue",
+  },
+  {
+    title: "Marketing",
+    description: "Campaigns and broadcasts",
+    path: "/marketing",
+    keywords: "marketing campaign broadcast promo",
+  },
+  {
+    title: "Feedback",
+    description: "Ratings, reviews, support",
+    path: "/feedback",
+    keywords: "feedback support rating review complaint",
+  },
+  {
+    title: "WhatsApp API Settings",
+    description: "Connection and credentials",
+    path: "/settings",
+    keywords: "settings whatsapp api credential connection",
+  },
+  {
+    title: "Chatbot Settings",
+    description: "AI persona and hybrid AI",
+    path: "/settings/chatbot-settings",
+    keywords: "settings chatbot ai persona hybrid",
+  },
+  {
+    title: "User Roles",
+    description: "Team members and permissions",
+    path: "/settings/user-roles",
+    keywords: "settings user role permission team",
+  },
+  {
+    title: "Security",
+    description: "Account security and audit log",
+    path: "/settings/security",
+    keywords: "settings security login audit session",
+  },
+];
+
+const searchableTargets = [
+  {
+    title: "Search patients",
+    description: "Name, phone, NIK, or RME",
+    path: "/patients",
+  },
+  {
+    title: "Search inbox",
+    description: "Conversation name or message list",
+    path: "/inbox",
+  },
+  {
+    title: "Search appointments",
+    description: "Patient, phone, doctor, queue, status",
+    path: "/appointments",
+  },
+  {
+    title: "Search campaigns",
+    description: "Campaign name",
+    path: "/marketing",
+  },
+  {
+    title: "Search feedback",
+    description: "Patient name or comment",
+    path: "/feedback",
+  },
+];
 
 export default function MainLayout() {
   const matches = useMatches();
@@ -51,13 +142,8 @@ export default function MainLayout() {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                  <div className="relative hidden md:block w-44 lg:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      type="search"
-                      placeholder="Search..."
-                      className="w-full pl-10 rounded-full border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
+                  <div className="hidden md:block w-44 lg:w-64">
+                    <HeaderSearch />
                   </div>
 
                   <MobileSearch />
@@ -93,6 +179,118 @@ export default function MainLayout() {
   );
 }
 
+function HeaderSearch({ autoFocus = false, onNavigate }) {
+  const navigate = useNavigate();
+  const wrapperRef = useRef(null);
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const results = useMemo(() => {
+    if (!normalizedQuery) {
+      return searchDestinations.slice(0, 5);
+    }
+
+    const matchedDestinations = searchDestinations.filter((item) => {
+      const searchable = `${item.title} ${item.description} ${item.keywords}`.toLowerCase();
+      return searchable.includes(normalizedQuery);
+    });
+
+    const targetResults = searchableTargets.map((item) => ({
+      ...item,
+      title: `${item.title}: "${query.trim()}"`,
+      path: `${item.path}?search=${encodeURIComponent(query.trim())}`,
+    }));
+
+    return [...matchedDestinations, ...targetResults].slice(0, 7);
+  }, [normalizedQuery, query]);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    setOpen(false);
+    setQuery("");
+    onNavigate?.();
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (results.length > 0) {
+      handleNavigate(results[0].path);
+      return;
+    }
+
+    if (query.trim()) {
+      handleNavigate(`/patients?search=${encodeURIComponent(query.trim())}`);
+    }
+  };
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <form onSubmit={handleSubmit}>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+        <Input
+          autoFocus={autoFocus}
+          type="search"
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpen(false);
+              event.currentTarget.blur();
+            }
+          }}
+          placeholder="Search..."
+          className="w-full pl-10 rounded-full border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+        />
+      </form>
+
+      {open && (
+        <div className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
+          {results.length > 0 ? (
+            <div className="flex flex-col">
+              {results.map((item) => (
+                <button
+                  key={`${item.title}-${item.path}`}
+                  type="button"
+                  onClick={() => handleNavigate(item.path)}
+                  className="flex w-full flex-col rounded-lg px-3 py-2 text-left hover:bg-muted"
+                >
+                  <span className="text-sm font-medium text-foreground">
+                    {item.title}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {item.description}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+              No results found.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MobileSearch() {
   const [open, setOpen] = useState(false);
 
@@ -111,15 +309,7 @@ function MobileSearch() {
 
       {open && (
         <div className="absolute right-0 top-10 w-64 z-50 bg-white dark:bg-card shadow-lg rounded-xl p-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              autoFocus
-              type="search"
-              placeholder="Search..."
-              className="w-full pl-10 rounded-full border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-          </div>
+          <HeaderSearch autoFocus onNavigate={() => setOpen(false)} />
         </div>
       )}
     </div>

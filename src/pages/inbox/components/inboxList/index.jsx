@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
@@ -7,13 +7,24 @@ import ChatItem from "./chat-item";
 import FilterTabs from "./filter-tabs";
 import { useUnifiedInbox } from "../../hooks/useUnifiendInbox.hooks";
 
-export default function InboxList({ onSelect, selectedId }) {
+export default function InboxList({ initialSearch = "", onSelect, selectedId }) {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const { chats, loading, error } = useUnifiedInbox();
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearch(initialSearch);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [initialSearch]);
+
   const filtered = chats.filter((chat) => {
-    const matchSearch = chat.name?.toLowerCase().includes(search.toLowerCase());
+    const query = search.toLowerCase();
+    const matchSearch = [chat.name, chat.phone, chat.last, chat.channel]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(query));
 
     if (activeFilter === "all") return matchSearch;
 

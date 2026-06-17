@@ -29,7 +29,7 @@ const kpiIcons = {
 
 export default function Dashboard() {
   const [date, setDate] = useState(new Date());
-  const { error, insights, kpiCards, loading, timeseries } =
+  const { activities, error, insights, kpiCards, loading, timeseries } =
     useDashboardAnalytics({ date });
   const conversionFunnelData = [];
 
@@ -183,7 +183,7 @@ export default function Dashboard() {
           />
         </div>
         <div className="w-full">
-          <LiveActivity />
+          <LiveActivity activities={activities} />
         </div>
       </div>
     </div>
