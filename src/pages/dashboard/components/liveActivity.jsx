@@ -133,7 +133,7 @@ export default function LiveActivity({ activities = [] }) {
                           item.type === "error" || item.type === "system"
                             ? "text-red-600"
                             : ""
-                        }`}
+                       }`}
                       >
                         {item.title}
                       </h4>
