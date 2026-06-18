@@ -11,7 +11,7 @@ export default function SearchInput({ value, disabled, onChange }) {
         disabled={disabled}
         onChange={onChange}
         placeholder="Search patient by name, NIK, RME, or phone..."
-        className="pl-9"
+        className="pl-9 text-sm"
       />
     </div>
   );

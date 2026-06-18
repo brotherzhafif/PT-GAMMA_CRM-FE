@@ -36,7 +36,12 @@ const TypingBubble = () => {
   );
 };
 
-export default function ChatArea({ chat, onToggleProfile, showProfilePanel }) {
+export default function ChatArea({
+  chat,
+  onToggleProfile,
+  showProfilePanel,
+  onCloseChat,
+}) {
   const {
     messages,
     loading,
@@ -131,6 +136,7 @@ export default function ChatArea({ chat, onToggleProfile, showProfilePanel }) {
         onToggleProfile={onToggleProfile}
         showProfilePanel={showProfilePanel}
         isTyping={isTyping}
+        onCloseChat={onCloseChat}
       />
 
       {loading && (

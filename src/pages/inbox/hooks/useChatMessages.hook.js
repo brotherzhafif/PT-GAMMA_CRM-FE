@@ -14,6 +14,13 @@ const unwrapMessages = (response) => {
   return [];
 };
 
+const getSenderType = (msg = {}) => {
+  if (msg.direction === "inbound") return "human";
+  if (msg.source === "admin") return "human";
+
+  return "ai";
+};
+
 export function useChatMessages(phone_number) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +54,7 @@ Terima kasih 🙏`,
         id: msg.id || `${msg.created_at}-${i}`,
         text: msg.message_text || "Teks kosong",
         sender: msg.direction === "inbound" ? "patient" : "agent",
-        senderType: msg.source === "system" ? "ai" : "human",
+        senderType: getSenderType(msg),
         time: msg.created_at ? formatChatTime(msg.created_at) : "",
         createdAt: msg.created_at,
         isEscalation: msg.is_escalation || false,

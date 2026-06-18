@@ -189,9 +189,13 @@ export default function PatientsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full ">
-      <div className="flex gap-4 h-[calc(100vh-150px)] overflow-hidden w-full">
-        <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+    <div className="flex flex-col gap-4 w-full sm:gap-6">
+      <div className="flex flex-col gap-4 overflow-visible w-full lg:h-[calc(100vh-150px)] lg:overflow-hidden lg:flex-row">
+        <div
+          className={`min-h-0 flex-1 flex-col gap-4 overflow-visible lg:overflow-hidden ${
+            showDetailPanel && selectedPatient ? "hidden lg:flex" : "flex"
+          }`}
+        >
           <PatientsToolbar
             totalPatients={patients.length}
             searchQuery={searchQuery}
@@ -220,7 +224,7 @@ export default function PatientsPage() {
           />
         </div>
 
-        <div className={`flex-shrink-0 h-full overflow-hidden transition-all duration-300 ease-out ${showDetailPanel && selectedPatient ? "w-[350px]" : "w-0"}`}>
+        <div className={`min-h-[calc(100svh-6rem)] overflow-hidden transition-all duration-300 ease-out lg:h-full lg:min-h-0 lg:flex-shrink-0 ${showDetailPanel && selectedPatient ? "w-full lg:w-[350px]" : "hidden w-0 lg:block"}`}>
           <div className={`h-full transition-opacity duration-300 ease-out ${showDetailPanel && selectedPatient ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
             {selectedPatient && (
               <PatientDetailPanel 

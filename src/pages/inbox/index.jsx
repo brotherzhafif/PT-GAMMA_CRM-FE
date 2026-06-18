@@ -100,8 +100,12 @@ export default function Inbox() {
   }, [activeChat, handleCloseChat]);
 
   return (
-    <div className="flex gap-2 h-[81vh] overflow-y-hidden w-full bg-background">
-      <Card className="w-[300px] flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden">
+    <div className="flex flex-col gap-2 h-[calc(100svh-5.5rem)] overflow-hidden w-full bg-background md:flex-row md:h-[81vh]">
+      <Card
+        className={`h-full flex-col rounded-lg overflow-hidden md:flex md:w-[300px] md:flex-shrink-0 ${
+          activeChat ? "hidden md:flex" : "flex"
+        }`}
+      >
         <InboxList
           initialSearch={initialSearch}
           onSelect={handleSelectChat}
@@ -109,19 +113,24 @@ export default function Inbox() {
         />
       </Card>
 
-      <Card className="flex-1 flex flex-col rounded-lg">
+      <Card
+        className={`min-h-0 flex-1 flex-col rounded-lg ${
+          activeChat ? "flex" : "hidden md:flex"
+        }`}
+      >
         <ChatArea
           chat={activeChat}
           onToggleProfile={handleToggleProfile}
           showProfilePanel={showProfilePanel}
+          onCloseChat={handleCloseChat}
         />
       </Card>
 
       <Card
-        className={`flex-shrink-0 h-full flex flex-col rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`flex-col rounded-lg overflow-hidden transition-all duration-300 ease-out md:h-full md:flex-shrink-0 ${
           showProfilePanel && activeChat
-            ? "w-[300px]"
-            : "w-0 border-0 ring-0 shadow-none"
+            ? "fixed inset-x-3 bottom-3 top-20 z-30 flex md:static md:w-[300px]"
+            : "hidden w-0 border-0 ring-0 shadow-none md:flex"
         }`}
       >
         <div
@@ -131,7 +140,12 @@ export default function Inbox() {
               : "opacity-0 pointer-events-none"
           }`}
         >
-          {activeChat && <ProfilePanel chat={activeChat} />}
+          {activeChat && (
+            <ProfilePanel
+              chat={activeChat}
+              onClose={() => setShowProfilePanel(false)}
+            />
+          )}
         </div>
       </Card>
     </div>

@@ -82,10 +82,10 @@ export default function Appointments() {
   });
 
   return (
-    <div className="w-full flex gap-4 h-[78vh] min-h-0 overflow-hidden">
-      <aside className="w-72 flex-shrink-0 h-full min-h-0 overflow-hidden">
+    <div className="w-full flex flex-col gap-4 min-h-0 overflow-visible lg:h-[78vh] lg:overflow-hidden lg:flex-row">
+      <aside className="w-full flex-shrink-0 overflow-visible lg:w-72 lg:h-full lg:min-h-0 lg:overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="flex flex-col gap-4 p-1 pr-4">
+          <div className="flex flex-col gap-4 p-1 lg:pr-4">
             <AppointmentCalendar 
               mode="single"
               selected={selectedDate}
@@ -96,10 +96,10 @@ export default function Appointments() {
         </ScrollArea>
       </aside>
 
-      <main className="flex-1 min-w-0 h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
-        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold text-slate-800 tracking-tight">{scheduleTitle}</h3>
+      <main className="min-h-[560px] flex-1 min-w-0 flex flex-col bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden lg:min-h-0">
+        <div className="flex-shrink-0 flex flex-col gap-3 px-4 py-4 border-b border-gray-200 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+            <h3 className="text-lg font-bold text-slate-800 tracking-tight sm:text-xl">{scheduleTitle}</h3>
             <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-none px-2 py-0.5">
               {formattedDateTime}
             </Badge>
@@ -119,7 +119,7 @@ export default function Appointments() {
         </div>
 
         <ScrollArea className="flex-1 min-h-0">
-          <div className="px-6 pb-6 pt-2">
+          <div className="px-4 pb-6 pt-2 sm:px-6">
             <AppointmentSearch
               searchPhone={searchPhone}
               onSearchPhoneChange={setSearchPhone}

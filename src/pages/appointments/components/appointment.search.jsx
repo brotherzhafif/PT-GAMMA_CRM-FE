@@ -33,7 +33,7 @@ export function AppointmentSearch({
           onChange={(e) => onSearchPhoneChange(e.target.value)}
         />
       </form>
-      <div className="flex items-center gap-2">
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2 sm:flex sm:flex-wrap">
         <Select value={statusFilter} onValueChange={onStatusFilterChange}>
           <SelectTrigger className="h-9 w-full bg-white">
             <Filter className="h-4 w-4 text-slate-400" />
@@ -47,7 +47,7 @@ export function AppointmentSearch({
             ))}
           </SelectContent>
         </Select>
-        <Button variant="secondary" onClick={onSearch} disabled={loading} className="h-9 w-16 shadow-md">
+        <Button variant="secondary" onClick={onSearch} disabled={loading} className="h-9 px-4 shadow-md">
           Cari
         </Button>
         <Button variant="outline" size="icon" onClick={onRefresh} title="Reset / Refresh Semua" className="h-9 w-9 bg-white">

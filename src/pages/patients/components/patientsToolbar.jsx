@@ -21,15 +21,15 @@ export default function PatientsToolbar({
   onExportCsv,
 }) {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-md">
+    <div className="bg-white rounded-2xl p-4 shadow-md sm:p-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-base font-semibold text-slate-900">Patients</h3>
 
           <p className="text-[11px] text-slate-500">{totalPatients} patients</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="ghost"
@@ -47,24 +47,24 @@ export default function PatientsToolbar({
             className="border border-gray-300 shadow-sm"
           >
             <Download className="w-4 h-4" />
-            Export CSV
+            <span className="hidden sm:inline">Export CSV</span>
           </Button>
 
           <Button type="button" onClick={onAddPatient}>
             <Plus className="w-4 h-4" />
-            Add Patient
+            <span className="hidden sm:inline">Add Patient</span>
           </Button>
         </div>
       </div>
 
       <form onSubmit={onSearchSubmit} className="flex flex-wrap items-center gap-3 mt-5 pt-4 border-t border-slate-100">
-        <div className="w-full flex flex-row items-center justify-between gap-2">
+        <div className="w-full flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <SearchInput
             value={searchQuery}
             disabled={isSearching}
             onChange={(event) => onSearchChange(event.target.value)}
           />
-          <div className="flex flex-row gap-2 items-center">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center md:w-auto">
             <VisitFilter value={lastVisitDate} onChange={onLastVisitChange} />
 
             <TagsFilter value={selectedTag} options={tagOptions} onChange={onTagChange} />

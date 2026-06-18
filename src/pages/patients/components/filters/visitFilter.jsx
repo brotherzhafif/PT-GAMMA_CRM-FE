@@ -14,7 +14,7 @@ export default function VisitFilter({ value, onChange }) {
         <Button
           type="button"
           variant="ghost"
-          className="flex shadow-md items-center gap-2"
+          className="flex w-full items-center justify-start gap-2 shadow-md sm:w-auto"
         >
           <CalendarDays className="w-4 h-4" />
           {value || "Last Visit"}

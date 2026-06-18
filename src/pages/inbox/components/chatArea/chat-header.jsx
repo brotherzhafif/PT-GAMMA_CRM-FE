@@ -2,10 +2,16 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Bot } from "lucide-react";
+import { ArrowLeft, UserPlus, Bot } from "lucide-react";
 import { createHandoffByPhoneNumber, deleteHandoffByPhoneNumber } from "@/services/unifiendBox.service";
 
-export default function ChatHeader({ chat, onToggleProfile, showProfilePanel, isTyping }) {
+export default function ChatHeader({
+  chat,
+  onToggleProfile,
+  showProfilePanel,
+  isTyping,
+  onCloseChat,
+}) {
   const [loading, setLoading] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(chat?.status);
   const isHandedOff = currentStatus === "needs-human" || currentStatus === "human";
@@ -39,9 +45,20 @@ export default function ChatHeader({ chat, onToggleProfile, showProfilePanel, is
   };
 
   return (
-    <div className="flex items-center justify-between gap-3 px-4 pb-3 shadow-sm">
+    <div className="flex items-center justify-between gap-3 px-3 pb-3 shadow-sm sm:px-4">
+      {onCloseChat && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onCloseChat}
+          className="h-8 w-8 shrink-0 p-0 md:hidden"
+          aria-label="Back to inbox"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+      )}
       <div
-        className="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity select-none "
+        className="flex min-w-0 flex-1 items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity select-none "
         onClick={onToggleProfile}
         title={showProfilePanel ? "Hide profile" : "Show profile"}
       >
@@ -51,8 +68,8 @@ export default function ChatHeader({ chat, onToggleProfile, showProfilePanel, is
             {chat?.name?.split(" ").map((n) => n[0]).join("").slice(0, 2) || "??"}
           </AvatarFallback>
         </Avatar>
-        <div>
-          <p className="font-semibold text-sm leading-tight">{chat?.name}</p>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-sm leading-tight">{chat?.name}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className={`w-2 h-2 rounded-full inline-block ${isTyping ? "bg-green-500 animate-pulse" : "bg-green-500"}`} />
             

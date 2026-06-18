@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
+  X,
   // Bot,
   // UserPlus,
   // RefreshCw,
@@ -26,7 +27,7 @@ const formatDate = (date) => {
   }).format(new Date(date));
 };
 
-export default function ProfilePanel({ chat }) {
+export default function ProfilePanel({ chat, onClose }) {
   const { patient } = usePatientProfile({
     patientId: chat?.patientId,
     phoneNumber: chat?.phone,
@@ -41,6 +42,19 @@ export default function ProfilePanel({ chat }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-4 space-y-5">
+        {onClose && (
+          <div className="flex justify-end md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0"
+              aria-label="Close profile"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
         <div className="flex flex-col items-center text-center pt-2">
           <Avatar className="w-20 h-20">
             <AvatarImage src="/avatar.png" />

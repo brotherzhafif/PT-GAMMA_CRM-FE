@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, FilterX } from "lucide-react";
+import { Search, FilterX } from "lucide-react";
 
 export default function FeedbackToolbar({
   search,
@@ -12,7 +12,6 @@ export default function FeedbackToolbar({
   setCategory,
   status,
   setStatus,
-  onAddClick,
   onResetFilters
 }) {
   const categories = ["Treatment", "Wait Time", "Facility", "Billing", "Service"];
@@ -22,11 +21,11 @@ export default function FeedbackToolbar({
   const hasActiveFilters = search !== "" || rating !== "all" || category !== "all" || status !== "all";
 
   return (
-    <div className="bg-white dark:bg-card rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-800">
+    <div className="bg-white dark:bg-card rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-800 sm:p-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-foreground">Patient Feedbacks</h3>
-          <p className="text-xs text-muted-foreground">Monitor and manage clinical feedback reports</p>
+        <div className="min-w-0">
+          <h3 className="text-base font-bold text-foreground sm:text-lg">Patient Feedbacks</h3>
+          <p className="text-xs leading-4 text-muted-foreground">Monitor and manage clinical feedback reports</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -49,7 +48,7 @@ export default function FeedbackToolbar({
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-slate-100 dark:border-gray-800">
+      <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-gray-800 md:flex-row">
         {/* Search */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -62,10 +61,10 @@ export default function FeedbackToolbar({
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:flex md:flex-wrap md:items-center">
           {/* Category */}
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-[140px] bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs">
+            <SelectTrigger className="w-full bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs md:w-[140px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -78,7 +77,7 @@ export default function FeedbackToolbar({
 
           {/* Rating */}
           <Select value={rating} onValueChange={setRating}>
-            <SelectTrigger className="w-[120px] bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs">
+            <SelectTrigger className="w-full bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs md:w-[120px]">
               <SelectValue placeholder="Rating" />
             </SelectTrigger>
             <SelectContent>
@@ -91,7 +90,7 @@ export default function FeedbackToolbar({
 
           {/* Status */}
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-[120px] bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs">
+            <SelectTrigger className="w-full bg-slate-50 border-gray-300 dark:bg-input/20 dark:border-gray-700 h-9 text-xs md:w-[120px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>

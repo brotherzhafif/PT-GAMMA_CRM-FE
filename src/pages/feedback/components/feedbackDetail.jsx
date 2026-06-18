@@ -98,8 +98,8 @@ export default function FeedbackDetail({
   return (
     <Card className="h-full flex flex-col bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
       {/* Header */}
-      <CardHeader className="flex flex-row items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-0">
-        <div className="flex items-center gap-2">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-0 sm:px-5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="text-sm font-bold text-foreground">Feedback Details</span>
           <Badge variant="outline" className={`text-[10px] px-2 py-0 font-medium ${sentimentStyles[feedback.sentiment]}`}>
             {feedback.sentiment} Sentiment
@@ -112,34 +112,34 @@ export default function FeedbackDetail({
 
       {/* Main Content Area */}
       <ScrollArea className="flex-1 w-full">
-        <div className="p-5 flex flex-col gap-5">
+        <div className="p-4 flex flex-col gap-5 sm:p-5">
           {/* Patient Profile Snapshot using Card */}
-          <Card className="flex items-start justify-between gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-150 dark:border-gray-800">
-            <div className="flex items-center gap-3">
+          <Card className="flex flex-col gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-150 dark:border-gray-800 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarFallback className="font-bold text-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
                   {feedback.avatar}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-foreground">{feedback.patientName}</span>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-sm font-bold text-foreground">{feedback.patientName}</span>
                 <span className="text-[10px] text-muted-foreground">Patient Record</span>
               </div>
             </div>
 
-            <div className="flex flex-col items-end gap-1.5 text-[10px] text-muted-foreground font-medium">
-              <div className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-slate-400" /> <span>{feedback.phone}</span>
+            <div className="flex min-w-0 flex-col gap-1.5 text-[10px] text-muted-foreground font-medium sm:items-end">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 shrink-0 text-slate-400" /> <span className="truncate">{feedback.phone}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-slate-400" /> <span>{feedback.email}</span>
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 shrink-0 text-slate-400" /> <span className="truncate">{feedback.email}</span>
               </div>
             </div>
           </Card>
 
           {/* Feedback Content */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               {renderStars(feedback.rating)}
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3 text-muted-foreground" />
@@ -147,7 +147,7 @@ export default function FeedbackDetail({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               <Badge variant="outline" className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 px-2.5 py-0.5 rounded border-none hover:bg-emerald-50 dark:hover:bg-emerald-950/20">
                 Category: {feedback.category}
               </Badge>
@@ -237,7 +237,7 @@ export default function FeedbackDetail({
             className="text-xs min-h-[70px] max-h-[120px] bg-white dark:bg-card border-gray-300 dark:border-gray-800"
           />
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-muted-foreground">Channel:</span>
               <Select value={replyChannel} onValueChange={setReplyChannel}>
@@ -252,7 +252,7 @@ export default function FeedbackDetail({
               </Select>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               {feedback.status !== "Resolved" && (
                 <Button 
                   variant="outline" 

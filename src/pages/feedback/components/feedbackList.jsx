@@ -69,13 +69,13 @@ export default function FeedbackList({
 
   return (
     <Card className="flex flex-col bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm h-full">
-      <ScrollArea className="flex-1 w-full p-4 overflow-hidden">
+      <ScrollArea className="flex-1 w-full overflow-hidden">
         {paginatedData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <span className="text-sm text-muted-foreground font-medium">No feedback matches your filter criteria.</span>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 p-3 sm:p-4">
             {paginatedData.map((item) => {
               const isActive = selectedFeedback?.id === item.id;
               const sourceInfo = channelIcons[item.source] || { icon: Globe, color: "text-slate-500 bg-slate-50" };
@@ -92,20 +92,20 @@ export default function FeedbackList({
                   }`}
                 >
                   {/* Card Header area */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-2">
                       <Avatar className="w-8 h-8">
                         <AvatarFallback className="text-xs font-bold bg-slate-100 text-slate-700 dark:bg-gray-800 dark:text-slate-300">
                           {item.avatar}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-foreground">{item.patientName}</span>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="truncate text-xs font-bold text-foreground">{item.patientName}</span>
                         <span className="text-[10px] text-muted-foreground">{item.date}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <Badge variant="outline" className={`text-[9px] px-1.5 py-0 font-medium ${sentimentColors[item.sentiment]}`}>
                         {item.sentiment}
                       </Badge>
@@ -132,7 +132,7 @@ export default function FeedbackList({
                   </p>
 
                   {/* Card Footer area */}
-                  <div className="flex items-center justify-between mt-1 pt-2 border-t border-slate-100 dark:border-gray-900">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-1 pt-2 border-t border-slate-100 dark:border-gray-900">
                     <Badge variant="secondary" className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border-none hover:bg-emerald-50 dark:hover:bg-emerald-950/20">
                       {item.category}
                     </Badge>
@@ -151,7 +151,7 @@ export default function FeedbackList({
 
       {/* Pagination Footer */}
       {data.length > ITEMS_PER_PAGE && (
-        <CardFooter className="px-4 py-3 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-card flex items-center justify-between">
+        <CardFooter className="px-4 py-3 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-card flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-[10px] text-muted-foreground font-semibold">
             Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, data.length)} of {data.length} reports
           </div>

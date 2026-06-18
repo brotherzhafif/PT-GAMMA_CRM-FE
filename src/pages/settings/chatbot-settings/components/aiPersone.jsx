@@ -34,18 +34,18 @@ export default function AIPersona({ settings, onChange, disabled }) {
   ];
 
   return (
-    <Card className="flex flex-col gap-8 border border-gray-300 shadow-md">
+    <Card className="flex flex-col gap-6 border border-gray-300 shadow-md sm:gap-8">
       <CardHeader className="flex flex-col items-start gap-0 border-b border-gray-300">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-base font-semibold sm:text-lg">
           AI Persona & Identity
         </h3>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs leading-4 text-gray-500">
           Set the name, tone, and language of your AI.
         </span>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-6 px-6">
-        <div className="flex w-full flex-row items-center justify-between gap-4">
+      <CardContent className="flex flex-col gap-6 px-4 sm:px-6">
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <Field className="w-full">
             <FieldLabel>AI Name</FieldLabel>
             <Input
@@ -85,7 +85,7 @@ export default function AIPersona({ settings, onChange, disabled }) {
         <Field className="w-full">
           <FieldLabel>Conversation Tone</FieldLabel>
 
-          <div className="flex w-full gap-4">
+          <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
             {toneOptions.map((item) => {
               const Icon = item.icon;
               const isActive = settings.conversation_tone === item.value;
@@ -98,7 +98,7 @@ export default function AIPersona({ settings, onChange, disabled }) {
                   disabled={disabled}
                   onClick={() => onChange("conversation_tone", item.value)}
                   className={cn(
-                    "h-8 flex-1 justify-center gap-2 border-gray-300 shadow-sm transition-all",
+                    "h-auto min-h-9 justify-center gap-2 whitespace-normal border-gray-300 px-2 py-2 text-center text-xs leading-4 shadow-sm transition-all sm:text-sm",
                     isActive
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 border-primary"
                       : "hover:bg-muted"

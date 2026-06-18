@@ -106,11 +106,11 @@ export default function Feedback() {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full mb-9 overflow-x-hidden">
+    <div className="flex flex-col gap-4 w-full mb-9 overflow-x-hidden sm:gap-6">
       {/* Title Header */}
-      <div className="flex flex-col items-start">
-        <h2 className="font-semibold">Feedback & Customer Care</h2>
-        <p className="text-sm text-gray-500">
+      <div className="flex min-w-0 flex-col items-start">
+        <h2 className="text-base font-semibold sm:text-lg">Feedback & Customer Care</h2>
+        <p className="text-sm leading-5 text-gray-500">
           Review patient experiences, ratings, sentiment trends, and manage immediate follow-ups.
         </p>
       </div>
@@ -119,9 +119,13 @@ export default function Feedback() {
       <FeedbackMetrics feedbacks={feedbacks} dashboardStats={dashboardStats} />
 
       {/* Main split dashboard view */}
-      <div className="flex gap-4 h-[calc(100vh-260px)] min-h-[480px] overflow-hidden w-full">
+      <div className="flex flex-col gap-4 min-h-0 overflow-visible w-full lg:h-[calc(100vh-260px)] lg:min-h-[480px] lg:overflow-hidden lg:flex-row">
         {/* Left column: Filters + List */}
-        <div className="flex-1 flex flex-col gap-4 overflow-hidden h-full">
+        <div
+          className={`min-h-0 flex-1 flex-col gap-4 overflow-visible lg:h-full lg:overflow-hidden ${
+            activeSelectedFeedback ? "hidden lg:flex" : "flex"
+          }`}
+        >
           <FeedbackToolbar
             search={search}
             setSearch={setSearch}
@@ -135,7 +139,7 @@ export default function Feedback() {
             onResetFilters={handleResetFilters}
           />
 
-          <div className="flex-1 overflow-hidden h-full">
+          <div className="min-h-[520px] flex-1 overflow-hidden lg:h-full lg:min-h-0">
             {loading && feedbacks.length === 0 ? (
               <div className="h-full flex items-center justify-center bg-white dark:bg-card border border-gray-200 dark:border-gray-800 rounded-2xl">
                 <span className="text-sm text-muted-foreground animate-pulse">Loading feedback records...</span>
@@ -152,8 +156,8 @@ export default function Feedback() {
 
         {/* Right column: Slide-out detailed view */}
         <div
-          className={`flex-shrink-0 h-full overflow-hidden transition-all duration-300 ease-out ${
-            activeSelectedFeedback ? "w-[420px]" : "w-0"
+          className={`min-h-[calc(100svh-6rem)] overflow-hidden transition-all duration-300 ease-out lg:h-full lg:min-h-0 lg:flex-shrink-0 ${
+            activeSelectedFeedback ? "w-full lg:w-[420px]" : "hidden w-0 lg:block"
           }`}
         >
           <div

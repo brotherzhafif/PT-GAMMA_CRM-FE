@@ -84,10 +84,10 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
   };
   
   return (
-    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-[400px] shadow-lg">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Tambah Janji Temu Baru</h2>
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-3">
+      <div className="bg-white p-4 rounded-xl w-full max-w-[400px] max-h-[calc(100svh-1.5rem)] overflow-y-auto shadow-lg sm:p-6">
+        <div className="flex justify-between items-start gap-3 mb-6">
+          <h2 className="text-lg font-bold leading-tight sm:text-xl">Tambah Janji Temu Baru</h2>
           <button onClick={() => onOpenChange(false)} className="text-slate-500 hover:text-slate-700">
             <X className="w-5 h-5" />
           </button>
@@ -153,7 +153,7 @@ export function BookingModal({ open, onOpenChange, onConfirm }) {
             />
           </div>
 
-          <div className="flex gap-2 justify-end pt-2">
+          <div className="flex flex-col-reverse gap-2 justify-end pt-2 sm:flex-row">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Batal
             </Button>

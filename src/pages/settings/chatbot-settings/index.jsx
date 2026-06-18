@@ -17,11 +17,11 @@ export default function ChatbotSettings() {
   } = useChatbotSettings();
 
   return (
-    <div className="flex flex-col gap-6 mb-10 px-4 py-3">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-semibold">AI Chatbot Settings</h3>
-          <p className="text-xs text-gray-500">
+    <div className="flex flex-col gap-5 mb-10 px-3 py-3 sm:px-4 sm:gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h3 className="text-lg font-semibold sm:text-xl">AI Chatbot Settings</h3>
+          <p className="text-xs leading-4 text-gray-500">
             Configure how the AI assistant interacts with your patients and when
             it escalates to a human.
           </p>
@@ -33,14 +33,14 @@ export default function ChatbotSettings() {
         <Button
           onClick={handleSave}
           disabled={loading || saving}
-          className="min-w-28"
+          className="w-full sm:w-auto sm:min-w-28"
         >
           {saving ? "Saving..." : "Save"}
         </Button>
       </div>
 
       <ScrollArea className="flex-1 flex-col w-full">
-        <div className="flex flex-col gap-5 w-full pr-4">
+        <div className="flex flex-col gap-5 w-full pr-0 sm:pr-4">
             <AIPersona
               settings={settings}
               onChange={handleChange}

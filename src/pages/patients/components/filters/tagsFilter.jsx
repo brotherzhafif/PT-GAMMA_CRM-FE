@@ -10,7 +10,7 @@ import {
 export default function TagsFilter({ value, options = [], onChange }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-9 min-w-36 shadow-md">
+      <SelectTrigger className="h-9 w-full min-w-0 shadow-md sm:min-w-36">
         <Tags className="w-4 h-4" />
         <SelectValue placeholder="Tags" />
       </SelectTrigger>

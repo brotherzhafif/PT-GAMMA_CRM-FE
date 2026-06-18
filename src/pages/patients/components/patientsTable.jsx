@@ -68,9 +68,9 @@ export default function PatientsTable({
   };
 
   return (
-    <Card className="h-full flex flex-col rounded-2xl border-slate-200 shadow-md  overflow-hidden">
+    <Card className="h-[60svh] min-h-[420px] flex flex-col rounded-2xl border-slate-200 shadow-md overflow-hidden lg:h-full lg:min-h-0">
       <ScrollArea className="flex-1 w-full overflow-x-auto overflow-y-auto">
-        <Table>
+        <Table className="min-w-[900px]">
           <TableHeader className="bg-slate-50/50 border-none sticky top-0 z-10">
             <TableRow className="border-none hover:bg-transparent">
               <TableHead className="w-12 px-6 py-4">
@@ -159,12 +159,12 @@ export default function PatientsTable({
         </Table>
       </ScrollArea>
 
-      <div className="px-6 py-4 border-t border-slate-100 flex-shrink-0 bg-white flex items-center justify-between">
+      <div className="px-4 py-3 border-t border-slate-100 flex-shrink-0 bg-white flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
         <div className="text-[11px] text-slate-500">
           Showing {data.length === 0 ? 0 : startIndex + 1} to {Math.min(visiblePage * ITEMS_PER_PAGE, data.length)} of {data.length} patients
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <Button
             variant="ghost"
             size="sm"

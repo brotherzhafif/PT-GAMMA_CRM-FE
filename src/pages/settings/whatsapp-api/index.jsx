@@ -29,7 +29,7 @@ const StatusBadge = ({ connected, label }) => (
 );
 
 const ConnectionSummary = ({ icon: Icon, title, connection }) => (
-  <div className="flex flex-row items-center justify-between gap-4">
+  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
     <div className="flex flex-row gap-3 items-center min-w-0">
       <div
         className={`flex w-10 h-10 rounded-md items-center justify-center ${
@@ -44,14 +44,14 @@ const ConnectionSummary = ({ icon: Icon, title, connection }) => (
       </div>
 
       <div className="flex flex-col gap-1 items-start min-w-0">
-        <h4 className="font-semibold">{title}</h4>
-        <h3 className="font-semibold truncate max-w-[360px]">
+        <h4 className="text-sm font-semibold sm:text-base">{title}</h4>
+        <h3 className="max-w-full truncate font-semibold sm:max-w-[360px]">
           {connection.phoneNumber}
         </h3>
         <p className="text-xs text-muted-foreground">
           Quality Rating: {connection.quality}
         </p>
-        <p className="text-xs text-muted-foreground truncate max-w-[420px]">
+        <p className="max-w-full truncate text-xs text-muted-foreground sm:max-w-[420px]">
           {connection.message}
         </p>
       </div>
@@ -88,7 +88,7 @@ const WhatsAppQrCard = ({ connection }) => {
 
   return (
     <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300">
-      <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300">
+      <div className="flex flex-col gap-3 border-b pb-4 border-gray-300 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col items-start">
           <h3 className="font-semibold text-lg">WhatsApp QR Code</h3>
           <span className="text-xs text-muted-foreground">
@@ -111,7 +111,7 @@ const WhatsAppQrCard = ({ connection }) => {
               <img
                 src={qrImageSource}
                 alt="WhatsApp connection QR code"
-                className="h-52 w-52 object-contain"
+                className="h-44 w-44 object-contain sm:h-52 sm:w-52"
               />
             </div>
             <p className="text-xs text-muted-foreground">
@@ -157,19 +157,19 @@ export default function WhatsapApi() {
   } = useConnectionStatus();
 
   return (
-    <div className="flex flex-col gap-5 h-full mb-10">
+    <div className="flex flex-col gap-5 h-full mb-10 px-3 py-3 sm:px-4">
       <div className="flex flex-col gap-1">
-        <h3 className="text-xl font-semibold">WhatsApp API Settings</h3>
-        <p className="text-xs text-gray-500">
+        <h3 className="text-lg font-semibold sm:text-xl">WhatsApp API Settings</h3>
+        <p className="text-xs leading-4 text-gray-500">
           Manage your connection to the WhatsApp Cloud API and sync message
           templates.
         </p>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="flex flex-col gap-5 pr-4">
+        <div className="flex flex-col gap-5 pr-0 sm:pr-4">
           <Card className="w-full flex flex-col p-4 gap-4 shadow-md border border-gray-300 ">
-            <div className="flex flex-row items-center justify-between border-b pb-4 border-gray-300" >
+            <div className="flex flex-col gap-3 border-b pb-4 border-gray-300 sm:flex-row sm:items-center sm:justify-between" >
               <div className="flex flex-col items-start">
                 <h3 className="font-semibold text-lg">Connection Status</h3>
                 <span className="text-xs text-muted-foreground">
@@ -183,7 +183,7 @@ export default function WhatsapApi() {
               />
             </div>
 
-            <div className="flex flex-row items-center justify-between gap-4 rounded-md bg-muted/40 p-3">
+            <div className="flex flex-col gap-3 rounded-md bg-muted/40 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <div className="flex flex-row gap-3 items-center min-w-0">
                 <Server className="w-5 h-5 text-muted-foreground" />
                 <div className="min-w-0">
@@ -193,7 +193,7 @@ export default function WhatsapApi() {
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="w-fit max-w-full truncate text-xs">
                 {health?.docs || "/docs"}
               </Badge>
             </div>
