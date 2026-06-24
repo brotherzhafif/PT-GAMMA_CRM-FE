@@ -73,7 +73,7 @@ export default function ChatItem({ chat, isSelected, onClick }) {
             }`}
             title={displayName}
           >
-            {truncateText(displayName, 20)}
+            {truncateText(displayName, 16)}
           </p>
 
           <span
@@ -92,7 +92,7 @@ export default function ChatItem({ chat, isSelected, onClick }) {
             }`}
             title={displayLastMessage}
           >
-            {truncateText(displayLastMessage, 23)}
+            {truncateText(displayLastMessage, 20)}
           </p>
 
           {showUnread && (
