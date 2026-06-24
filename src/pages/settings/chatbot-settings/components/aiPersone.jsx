@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 export default function AIPersona({ settings, onChange, disabled }) {
@@ -81,6 +82,18 @@ export default function AIPersona({ settings, onChange, disabled }) {
             </Select>
           </Field>
         </div>
+
+        <Field className="w-full">
+          <FieldLabel>System Prompt</FieldLabel>
+          <Textarea
+            value={settings.system_prompt}
+            onChange={(event) => onChange("system_prompt", event.target.value)}
+            disabled={disabled}
+            placeholder={settings.system_prompt}
+            className="min-h-32 w-full border-gray-300 shadow-sm"
+            rows={6}
+          />
+        </Field>
 
         <Field className="w-full">
           <FieldLabel>Conversation Tone</FieldLabel>
