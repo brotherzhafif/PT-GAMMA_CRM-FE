@@ -12,6 +12,7 @@ const initialSettings = {
   handoff_threshold: 70,
   handoff_message: "",
   ai_badge_enabled: true,
+  system_prompt: "",
 };
 
 export function useChatbotSettings() {
@@ -62,6 +63,7 @@ export function useChatbotSettings() {
         handoff_threshold: Number(settings.handoff_threshold),
         handoff_message: settings.handoff_message,
         ai_badge_enabled: settings.ai_badge_enabled,
+        system_prompt: settings.system_prompt,
       };
 
       const response = await updateChatbotSettings(payload);
