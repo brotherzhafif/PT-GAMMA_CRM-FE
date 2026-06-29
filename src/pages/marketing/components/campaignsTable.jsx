@@ -65,6 +65,7 @@ const downloadCsv = (campaigns) => {
 
 export default function CampaignsTable({
   campaigns = [],
+  onDetail,
   onEdit,
   onRefresh,
   onCreate,
@@ -174,6 +175,7 @@ export default function CampaignsTable({
                 <CampaignRow
                   key={campaign.id}
                   campaign={campaign}
+                  onDetail={onDetail}
                   onEdit={onEdit}
                 />
               ))

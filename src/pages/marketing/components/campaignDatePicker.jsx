@@ -56,7 +56,7 @@ export default function CampaignDatePicker({ selectedDate, onDateChange }) {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="h-10 w-full justify-between font-normal hover:bg-muted/40"
+            className="h-10 w-full justify-between px-3 font-normal hover:bg-muted/40"
           >
             <span className={date ? "text-foreground" : "text-muted-foreground"}>
               {formattedDate}

@@ -38,7 +38,7 @@ export default function TemplateSelector({ onSelectTemplate }) {
           }
         }}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="h-10 w-full px-3">
           <SelectValue placeholder="Choose template" />
         </SelectTrigger>
 

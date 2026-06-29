@@ -30,6 +30,12 @@ import TemplateSelector from "./templateSelector";
 const defaultMessage =
   "Hello John, enjoy our exclusive dental whitening promotion with up to 25% discount this week. Book your appointment today.";
 
+const getApiErrorMessage = (error) => {
+  return error.response?.data?.detail || error.response?.data?.message || error.message || "Coba beberapa saat lagi.";
+};
+
+const campaignNamePathSeparatorPattern = /[\\/]/;
+
 export default function CreateCampaignPanel({
   onCreateCampaign,
   onUpdateCampaign,
@@ -75,6 +81,20 @@ export default function CreateCampaignPanel({
       return;
     }
 
+    if (campaignNamePathSeparatorPattern.test(selectedCampaign?.raw?.campaign_name || "")) {
+      toast.error("Campaign tidak bisa diedit", {
+        description: "Nama campaign lama mengandung / atau \\. Endpoint by-name backend membacanya sebagai path.",
+      });
+      return;
+    }
+
+    if (campaignNamePathSeparatorPattern.test(campaignName)) {
+      toast.warning("Nama campaign tidak valid", {
+        description: "Gunakan tanda - untuk tanggal, contoh: Test Diskon 18-06-2026.",
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -100,7 +120,7 @@ export default function CreateCampaignPanel({
     } catch (error) {
       console.error(error);
       toast.error(selectedCampaign ? "Gagal memperbarui campaign" : "Gagal membuat campaign", {
-        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+        description: getApiErrorMessage(error),
       });
     } finally {
       setIsSubmitting(false);

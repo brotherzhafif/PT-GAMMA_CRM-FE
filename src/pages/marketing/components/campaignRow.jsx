@@ -3,9 +3,9 @@ import CampaignSegmentBadge from "./campaignSegmentBadge";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 
-import { ChevronRight, Pencil } from "lucide-react";
+import { ChevronRight, Eye, Pencil } from "lucide-react";
 
-export default function CampaignRow({ campaign, onEdit }) {
+export default function CampaignRow({ campaign, onDetail, onEdit }) {
   return (
     <TableRow className="group border-gray-200">
       <TableCell className="px-4 py-3">
@@ -49,7 +49,18 @@ export default function CampaignRow({ campaign, onEdit }) {
       </TableCell>
 
       <TableCell className="px-4 py-3">
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onDetail?.(campaign)}
+            className="h-8 cursor-pointer border border-gray-300 text-xs shadow-sm"
+          >
+            <Eye className="h-4 w-4" />
+            Detail
+          </Button>
+
           <Button
             type="button"
             variant="ghost"

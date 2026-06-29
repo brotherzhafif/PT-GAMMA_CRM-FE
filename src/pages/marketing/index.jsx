@@ -9,12 +9,22 @@ import {
 
 import MarketingHeader from "./components/marketingHeader";
 import CampaignsTable from "./components/campaignsTable";
+import CampaignDetailModal from "./components/campaignDetailModal";
 import CreateCampaignModal from "./components/createCampaignModal";
+
+const getApiErrorMessage = (error) => {
+  return error.response?.data?.detail || error.response?.data?.message || error.message || "Coba beberapa saat lagi.";
+};
+
+const campaignNamePathSeparatorPattern = /[\\/]/;
 
 export default function MarketingPage() {
   const [campaigns, setCampaigns] = useState([]);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [detailCampaign, setDetailCampaign] = useState(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalSession, setModalSession] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCampaigns = useCallback(async () => {
@@ -69,7 +79,7 @@ export default function MarketingPage() {
     } catch (error) {
       console.error("Failed to create campaign:", error);
       toast.error("Gagal membuat campaign", {
-        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+        description: getApiErrorMessage(error),
       });
 
       return false;
@@ -90,7 +100,7 @@ export default function MarketingPage() {
     } catch (error) {
       console.error("Failed to update campaign:", error);
       toast.error("Gagal memperbarui campaign", {
-        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+        description: getApiErrorMessage(error),
       });
 
       return false;
@@ -98,18 +108,37 @@ export default function MarketingPage() {
   };
 
   const handleEditCampaign = (campaign) => {
+    if (campaignNamePathSeparatorPattern.test(campaign.name || "")) {
+      toast.error("Campaign tidak bisa diedit", {
+        description: "Nama campaign mengandung / atau \\. Campaign tanpa simbol itu tetap bisa diedit.",
+      });
+      return;
+    }
+
     setSelectedCampaign(campaign);
+    setModalSession((session) => session + 1);
     setIsModalOpen(true);
+  };
+
+  const handleDetailCampaign = (campaign) => {
+    setDetailCampaign(campaign);
+    setIsDetailOpen(true);
   };
 
   const handleCreateClick = () => {
     setSelectedCampaign(null);
+    setModalSession((session) => session + 1);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setSelectedCampaign(null);
     setIsModalOpen(false);
+  };
+
+  const handleCloseDetail = () => {
+    setDetailCampaign(null);
+    setIsDetailOpen(false);
   };
 
   const handleRefresh = async () => {
@@ -142,6 +171,7 @@ export default function MarketingPage() {
 
         <CampaignsTable
           campaigns={campaigns}
+          onDetail={handleDetailCampaign}
           onEdit={handleEditCampaign}
           onRefresh={handleRefresh}
           onCreate={handleCreateClick}
@@ -149,12 +179,18 @@ export default function MarketingPage() {
       </div>
 
       <CreateCampaignModal
-        key={selectedCampaign?.id || "new-campaign"}
+        key={`${selectedCampaign?.id || "new-campaign"}-${modalSession}`}
         open={isModalOpen}
         onClose={handleCloseModal}
         selectedCampaign={selectedCampaign}
         onCreateCampaign={handleCreateCampaign}
         onUpdateCampaign={handleUpdateCampaign}
+      />
+
+      <CampaignDetailModal
+        campaign={detailCampaign}
+        open={isDetailOpen}
+        onClose={handleCloseDetail}
       />
     </>
   );
