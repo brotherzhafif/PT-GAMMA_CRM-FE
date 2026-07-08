@@ -2,13 +2,15 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Eye } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 
 import CampaignFileUpload from "./campaignFileUpload";
 import CampaignStatusBadge from "./campaignStatusBadge";
@@ -32,7 +34,7 @@ const formatDateTime = (value) => {
   });
 };
 
-export default function CampaignDetailModal({ campaign, open, onClose }) {
+export default function CampaignDetailModal({ campaign, open, onClose, onDelete }) {
   const attachment = getCampaignAttachment(campaign);
 
   return (
@@ -104,6 +106,34 @@ export default function CampaignDetailModal({ campaign, open, onClose }) {
               </div>
             </div>
           </ScrollArea>
+
+          <DialogFooter className="border-t border-gray-200 px-5 py-4 flex items-center justify-between sm:justify-between w-full">
+            {campaign?.raw?.campaign_type !== 'birthday' ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  onDelete?.(campaign);
+                  onClose();
+                }}
+                className="cursor-pointer border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 shadow-sm mr-auto"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Campaign
+              </Button>
+            ) : (
+              <div />
+            )}
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer shadow-sm"
+            >
+              Close
+            </Button>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

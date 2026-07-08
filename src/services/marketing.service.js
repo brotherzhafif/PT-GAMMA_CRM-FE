@@ -72,3 +72,14 @@ export const updateCampaign = async (campaignName, payload) => {
   );
   return response.data;
 };
+
+export const deleteCampaign = async (campaignName) => {
+  validateCampaignName(campaignName);
+
+  const encodedCampaignName = encodeURIComponent(String(campaignName).trim());
+
+  const response = await api.delete(
+    `/api/marketing/campaigns/by-name/${encodedCampaignName}`
+  );
+  return response.data;
+};
