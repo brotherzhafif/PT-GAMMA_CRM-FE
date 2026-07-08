@@ -43,8 +43,14 @@ const getStatusClassName = (status = "") =>
     ? "bg-red-100 text-red-800"
     : "bg-green-100 text-green-800";
 
-const truncateText = (text = "", maxLength = 50) =>
-  text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+// const truncateText = (text = "", maxLength = 50) =>
+//   text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+
+const truncateWords = (text = "", maxWords = 4) => {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ")}...`;
+};
 
 export default function RecentLogin() {
   const navigate = useNavigate();
@@ -95,8 +101,8 @@ export default function RecentLogin() {
         <TableHeader className="border-none shadow-sm">
           <TableRow className="border-none">
             <TableHead className="px-6 text-gray-500">Device & Browser</TableHead>
-            <TableHead className="px-6 text-gray-500">IP & Location</TableHead>
-            <TableHead className="px-6 text-gray-500">Time</TableHead>
+            <TableHead className="px-2 text-gray-500">IP & Location</TableHead>
+            <TableHead className="px-3 text-gray-500">Time</TableHead>
             <TableHead className="px-6 text-gray-500">Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -133,15 +139,15 @@ export default function RecentLogin() {
                     >
                       <DeviceIcon className="w-4 h-4 flex-shrink-0" />
                       <span className="truncate">
-                        {truncateText(deviceBrowser)}
+                        {truncateWords(deviceBrowser, 5)}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="flex flex-col gap-1 px-6 py-4 items-start">
-                    <span className="text-xs font-medium">{log.ip}</span>
-                    <span className="text-xs text-gray-500">{log.location}</span>
+                  <TableCell className="flex flex-col gap-1 px-2 py-4 items-start">
+                    <span className="text-xs font-medium">{truncateWords(log.ip, 1)}</span>
+                    <span className="text-xs text-gray-500">{truncateWords(log.location, 4)}</span>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-xs text-gray-500">
+                  <TableCell className="px-3 py-4 text-xs text-gray-500">
                     {log.time}
                   </TableCell>
                   <TableCell className="px-6 py-4">
