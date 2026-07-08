@@ -20,6 +20,26 @@ const templates = [
     message:
       "Hello John, start your smile transformation journey with our professional orthodontic consultation this month.",
   },
+  {
+    id: 4,
+    name: "Birthday Promo",
+    message: `🎂 Birthday Health Check GRATIS!
+
+Rayakan ulang tahunmu dengan hadiah kesehatan dari kami.
+
+Nikmati GRATIS:
+- ✅ Konsultasi Dokter Umum
+- ✅ Pemeriksaan Tekanan Darah
+- ✅ Pemeriksaan Berat & Tinggi Badan
+- ✅ Pengukuran BMI
+- ✅ Pemeriksaan Saturasi Oksigen
+- ✅ Edukasi Kesehatan
+
+Syarat:
+- Berlaku selama bulan ulang tahun.
+- Tunjukkan KTP atau identitas.
+- Berlaku 1 kali per orang.`,
+  },
 ];
 
 export default function TemplateSelector({ onSelectTemplate }) {

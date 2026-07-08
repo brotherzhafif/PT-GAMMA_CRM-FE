@@ -5,12 +5,15 @@ import {
   getCampaigns,
   createCampaign,
   updateCampaign,
+  deleteCampaign,
 } from "@/services/marketing.service";
 
 import MarketingHeader from "./components/marketingHeader";
 import CampaignsTable from "./components/campaignsTable";
 import CampaignDetailModal from "./components/campaignDetailModal";
 import CreateCampaignModal from "./components/createCampaignModal";
+import { AlertWithMedia } from "@/components/ui/alert-with-media";
+import { Trash2 } from "lucide-react";
 
 const getApiErrorMessage = (error) => {
   return error.response?.data?.detail || error.response?.data?.message || error.message || "Coba beberapa saat lagi.";
@@ -25,6 +28,8 @@ export default function MarketingPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSession, setModalSession] = useState(0);
+  const [campaignToDelete, setCampaignToDelete] = useState(null);
+  const [deletingCampaign, setDeletingCampaign] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const fetchCampaigns = useCallback(async () => {
@@ -120,6 +125,39 @@ export default function MarketingPage() {
     setIsModalOpen(true);
   };
 
+  const handleDeleteCampaign = (campaign) => {
+    if (campaignNamePathSeparatorPattern.test(campaign.name || "")) {
+      toast.error("Campaign tidak bisa dihapus", {
+        description: "Nama campaign mengandung / atau \\.",
+      });
+      return;
+    }
+    setCampaignToDelete(campaign);
+  };
+
+  const handleConfirmDeleteCampaign = async () => {
+    if (!campaignToDelete) return;
+
+    try {
+      setDeletingCampaign(true);
+      await deleteCampaign(campaignToDelete.name);
+      await fetchCampaigns();
+      
+      handleCloseDetail();
+      setCampaignToDelete(null);
+      toast.success("Campaign dihapus", {
+        description: `${campaignToDelete.name} berhasil dihapus.`,
+      });
+    } catch (error) {
+      console.error("Failed to delete campaign:", error);
+      toast.error("Gagal menghapus campaign", {
+        description: getApiErrorMessage(error),
+      });
+    } finally {
+      setDeletingCampaign(false);
+    }
+  };
+
   const handleDetailCampaign = (campaign) => {
     setDetailCampaign(campaign);
     setIsDetailOpen(true);
@@ -191,6 +229,18 @@ export default function MarketingPage() {
         campaign={detailCampaign}
         open={isDetailOpen}
         onClose={handleCloseDetail}
+        onDelete={handleDeleteCampaign}
+      />
+
+      <AlertWithMedia
+        open={Boolean(campaignToDelete)}
+        onOpenChange={(open) => !open && setCampaignToDelete(null)}
+        icon={Trash2}
+        title="Hapus campaign?"
+        description={`Data campaign ${campaignToDelete?.name || ""} akan dihapus dari sistem.`}
+        cancelLabel="Batal"
+        actionLabel={deletingCampaign ? "Menghapus..." : "Hapus campaign"}
+        onAction={handleConfirmDeleteCampaign}
       />
     </>
   );

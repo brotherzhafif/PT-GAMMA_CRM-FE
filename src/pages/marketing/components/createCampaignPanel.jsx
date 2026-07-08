@@ -23,12 +23,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Pencil, SendHorizonal, Sparkles } from "lucide-react";
 
 import CampaignDatePicker from "./campaignDatePicker";
+import CampaignFileUpload from "./campaignFileUpload";
 import MessagePreview from "./messagePreview";
 import ProgressBar from "./progressBar";
 import TemplateSelector from "./templateSelector";
 
 const defaultMessage =
   "Hello John, enjoy our exclusive dental whitening promotion with up to 25% discount this week. Book your appointment today.";
+
+const getCampaignAttachment = (campaign) => {
+  const url = campaign?.raw?.image_url || campaign?.raw?.attachment_url;
+  if (!url) return null;
+
+  return {
+    url: url,
+    filename: campaign.raw.filename,
+  };
+};
 
 const getApiErrorMessage = (error) => {
   return error.response?.data?.detail || error.response?.data?.message || error.message || "Coba beberapa saat lagi.";
@@ -51,7 +62,14 @@ export default function CreateCampaignPanel({
   const [message, setMessage] = useState(
     selectedCampaign?.description || defaultMessage
   );
+  const [status, setStatus] = useState(
+    selectedCampaign?.status?.toLowerCase() || "scheduled"
+  );
+  const [attachmentFile, setAttachmentFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isBirthdayCampaign = selectedCampaign?.raw?.campaign_type === "birthday";
+  const existingAttachment = getCampaignAttachment(selectedCampaign);
 
   const characterCount = message.length;
 
@@ -71,6 +89,7 @@ export default function CreateCampaignPanel({
     setSelectedSegment("VIP Patients");
     setSelectedDate("");
     setMessage(defaultMessage);
+    setAttachmentFile(null);
   };
 
   const handleSubmit = async () => {
@@ -102,9 +121,8 @@ export default function CreateCampaignPanel({
         campaign_name: campaignName,
         schedule_date: selectedDate,
         campaign_message: message,
-        attachment_url: "",
-        filename: "",
-        status: "scheduled",
+        status: status,
+        ...(!selectedCampaign && attachmentFile ? { file: attachmentFile } : {}),
       };
 
       const success = selectedCampaign
@@ -179,9 +197,34 @@ export default function CreateCampaignPanel({
           </Select>
         </div>
 
+        {selectedCampaign && (
+          <div className="flex flex-col gap-2">
+            <Label className="text-xs">Campaign Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {!isBirthdayCampaign && (
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                )}
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="disabled">Disabled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <CampaignDatePicker
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
+        />
+
+        <CampaignFileUpload
+          file={attachmentFile}
+          onFileChange={setAttachmentFile}
+          existingAttachment={existingAttachment}
+          readOnly={Boolean(selectedCampaign)}
         />
 
         <TemplateSelector onSelectTemplate={setMessage} />
