@@ -14,10 +14,11 @@ import CampaignFileUpload from "./campaignFileUpload";
 import CampaignStatusBadge from "./campaignStatusBadge";
 
 const getCampaignAttachment = (campaign) => {
-  if (!campaign?.raw?.attachment_url) return null;
+  const url = campaign?.raw?.image_url || campaign?.raw?.attachment_url;
+  if (!url) return null;
 
   return {
-    url: campaign.raw.attachment_url,
+    url: url,
     filename: campaign.raw.filename,
   };
 };

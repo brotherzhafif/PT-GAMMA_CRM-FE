@@ -21,14 +21,22 @@ import CampaignDatePicker from "./campaignDatePicker";
 import CampaignFileUpload from "./campaignFileUpload";
 import MessagePreview from "./messagePreview";
 import TemplateSelector from "./templateSelector";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const campaignNamePathSeparatorPattern = /[\\/]/;
 
 const getCampaignAttachment = (campaign) => {
-  if (!campaign?.raw?.attachment_url) return null;
+  const url = campaign?.raw?.image_url || campaign?.raw?.attachment_url;
+  if (!url) return null;
 
   return {
-    url: campaign.raw.attachment_url,
+    url: url,
     filename: campaign.raw.filename,
   };
 };
@@ -49,7 +57,12 @@ export default function CreateCampaignModal({
   const [message, setMessage] = useState(
     selectedCampaign?.description || ""
   );
+  const [status, setStatus] = useState(
+    selectedCampaign?.status?.toLowerCase() || "scheduled"
+  );
   const [attachmentFile, setAttachmentFile] = useState(null);
+
+  const isBirthdayCampaign = selectedCampaign?.raw?.campaign_type === "birthday";
   const [loading, setLoading] = useState(false);
   const existingAttachment = getCampaignAttachment(selectedCampaign);
 
@@ -79,7 +92,7 @@ export default function CreateCampaignModal({
       campaign_name: campaignName,
       campaign_message: message,
       schedule_date: scheduleDate,
-      status: "scheduled",
+      status: status,
       ...(!selectedCampaign && attachmentFile ? { file: attachmentFile } : {}),
     };
 
@@ -139,6 +152,24 @@ export default function CreateCampaignModal({
                 selectedDate={scheduleDate}
                 onDateChange={setScheduleDate}
               />
+
+              {selectedCampaign && (
+                <div className="flex flex-col gap-2">
+                  <Label className="text-xs">Campaign Status</Label>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger className="h-10 px-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {!isBirthdayCampaign && (
+                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                      )}
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="disabled">Disabled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <TemplateSelector onSelectTemplate={setMessage} />
 

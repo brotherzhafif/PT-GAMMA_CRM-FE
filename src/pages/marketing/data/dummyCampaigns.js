@@ -143,4 +143,34 @@ export const dummyCampaigns = [
 
     date: "25 Oct 2025",
   },
+  {
+    id: 6,
+
+    name: "Birthday Health Check",
+
+    campaign_type: "birthday",
+
+    description:
+      "Automated birthday greeting with free health check offer.",
+
+    segment: "Birthday Patients",
+
+    status: "Active",
+
+    channel: "WhatsApp",
+
+    performance: "65.3%",
+
+    conversion: "25.1%",
+
+    audience: "450 Recipients",
+
+    opened: "380 Opened",
+
+    clicked: "152 Clicks",
+
+    createdBy: "Marketing Team",
+
+    date: "01 Nov 2025",
+  }
 ];
