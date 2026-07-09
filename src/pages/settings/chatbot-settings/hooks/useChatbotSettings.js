@@ -4,6 +4,10 @@ import {
   updateChatbotSettings,
 } from "@/services/settings.service";
 import { toast } from "sonner";
+import {
+  buildSystemPrompt,
+  resolveSystemPromptSections,
+} from "@/helpers/systemPrompt.helper";
 
 const initialSettings = {
   ai_name: "",
@@ -13,6 +17,21 @@ const initialSettings = {
   handoff_message: "",
   ai_badge_enabled: true,
   system_prompt: "",
+  // 6 section pecahan system_prompt
+  persona_identity: "",
+  capabilities: "",
+  restrictions: "",
+  mandatory_flow: "",
+  general_rules: "",
+  disclaimer: "",
+  // knowledge base klinik
+  lokasi: "",
+  maps: "",
+  biaya_pendaftaran: "",
+  biaya_konsultasi: "",
+  layanan_poli: "",
+  layanan_khusus: "",
+  layanan_penunjang: "",
 };
 
 export function useChatbotSettings() {
@@ -26,15 +45,19 @@ export function useChatbotSettings() {
       try {
         setLoading(true);
         const response = await getChatbotSettings();
+        const data = response?.data || response || {};
+
         setSettings({
           ...initialSettings,
-          ...(response?.data || response),
+          ...data,
+          ...resolveSystemPromptSections(data),
         });
       } catch (error) {
         console.error("Failed get chatbot settings:", error);
         setStatusMessage("Unable to load chatbot settings.");
         toast.error("Gagal memuat pengaturan chatbot", {
-          description: error.response?.data?.message || error.message || "Coba muat ulang halaman.",
+          description:
+            error.response?.data?.message || error.message || "Coba muat ulang halaman.",
         });
       } finally {
         setLoading(false);
@@ -63,7 +86,14 @@ export function useChatbotSettings() {
         handoff_threshold: Number(settings.handoff_threshold),
         handoff_message: settings.handoff_message,
         ai_badge_enabled: settings.ai_badge_enabled,
-        system_prompt: settings.system_prompt,
+        system_prompt: buildSystemPrompt(settings), // ini jadi 6 section di FE di BE tetep satu string
+        lokasi: settings.lokasi,
+        maps: settings.maps,
+        biaya_pendaftaran: settings.biaya_pendaftaran,
+        biaya_konsultasi: settings.biaya_konsultasi,
+        layanan_poli: settings.layanan_poli,
+        layanan_khusus: settings.layanan_khusus,
+        layanan_penunjang: settings.layanan_penunjang,
       };
 
       const response = await updateChatbotSettings(payload);
@@ -79,7 +109,8 @@ export function useChatbotSettings() {
       console.error("Failed update chatbot settings:", error);
       setStatusMessage("Unable to save chatbot settings.");
       toast.error("Gagal menyimpan pengaturan", {
-        description: error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+        description:
+          error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
       });
     } finally {
       setSaving(false);

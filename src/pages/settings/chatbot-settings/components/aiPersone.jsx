@@ -1,4 +1,5 @@
-import { Briefcase, Heart, Smile, } from "lucide-react";
+import { Briefcase, Heart, Search, Smile } from "lucide-react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -14,38 +15,100 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { usePromptSearch } from "../hooks/usePromptSearch";
+import { KnowledgeSearchResults } from "./KnowledgeSearchResults";
+
+const PROMPT_SECTIONS = [
+  {
+    key: "persona_identity",
+    label: "Identitas & Peran AI",
+    placeholder: "Nama, peran, nada bicara, aturan sapaan...",
+    rows: 5,
+  },
+  {
+    key: "capabilities",
+    label: "Kapabilitas",
+    placeholder: "Hal-hal yang boleh dibantu AI...",
+    rows: 4,
+  },
+  {
+    key: "restrictions",
+    label: "Batasan Tegas",
+    placeholder: "Hal-hal yang tidak boleh dilakukan AI...",
+    rows: 4,
+  },
+  {
+    key: "mandatory_flow",
+    label: "Alur Wajib (saat pasien sebut gejala)",
+    placeholder: "Langkah-langkah & mapping poli berdasarkan gejala...",
+    rows: 8,
+  },
+  {
+    key: "general_rules",
+    label: "Aturan Umum & Larangan Mutlak",
+    placeholder: "Topik yang boleh dijawab, larangan mutlak, teks penolakan...",
+    rows: 8,
+  },
+  {
+    key: "disclaimer",
+    label: "Disclaimer",
+    placeholder: "Teks disclaimer di akhir pesan...",
+    rows: 3,
+  },
+];
 
 export default function AIPersona({ settings, onChange, disabled }) {
+  const fieldRefs = useRef({});
+  const [keyword, setKeyword] = useState("");
+  const results = usePromptSearch(settings, keyword);
+
+  const handleJumpTo = (field) => {
+    const el = fieldRefs.current?.[field];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus();
+    }
+  };
+
   const toneOptions = [
-    {
-      value: "friendly",
-      label: "Friendly & Empathetic",
-      icon: Smile,
-    },
-    {
-      value: "professional",
-      label: "Professional & Direct",
-      icon: Briefcase,
-    },
-    {
-      value: "caring",
-      label: "Caring & Soft",
-      icon: Heart,
-    },
+    { value: "friendly", label: "Friendly & Empathetic", icon: Smile },
+    { value: "professional", label: "Professional & Direct", icon: Briefcase },
+    { value: "caring", label: "Caring & Soft", icon: Heart },
   ];
 
   return (
     <Card className="flex flex-col gap-6 border border-gray-300 shadow-md sm:gap-8">
-      <CardHeader className="flex flex-col items-start gap-0 border-b border-gray-300">
-        <h3 className="text-base font-semibold sm:text-lg">
-          AI Persona & Identity
-        </h3>
-        <span className="text-xs leading-4 text-gray-500">
-          Set the name, tone, and language of your AI.
-        </span>
+      <CardHeader className="flex flex-row items-center justify-between gap-4 border-b border-gray-300">
+        <div className="flex flex-col items-start gap-0">
+          <h3 className="text-base font-semibold sm:text-lg">
+            AI Persona & Identity
+          </h3>
+          <span className="text-xs leading-4 text-gray-500">
+            Set the name, tone, and language of your AI.
+          </span>
+        </div>
+
+        <Field orientation="horizontal" className="w-full max-w-64">
+          <div className="relative w-full shadow-md border-gray-300 border rounded-md">
+            <Search className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-gray-400" />
+            <Input
+              type="search"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Cari di system prompt..."
+              className="pl-8"
+            />
+          </div>
+        </Field>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-6 px-4 sm:px-6">
+        <KnowledgeSearchResults
+          results={results}
+          keyword={keyword}
+          onJumpTo={handleJumpTo}
+        />
+
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <Field className="w-full">
             <FieldLabel>AI Name</FieldLabel>
@@ -71,29 +134,28 @@ export default function AIPersona({ settings, onChange, disabled }) {
 
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="id">
-                    Bahasa Indonesia
-                  </SelectItem>
-                  <SelectItem value="en">
-                    English
-                  </SelectItem>
+                  <SelectItem value="id">Bahasa Indonesia</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </Field>
         </div>
 
-        <Field className="w-full">
-          <FieldLabel>System Prompt</FieldLabel>
-          <Textarea
-            value={settings.system_prompt}
-            onChange={(event) => onChange("system_prompt", event.target.value)}
-            disabled={disabled}
-            placeholder={settings.system_prompt}
-            className="min-h-32 w-full border-gray-300 shadow-sm"
-            rows={6}
-          />
-        </Field>
+        {PROMPT_SECTIONS.map((section) => (
+          <Field key={section.key} className="w-full">
+            <FieldLabel>{section.label}</FieldLabel>
+            <Textarea
+              ref={(el) => (fieldRefs.current[section.key] = el)}
+              value={settings[section.key]}
+              onChange={(e) => onChange(section.key, e.target.value)}
+              disabled={disabled}
+              placeholder={section.placeholder}
+              className="min-h-24 w-full border-gray-300 shadow-sm"
+              rows={section.rows}
+            />
+          </Field>
+        ))}
 
         <Field className="w-full">
           <FieldLabel>Conversation Tone</FieldLabel>

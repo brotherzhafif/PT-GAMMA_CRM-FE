@@ -135,6 +135,25 @@ export function useConnectionStatus() {
       }
     };
 
+    const handleWhatsappQr = (event) => {
+      const payload = parseEventData(event);
+      if (!payload) return;
+
+      setWhatsappConnection((prev) => ({
+        ...prev,
+        hasQr: true,
+        qrCode:
+          typeof payload === "string"
+            ? payload
+            : payload.qr ||
+              payload.qr_code ||
+              payload.qrCode ||
+              payload.qr_image ||
+              payload.qrImage ||
+              null,
+      }));
+    };
+
     const handleRme = (event) => {
       const payload = parseEventData(event);
       if (payload) {
@@ -145,6 +164,7 @@ export function useConnectionStatus() {
     whatsappStream.addEventListener("message", handleWhatsapp);
     whatsappStream.addEventListener("status", handleWhatsapp);
     whatsappStream.onmessage = handleWhatsapp;
+    whatsappStream.addEventListener("qr_update", handleWhatsappQr);
     whatsappStream.onerror = () => {
       setWhatsappConnection((prev) => ({
         ...prev,
