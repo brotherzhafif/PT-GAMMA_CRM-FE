@@ -117,7 +117,6 @@ export default function Feedback() {
 
       {/* Metrics & Analytics Dashboard */}
       <FeedbackMetrics feedbacks={feedbacks} dashboardStats={dashboardStats} />
-xvv
       {/* Main split dashboard view */}
       <div className="flex flex-col gap-4 min-h-0 overflow-visible w-full lg:h-[calc(100vh-260px)] lg:min-h-[620px] lg:overflow-hidden lg:flex-row">
         {/* Left column: Filters + List */}
