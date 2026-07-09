@@ -11,14 +11,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Search, Filter, Download, RefreshCw, Plus } from "lucide-react";
+import { 
+  Search, 
+  Filter, 
+  Download, 
+  // RefreshCw, 
+  Plus 
+} from "lucide-react";
 
 export default function CampaignsToolbar({
   searchValue,
   onSearchChange,
   selectedStatus,
   onStatusChange,
-  onRefresh,
+  // onRefresh,
   onCreate,
   onExportCsv,
 }) {
@@ -45,17 +51,17 @@ export default function CampaignsToolbar({
             Export CSV
           </Button>
 
-          <Button
+          {/* <Button
             variant="ghost"
             className="cursor-pointer border border-gray-300 shadow-sm"
             onClick={onRefresh}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-          </Button>
+          </Button> */}
 
           <Button
             onClick={onCreate}
-            className="cursor-pointer shadow-sm transition-all duration-200 hover:scale-[1.03]"
+            className="cursor-pointer shadow-sm transition-all duration-200 hover:translate-y-1"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Campaign

@@ -1,4 +1,4 @@
-import { getStatusClasses } from "../utils/patientHelpers";
+import { getStatusClasses } from "../../../helpers/patientHelpers";
 
 export default function PatientStatusBadge({
   status,

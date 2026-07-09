@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Download, Plus, RefreshCw } from "lucide-react";
+import { 
+  Download, 
+  Plus, 
+  // RefreshCw 
+} from "lucide-react";
 
 import SearchInput from "./filters/searchInput";
 import VisitFilter from "./filters/visitFilter";
@@ -16,7 +20,7 @@ export default function PatientsToolbar({
   onLastVisitChange,
   onTagChange,
   onSearchSubmit,
-  onRefresh,
+  // onRefresh,
   onAddPatient,
   onExportCsv,
 }) {
@@ -30,7 +34,7 @@ export default function PatientsToolbar({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button
+          {/* <Button
             type="button"
             variant="ghost"
             onClick={onRefresh}
@@ -38,7 +42,7 @@ export default function PatientsToolbar({
             className="border border-gray-300 shadow-sm"
           >
             <RefreshCw className="w-4 h-4" />
-          </Button>
+          </Button> */}
 
           <Button
             type="button"

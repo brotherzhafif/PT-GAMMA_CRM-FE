@@ -159,7 +159,7 @@ export default function PatientsTable({
         </Table>
       </ScrollArea>
 
-      <div className="px-4 py-3 border-t border-slate-100 flex-shrink-0 bg-white flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+      <div className="px-4 py-3 border-t border-slate-100 flex-shrink-0 bg-white flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
         <div className="text-[11px] text-slate-500">
           Showing {data.length === 0 ? 0 : startIndex + 1} to {Math.min(visiblePage * ITEMS_PER_PAGE, data.length)} of {data.length} patients
         </div>

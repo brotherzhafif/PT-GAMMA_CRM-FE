@@ -1,5 +1,5 @@
 import { useEffect, useState, startTransition } from "react";
-import { formatChatTime } from "@/utils/formatTime";
+import { formatChatTime } from "@/lib/formatTime";
 import {
   getChatMessagesStream,
   getMessageByPhoneNumber,

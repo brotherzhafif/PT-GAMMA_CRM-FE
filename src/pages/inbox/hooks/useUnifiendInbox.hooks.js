@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatChatTime } from "@/utils/formatTime";
+import { formatChatTime } from "@/lib/formatTime";
 import { getLatestMessagesStream } from "@/services/unifiendBox.service"; 
 
 export const useUnifiedInbox = () => {

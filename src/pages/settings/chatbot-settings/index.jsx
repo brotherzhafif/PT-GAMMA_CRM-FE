@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import AIPersona from "./components/aiPersone";
+import AIPersona from "./components/aiPersona";
 import HybridAI from "./components/hybridAI";
 // import Transparancy from "./components/transparancy";
 import { useChatbotSettings } from "./hooks/useChatbotSettings";

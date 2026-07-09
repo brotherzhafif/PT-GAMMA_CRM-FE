@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getFeedbacks, createFeedback, getFeedbackDashboard } from "@/services/feedback.service";
 
 const toArray = (value) => {
@@ -13,7 +13,7 @@ const mapBackendFeedback = (item, idx) => {
   const rating = Number(item?.rating) || 0;
   const comment = item?.ulasan || item?.comment || "";
   const id = item?.id || item?._id || idx + 1;
-  const avatar = patientName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "P";
+  const avatar = patientName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "P";
   const email = item?.email || "-";
   const category = item?.category || item?.kategori || "-";
   const sentiment = item?.sentiment || (rating >= 4 ? "Positive" : rating <= 2 ? "Negative" : "Neutral");
@@ -35,7 +35,7 @@ const mapBackendFeedback = (item, idx) => {
     status,
     date,
     comment,
-    replies
+    replies,
   };
 };
 
@@ -45,21 +45,18 @@ export function useFeedback() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const normalizedFeedbacks = useMemo(() => {
-    return feedbacks.map((item, idx) => mapBackendFeedback(item, idx));
-  }, [feedbacks]);
-
   // Fetch Feedback list
   const fetchFeedbacks = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await getFeedbacks();
-      // Handle response structures: backend might return wrapped `{ data: [...] }` or raw array
       const rawData = response?.data || response;
       const list = toArray(rawData);
 
-      setFeedbacks(list);
+      // Normalize LANGSUNG di sini, biar state `feedbacks` selalu punya
+      // bentuk & id yang konsisten di seluruh hook (gak ada 2 representasi lagi)
+      setFeedbacks(list.map(mapBackendFeedback));
     } catch (err) {
       console.warn("Feedback API failed:", err);
       setFeedbacks([]);
@@ -82,33 +79,35 @@ export function useFeedback() {
   }, []);
 
   // Submit Feedback
-  const addFeedback = useCallback(async (payload) => {
-    setLoading(true);
-    try {
-      // Map payload to backend keys
-      const backendPayload = {
-        nama: payload.patientName,
-        no_hp: payload.phone,
-        rating: payload.rating,
-        ulasan: payload.comment
-      };
-      
-      const response = await createFeedback(backendPayload);
-      const created = response?.data || response;
-      
-      // Update local state
-      setFeedbacks((prev) => [created || payload, ...prev]);
-      
-      // Refresh statistics
-      fetchDashboardStats();
-      return response;
-    } catch (err) {
-      console.error("Failed to post feedback:", err);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDashboardStats]);
+  const addFeedback = useCallback(
+    async (payload) => {
+      setLoading(true);
+      try {
+        const backendPayload = {
+          nama: payload.patientName,
+          no_hp: payload.phone,
+          rating: payload.rating,
+          ulasan: payload.comment,
+        };
+
+        const response = await createFeedback(backendPayload);
+        const created = response?.data || response;
+
+        // Normalize juga hasil create, biar bentuknya konsisten sama data lain
+        const normalizedCreated = mapBackendFeedback(created || payload, 0);
+        setFeedbacks((prev) => [normalizedCreated, ...prev]);
+
+        fetchDashboardStats();
+        return response;
+      } catch (err) {
+        console.error("Failed to post feedback:", err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDashboardStats]
+  );
 
   // Reply locally (canned / custom answers)
   const addReplyLocal = useCallback((feedbackId, replyText, channel) => {
@@ -119,20 +118,23 @@ export function useFeedback() {
             id: Date.now(),
             sender: `Clinic Admin (via ${channel})`,
             message: replyText,
-            date: new Date().toLocaleDateString("en-US", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            }) + ", " + new Date().toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
-            })
+            date:
+              new Date().toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }) +
+              ", " +
+              new Date().toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }),
           };
           return {
             ...f,
             status: "Replied",
-            replies: [...(f.replies || []), newReply]
+            replies: [...(f.replies || []), newReply],
           };
         }
         return f;
@@ -158,7 +160,7 @@ export function useFeedback() {
   }, [fetchFeedbacks, fetchDashboardStats]);
 
   return {
-    feedbacks: normalizedFeedbacks,
+    feedbacks, 
     dashboardStats,
     loading,
     error,
@@ -166,6 +168,6 @@ export function useFeedback() {
     fetchDashboardStats,
     addFeedback,
     addReplyLocal,
-    updateStatusLocal
+    updateStatusLocal,
   };
 }

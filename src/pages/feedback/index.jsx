@@ -106,7 +106,7 @@ export default function Feedback() {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full mb-9 overflow-x-hidden sm:gap-6">
+    <div className="flex flex-col gap-4 w-full overflow-x-hidden sm:gap-6">
       {/* Title Header */}
       <div className="flex min-w-0 flex-col items-start">
         <h2 className="text-base font-semibold sm:text-lg">Feedback & Customer Care</h2>
@@ -117,9 +117,9 @@ export default function Feedback() {
 
       {/* Metrics & Analytics Dashboard */}
       <FeedbackMetrics feedbacks={feedbacks} dashboardStats={dashboardStats} />
-
+xvv
       {/* Main split dashboard view */}
-      <div className="flex flex-col gap-4 min-h-0 overflow-visible w-full lg:h-[calc(100vh-260px)] lg:min-h-[480px] lg:overflow-hidden lg:flex-row">
+      <div className="flex flex-col gap-4 min-h-0 overflow-visible w-full lg:h-[calc(100vh-260px)] lg:min-h-[620px] lg:overflow-hidden lg:flex-row">
         {/* Left column: Filters + List */}
         <div
           className={`min-h-0 flex-1 flex-col gap-4 overflow-visible lg:h-full lg:overflow-hidden ${

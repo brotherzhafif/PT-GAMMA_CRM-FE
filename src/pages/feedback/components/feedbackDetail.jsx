@@ -1,13 +1,29 @@
-import { useState, useEffect } from "react";
+// import { 
+//   useState, 
+//   useEffect 
+// } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Star, X, MessageSquare, Send, CheckCircle2, Phone, Mail, Clock, MessageCircle, Laptop, Smartphone, Globe } from "lucide-react";
+// import { Separator } from "@/components/ui/separator";
+import { 
+  Star, 
+  X, 
+  MessageSquare, 
+  // Send, 
+  // CheckCircle2, 
+  Phone, 
+  Mail, 
+  Clock, 
+  MessageCircle, 
+  Laptop, 
+  Smartphone, 
+  Globe 
+} from "lucide-react";
 
 const channelIcons = {
   WhatsApp: { icon: MessageCircle, color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20" },
@@ -25,24 +41,24 @@ const sentimentStyles = {
 export default function FeedbackDetail({
   feedback,
   onClose,
-  onAddReply,
-  onUpdateStatus
+  // onAddReply,
+  // onUpdateStatus
 }) {
-  const [replyMessage, setReplyMessage] = useState("");
-  const [replyChannel, setReplyChannel] = useState("WhatsApp");
+  // const [replyMessage, setReplyMessage] = useState("");
+  // const [replyChannel, setReplyChannel] = useState("WhatsApp");
 
   // Reset reply text when feedback item changes
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setReplyMessage("");
-    }, 0);
+  // useEffect(() => {
+  //   const timer = window.setTimeout(() => {
+  //     setReplyMessage("");
+  //   }, 0);
 
-    return () => window.clearTimeout(timer);
-  }, [feedback?.id]);
+  //   return () => window.clearTimeout(timer);
+  // }, [feedback?.id]);
 
   if (!feedback) {
     return (
-      <Card className="h-full flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 p-8 text-center shadow-sm">
+      <Card className="h-full flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl  dark:border-gray-800 p-8 text-center shadow-sm">
         <MessageSquare className="w-8 h-8 text-muted-foreground mb-2 opacity-50" />
         <h4 className="text-sm font-semibold text-foreground">Select feedback report</h4>
         <p className="text-xs text-muted-foreground max-w-xs mt-1">
@@ -55,30 +71,30 @@ export default function FeedbackDetail({
   const sourceInfo = channelIcons[feedback.source] || { icon: Globe, color: "text-slate-500 bg-slate-50" };
   const SourceIcon = sourceInfo.icon;
 
-  const quickReplies = [
-    {
-      label: "Thank Patient",
-      message: `Dear ${feedback.patientName}, thank you so much for your positive feedback! We are thrilled to hear you had a great clinical treatment experience. We look forward to welcoming you back!`,
-    },
-    {
-      label: "Apologize for Wait",
-      message: `Dear ${feedback.patientName}, we sincerely apologize for the delay you experienced. We value your feedback and are currently restructuring our scheduling system to prevent appointment wait times.`,
-    },
-    {
-      label: "Address Billing Query",
-      message: `Dear ${feedback.patientName}, thank you for bringing this up. We want to be completely transparent. One of our billing officers will contact you at ${feedback.phone} shortly to clarify the fee structure.`,
-    }
-  ];
+  // const quickReplies = [
+  //   {
+  //     label: "Thank Patient",
+  //     message: `Dear ${feedback.patientName}, thank you so much for your positive feedback! We are thrilled to hear you had a great clinical treatment experience. We look forward to welcoming you back!`,
+  //   },
+  //   {
+  //     label: "Apologize for Wait",
+  //     message: `Dear ${feedback.patientName}, we sincerely apologize for the delay you experienced. We value your feedback and are currently restructuring our scheduling system to prevent appointment wait times.`,
+  //   },
+  //   {
+  //     label: "Address Billing Query",
+  //     message: `Dear ${feedback.patientName}, thank you for bringing this up. We want to be completely transparent. One of our billing officers will contact you at ${feedback.phone} shortly to clarify the fee structure.`,
+  //   }
+  // ];
 
-  const handleTemplateClick = (templateText) => {
-    setReplyMessage(templateText);
-  };
+  // const handleTemplateClick = (templateText) => {
+  //   setReplyMessage(templateText);
+  // };
 
-  const handleSend = () => {
-    if (!replyMessage.trim()) return;
-    onAddReply(feedback.id, replyMessage, replyChannel);
-    setReplyMessage("");
-  };
+  // const handleSend = () => {
+  //   if (!replyMessage.trim()) return;
+  //   onAddReply(feedback.id, replyMessage, replyChannel);
+  //   setReplyMessage("");
+  // };
 
   const renderStars = (rating) => {
     return (
@@ -98,7 +114,7 @@ export default function FeedbackDetail({
   return (
     <Card className="h-full flex flex-col bg-white dark:bg-card rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
       {/* Header */}
-      <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-0 sm:px-5">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 px-4 py-4 shadow-md border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-0 sm:px-5">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="text-sm font-bold text-foreground">Feedback Details</span>
           <Badge variant="outline" className={`text-[10px] px-2 py-0 font-medium ${sentimentStyles[feedback.sentiment]}`}>
@@ -114,7 +130,7 @@ export default function FeedbackDetail({
       <ScrollArea className="flex-1 w-full">
         <div className="p-4 flex flex-col gap-5 sm:p-5">
           {/* Patient Profile Snapshot using Card */}
-          <Card className="flex flex-col gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-150 dark:border-gray-800 sm:flex-row sm:items-start sm:justify-between">
+          <Card className="flex flex-col gap-4 p-4 bg-white shadow-md sm:flex-row sm:items-start sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarFallback className="font-bold text-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
@@ -169,7 +185,7 @@ export default function FeedbackDetail({
           </div>
 
           {/* Status Change Toolbar */}
-          <div className="flex flex-col gap-3 pt-2">
+          {/* <div className="flex flex-col gap-3 pt-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">Feedback Status:</span>
               <Select value={feedback.status} onValueChange={(val) => onUpdateStatus(feedback.id, val)}>
@@ -184,10 +200,10 @@ export default function FeedbackDetail({
               </Select>
             </div>
             <Separator className="my-1" />
-          </div>
+          </div> */}
 
           {/* Reply Log History */}
-          <div className="flex flex-col gap-3">
+          {/* <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-foreground">Responses History ({feedback.replies.length})</span>
             {feedback.replies.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">No replies sent yet.</p>
@@ -206,13 +222,12 @@ export default function FeedbackDetail({
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </ScrollArea>
 
       {/* Reply Workspace */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-3">
-        {/* Quick Replies templates */}
+      {/* <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <span className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">Canned Responses</span>
           <div className="flex flex-wrap gap-1.5">
@@ -228,7 +243,6 @@ export default function FeedbackDetail({
           </div>
         </div>
 
-        {/* Text Input & Channel Send Options */}
         <div className="flex flex-col gap-2 mt-1">
           <Textarea
             placeholder="Type your response to the patient..."
@@ -274,7 +288,7 @@ export default function FeedbackDetail({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </Card>
   );
 }
