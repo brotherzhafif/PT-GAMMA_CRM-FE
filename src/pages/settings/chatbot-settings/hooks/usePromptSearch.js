@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export function usePromptSearch(text = "", keyword = "") {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [prevKeyword, setPrevKeyword] = useState(keyword);
 
   const matches = useMemo(() => {
     const trimmed = keyword.trim();
@@ -21,9 +22,12 @@ export function usePromptSearch(text = "", keyword = "") {
     return positions;
   }, [text, keyword]);
 
-  useEffect(() => {
+  if (keyword !== prevKeyword) {
+    setPrevKeyword(keyword);
     setActiveIndex(0);
-  }, [keyword, matches.length]);
+  }
+
+  const safeActiveIndex = matches.length === 0 ? 0 : activeIndex % matches.length;
 
   const goNext = () => {
     if (matches.length === 0) return;
@@ -36,10 +40,10 @@ export function usePromptSearch(text = "", keyword = "") {
   };
 
   return {
-    matches,              // ← ini yang ditambahin
+    matches,
     total: matches.length,
-    activeIndex,
-    activeMatch: matches[activeIndex] || null,
+    activeIndex: safeActiveIndex,
+    activeMatch: matches[safeActiveIndex] || null,
     goNext,
     goPrev,
   };

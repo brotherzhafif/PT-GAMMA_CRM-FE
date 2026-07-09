@@ -4,10 +4,6 @@ import {
   updateChatbotSettings,
 } from "@/services/settings.service";
 import { toast } from "sonner";
-import {
-  buildSystemPrompt,
-  resolveSystemPromptSections,
-} from "@/helpers/systemPrompt.helper";
 
 const initialSettings = {
   ai_name: "",
@@ -17,14 +13,7 @@ const initialSettings = {
   handoff_message: "",
   ai_badge_enabled: true,
   system_prompt: "",
-  // 6 section pecahan system_prompt
-  persona_identity: "",
-  capabilities: "",
-  restrictions: "",
-  mandatory_flow: "",
-  general_rules: "",
-  disclaimer: "",
-  // knowledge base klinik
+
   lokasi: "",
   maps: "",
   biaya_pendaftaran: "",
@@ -50,14 +39,15 @@ export function useChatbotSettings() {
         setSettings({
           ...initialSettings,
           ...data,
-          ...resolveSystemPromptSections(data),
         });
       } catch (error) {
         console.error("Failed get chatbot settings:", error);
         setStatusMessage("Unable to load chatbot settings.");
         toast.error("Gagal memuat pengaturan chatbot", {
           description:
-            error.response?.data?.message || error.message || "Coba muat ulang halaman.",
+            error.response?.data?.message ||
+            error.message ||
+            "Coba muat ulang halaman.",
         });
       } finally {
         setLoading(false);
@@ -86,7 +76,8 @@ export function useChatbotSettings() {
         handoff_threshold: Number(settings.handoff_threshold),
         handoff_message: settings.handoff_message,
         ai_badge_enabled: settings.ai_badge_enabled,
-        system_prompt: buildSystemPrompt(settings), // ini jadi 6 section di FE di BE tetep satu string
+        system_prompt: settings.system_prompt,
+
         lokasi: settings.lokasi,
         maps: settings.maps,
         biaya_pendaftaran: settings.biaya_pendaftaran,
@@ -110,7 +101,9 @@ export function useChatbotSettings() {
       setStatusMessage("Unable to save chatbot settings.");
       toast.error("Gagal menyimpan pengaturan", {
         description:
-          error.response?.data?.message || error.message || "Coba beberapa saat lagi.",
+          error.response?.data?.message ||
+          error.message ||
+          "Coba beberapa saat lagi.",
       });
     } finally {
       setSaving(false);
