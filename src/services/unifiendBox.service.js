@@ -50,6 +50,26 @@ export const createReplyHandoffByPhoneNumber = async (
   return res.data;
 };
 
+export const sendMediaMessage = async (payload) => {
+  const formData = new FormData();
+  formData.append("target", payload.target); 
+  
+  if (payload.message) {
+    formData.append("message", payload.message);
+  }
+  
+  if (payload.file) {
+    formData.append("file", payload.file); 
+  }
+
+  const res = await api.post("/api/send/media", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};
+
 // stream function
 export const getLatestMessagesStream = (limit) => {
   const url = limit ? `${SSE_BASE_URL}/latest?limit=${limit}` : `${SSE_BASE_URL}/latest`;

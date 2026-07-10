@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { getAccessToken } from "@/services/auth.service";
 import {
-  getDashboardActivities,
   getDashboardInsights,
   getDashboardMessagesChart,
   getDashboardOverview,
@@ -63,6 +64,13 @@ const emptySummaryCards = [
 const unwrap = (response) => response?.data ?? response ?? {};
 
 const toArray = (value) => (Array.isArray(value) ? value : []);
+
+const normalizeList = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (data.data) return Array.isArray(data.data) ? data.data : [data.data];
+  return [data];
+};
 
 const toNumber = (value, fallback = 0) => {
   const numberValue = Number(value);
@@ -281,8 +289,10 @@ const normalizeActivityType = (category) => {
   return "chat";
 };
 
-const normalizeActivities = (activities = {}) => {
-  return toArray(activities.activities).map((item) => ({
+const normalizeActivities = (rawInput) => {
+  const list = Array.isArray(rawInput) ? rawInput : toArray(rawInput?.activities);
+  
+  return list.filter(Boolean).map((item) => ({
     id: item.id,
     type: normalizeActivityType(item.category),
     title: item.action || item.category || "Aktivitas",
@@ -307,15 +317,18 @@ export function useDashboardAnalytics({ date } = {}) {
   const [timeseries, setTimeseries] = useState(emptyTimeseries);
   const [insights, setInsights] = useState(emptyInsights);
   const [activities, setActivities] = useState(emptyActivities);
-  const [loading, setLoading] = useState(true);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+  const [loadingActivities, setLoadingActivities] = useState(true);
   const [error, setError] = useState(null);
+
+  const activeRef = useRef(true);
 
   const params = useMemo(() => {
     return formatDateRangeParams(date);
   }, [date]);
 
   const fetchAnalytics = useCallback(async () => {
-    setLoading(true);
+    setLoadingAnalytics(true);
     setError(null);
 
     try {
@@ -324,13 +337,11 @@ export function useDashboardAnalytics({ date } = {}) {
         messagesChartResponse,
         sourceBreakdownResponse,
         insightsResponse,
-        activitiesResponse,
       ] = await Promise.all([
         getDashboardOverview(params),
         getDashboardMessagesChart({ ...params, group_by: "hour" }),
         getDashboardSourceBreakdown(params),
         getDashboardInsights(params),
-        getDashboardActivities({ ...params, limit: 50 }),
       ]);
 
       setSummary(unwrap(overviewResponse));
@@ -339,7 +350,6 @@ export function useDashboardAnalytics({ date } = {}) {
         ...normalizeSourceBreakdown(unwrap(sourceBreakdownResponse)),
       });
       setInsights(normalizeInsights(unwrap(insightsResponse)));
-      setActivities(normalizeActivities(unwrap(activitiesResponse)));
     } catch (err) {
       console.warn("Dashboard analytics API failed:", err);
       setError(
@@ -350,9 +360,8 @@ export function useDashboardAnalytics({ date } = {}) {
       setSummary({});
       setTimeseries(emptyTimeseries);
       setInsights(emptyInsights);
-      setActivities(emptyActivities);
     } finally {
-      setLoading(false);
+      setLoadingAnalytics(false);
     }
   }, [params]);
 
@@ -364,7 +373,84 @@ export function useDashboardAnalytics({ date } = {}) {
     return () => window.clearTimeout(timer);
   }, [fetchAnalytics]);
 
+
+  useEffect(() => {
+    activeRef.current = true;
+    const controller = new AbortController();
+    const token = getAccessToken();
+
+    const connectActivitiesStream = async () => {
+      setActivities(emptyActivities);
+      setLoadingActivities(true);
+      
+      try {
+        const url = new URL(`${import.meta.env.VITE_API_URL}/api/activity`);
+        
+        if (params.start_date) url.searchParams.append("start_date", params.start_date);
+        if (params.end_date) url.searchParams.append("end_date", params.end_date);
+        url.searchParams.append("limit", "50");
+
+        await fetchEventSource(url.toString(), {
+          method: "GET",
+          headers: {
+            "Accept": "text/event-stream",
+            "Authorization": `Bearer ${token}`
+          },
+          signal: controller.signal,
+          onopen(res) {
+            if (res.ok && activeRef.current) {
+              setLoadingActivities(false);
+            } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+              throw new Error(`Akses ditolak (Status: ${res.status})`);
+            }
+          },
+          onmessage(event) {
+            if (!activeRef.current) return;
+            try {
+              const data = JSON.parse(event.data);
+              
+              const incomingItems = normalizeActivities(normalizeList(data));
+              if (incomingItems.length === 0) return;
+
+              setActivities((prev) => {
+                const uniqueNew = incomingItems.filter(
+                  (newItem) => !prev.some((prevItem) => prevItem.id === newItem.id)
+                );
+                
+                return [...uniqueNew, ...prev].slice(0, 50);
+              });
+            } catch (err) {
+              console.error("Gagal parsing SSE dashboard activities:", err);
+            }
+          },
+          onerror(err) {
+            if (activeRef.current) {
+              console.error("SSE Error Dashboard Activities:", err);
+              setLoadingActivities(false);
+            }
+            throw err;
+          }
+        });
+      } catch (err) {
+        if (activeRef.current && err.name !== "AbortError") {
+          console.error(`Gagal menghubungkan stream activities: ${err.message}`);
+          setLoadingActivities(false);
+        }
+      }
+    };
+
+    connectActivitiesStream();
+
+    return () => {
+      activeRef.current = false;
+      controller.abort();
+    };
+  }, [params]);
+
+
   const kpiCards = useMemo(() => normalizeSummaryCards(summary), [summary]);
+  
+  const loading = loadingAnalytics || loadingActivities; 
 
   return {
     activities,

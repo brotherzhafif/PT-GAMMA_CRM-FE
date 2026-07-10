@@ -122,7 +122,7 @@ export default function CreateCampaignPanel({
         schedule_date: selectedDate,
         campaign_message: message,
         status: status,
-        ...(!selectedCampaign && attachmentFile ? { file: attachmentFile } : {}),
+        ...(attachmentFile ? { file: attachmentFile } : {}),
       };
 
       const success = selectedCampaign

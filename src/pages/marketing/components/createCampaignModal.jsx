@@ -93,7 +93,7 @@ export default function CreateCampaignModal({
       campaign_message: message,
       schedule_date: scheduleDate,
       status: status,
-      ...(!selectedCampaign && attachmentFile ? { file: attachmentFile } : {}),
+      ...(attachmentFile ? { file: attachmentFile } : {}),
     };
 
     try {
@@ -177,7 +177,7 @@ export default function CreateCampaignModal({
                 file={attachmentFile}
                 onFileChange={setAttachmentFile}
                 existingAttachment={existingAttachment}
-                readOnly={Boolean(selectedCampaign)}
+                // readOnly={Boolean(selectedCampaign)}
               />
 
               <div className="flex flex-col gap-2">

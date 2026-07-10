@@ -95,6 +95,7 @@ export const logoutAllDevices = async () => {
       "Logout all devices request failed:",
       error.response?.data || error.message,
     );
+    throw error; 
   } finally {
     clearAuthSession();
   }

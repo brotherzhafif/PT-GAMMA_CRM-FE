@@ -24,19 +24,31 @@ const mapCampaign = (campaign) => ({
   name: campaign.campaign_name,
   description: campaign.campaign_message,
   status:
-    campaign.status?.charAt(0).toUpperCase() + campaign.status?.slice(1),
-  date: new Date(campaign.schedule_date).toLocaleDateString("id-ID"),
+  campaign.status?.charAt(0).toUpperCase() + campaign.status?.slice(1),
+  date: campaign.schedule_date 
+    ? new Date(campaign.schedule_date).toLocaleDateString("id-ID") 
+    : "-",
   audience: "-",
   segment: "All Patients",
   raw: campaign,
 });
 
 const sortCampaigns = (campaignA, campaignB) => {
-  const dateA = new Date(campaignA.raw?.schedule_date).getTime();
-  const dateB = new Date(campaignB.raw?.schedule_date).getTime();
+  const statusA = campaignA.raw?.status?.toLowerCase();
+  const statusB = campaignB.raw?.status?.toLowerCase();
+
+  if (statusA === "active" && statusB !== "active") return -1;
+  if (statusB === "active" && statusA !== "active") return 1;
+
+  const dateA = campaignA.raw?.schedule_date 
+    ? new Date(campaignA.raw.schedule_date).getTime() 
+    : 0; 
+  const dateB = campaignB.raw?.schedule_date 
+    ? new Date(campaignB.raw.schedule_date).getTime() 
+    : 0;
 
   if (dateA !== dateB) {
-    return dateB - dateA;
+    return dateB - dateA; 
   }
 
   return Number(campaignB.id || 0) - Number(campaignA.id || 0);

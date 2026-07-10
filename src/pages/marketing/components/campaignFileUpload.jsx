@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FileText, Image, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,9 +20,8 @@ const allowedMimeTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
-
-const documentExtensionPattern = /\.(docx?|pdf)$/i;
+const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)(\?.*)?$/i;
+const documentExtensionPattern = /\.(docx?|pdf)(\?.*)?$/i;
 
 const isAllowedFile = (file) => {
   return file.type.startsWith("image/") || allowedMimeTypes.includes(file.type);
@@ -32,15 +31,20 @@ const isImageAttachment = (attachment) => {
   return imageExtensionPattern.test(attachment?.filename || attachment?.url || "");
 };
 
-const isBrowserPreviewUrl = (url) => {
-  return /^(https?:|blob:|data:)/i.test(url || "");
+const getFullUrl = (url) => {
+  if (!url) return "";
+  if (/^(https?:|blob:|data:)/i.test(url)) return url;
+  
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const separator = url.startsWith("/") ? "" : "/";
+  return `${baseUrl}${separator}${url}`;
 };
 
 const getDisplayName = (attachment) => {
   if (attachment?.filename) return attachment.filename;
   if (!attachment?.url) return "Campaign attachment";
 
-  return attachment.url.split("/").pop() || "Campaign attachment";
+  return attachment.url.split("/").pop().split("?")[0] || "Campaign attachment";
 };
 
 const formatFileSize = (size) => {
@@ -62,27 +66,38 @@ export default function CampaignFileUpload({
   readOnly = false,
 }) {
   const inputRef = useRef(null);
-  const hasExistingAttachment = Boolean(existingAttachment?.url);
+  
+    const [isExistingRemoved, setIsExistingRemoved] = useState(false);
+  const [prevExistingUrl, setPrevExistingUrl] = useState(existingAttachment?.url);
+
+  if (existingAttachment?.url !== prevExistingUrl) {
+    setPrevExistingUrl(existingAttachment?.url);
+    setIsExistingRemoved(false);
+  }
+
+const hasExistingAttachment = Boolean(existingAttachment?.url) && !isExistingRemoved;  
   const isExistingImage = isImageAttachment(existingAttachment);
   const existingAttachmentName = getDisplayName(existingAttachment);
-  const existingAttachmentUrl = existingAttachment?.url || "";
+  const existingAttachmentUrl = getFullUrl(existingAttachment?.url);
+  
   const isImage = file?.type?.startsWith("image/");
+  
   const previewUrl = useMemo(() => {
     if (!file || !isImage) return "";
-
     return URL.createObjectURL(file);
   }, [file, isImage]);
+
   const hasAttachment = Boolean(file) || hasExistingAttachment;
+  
   const shouldShowImagePreview = Boolean(
-    (isImage && previewUrl) ||
-      (!file && isExistingImage && isBrowserPreviewUrl(existingAttachmentUrl)),
+    (isImage && previewUrl) || (!file && isExistingImage && existingAttachmentUrl && !isExistingRemoved)
   );
+  
   const imagePreviewUrl = file ? previewUrl : existingAttachmentUrl;
   const attachmentName = file ? file.name : existingAttachmentName;
 
   useEffect(() => {
     if (!previewUrl) return undefined;
-
     return () => URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
 
@@ -107,14 +122,13 @@ export default function CampaignFileUpload({
       return;
     }
 
-    if (selectedFile) {
-      onFileChange?.(selectedFile);
-    }
+    onFileChange?.(selectedFile);
   };
 
   const handleRemoveFile = () => {
     if (!readOnly) {
       onFileChange?.(null);
+      setIsExistingRemoved(true); 
     }
 
     if (inputRef.current) {
@@ -162,7 +176,7 @@ export default function CampaignFileUpload({
               </p>
             </div>
 
-            {!readOnly && file ? (
+            {!readOnly && (file || existingAttachmentUrl) ? (
               <Button
                 type="button"
                 variant="ghost"

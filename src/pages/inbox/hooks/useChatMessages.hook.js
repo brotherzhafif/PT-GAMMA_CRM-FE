@@ -53,6 +53,7 @@ Terima kasih 🙏`,
       .map((msg, i) => ({
         id: msg.id || `${msg.created_at}-${i}`,
         text: msg.message_text || "Teks kosong",
+        imageUrl: msg.image_url || null,
         sender: msg.direction === "inbound" ? "patient" : "agent",
         senderType: getSenderType(msg),
         time: msg.created_at ? formatChatTime(msg.created_at) : "",

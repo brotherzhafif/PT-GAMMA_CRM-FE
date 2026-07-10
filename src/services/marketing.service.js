@@ -66,6 +66,34 @@ export const updateCampaign = async (campaignName, payload) => {
 
   const encodedCampaignName = encodeURIComponent(String(campaignName).trim());
 
+  if (payload.file) {
+    const formData = new FormData();
+    formData.append("campaign_name", payload.campaign_name);
+    
+    if (payload.schedule_date) {
+      formData.append("schedule_date", getCampaignScheduleDate(payload.schedule_date));
+    }
+    
+    formData.append("campaign_message", payload.campaign_message);
+    
+    if (payload.status) {
+      formData.append("status", payload.status);
+    }
+    
+    formData.append("file", payload.file);
+
+    const response = await api.patch(
+      `/api/marketing/campaigns/by-name/${encodedCampaignName}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  }
+
   const response = await api.patch(
     `/api/marketing/campaigns/by-name/${encodedCampaignName}`,
     payload,

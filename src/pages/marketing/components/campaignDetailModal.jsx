@@ -17,11 +17,12 @@ import CampaignStatusBadge from "./campaignStatusBadge";
 
 const getCampaignAttachment = (campaign) => {
   const url = campaign?.raw?.image_url || campaign?.raw?.attachment_url;
-  if (!url) return null;
+  
+  if (!url || url.startsWith("file://")) return null;
 
   return {
     url: url,
-    filename: campaign.raw.filename,
+    filename: campaign?.raw?.filename || null,
   };
 };
 
