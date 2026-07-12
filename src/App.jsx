@@ -25,6 +25,9 @@ import Security from "./pages/settings/security";
 import Feedback from "./pages/feedback";
 import LoginPage from "./pages/auth/login";
 
+// Error Page
+import NotFound from "@/pages/errors/NotFound";
+
 function ProtectedRoute() {
   const location = useLocation();
 
@@ -118,8 +121,12 @@ const router = createBrowserRouter([
                 handle: { title: "General Settings" },
               },
             ],
-          }
+          },
         ],
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
