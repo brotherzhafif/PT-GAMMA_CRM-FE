@@ -6,22 +6,30 @@ import {
   refreshAuthToken,
 } from "@/services/auth.service";
 
-let isRedirectingToLogin = false;
+// let isRedirectingToLogin = false;
 
 const isUnauthorizedError = (error) => {
-  return error.response?.status === 401 || error.response?.data?.statusCode === 401;
+  return (
+    error.response?.status === 401 || error.response?.data?.statusCode === 401
+  );
 };
 
 const getSessionAccessToken = (session) => {
-  return session?.access_token || session?.accessToken || session?.token || session?.data?.access_token || session?.data?.accessToken || session?.data?.token;
+  return (
+    session?.access_token ||
+    session?.accessToken ||
+    session?.token ||
+    session?.data?.access_token ||
+    session?.data?.accessToken ||
+    session?.data?.token
+  );
 };
 
 const redirectToLogin = () => {
+  if (window.location.pathname === "/login") return;
+
   clearAuthSession();
 
-  if (isRedirectingToLogin || window.location.pathname === "/login") return;
-
-  isRedirectingToLogin = true;
   window.location.replace("/login");
 };
 
@@ -57,7 +65,12 @@ api.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    if (isUnauthorizedError(error) && originalRequest && !originalRequest._retry && getRefreshToken()) {
+    if (
+      isUnauthorizedError(error) &&
+      originalRequest &&
+      !originalRequest._retry &&
+      getRefreshToken()
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -79,7 +92,7 @@ api.interceptors.response.use(
       }
     }
 
-    if (isUnauthorizedError(error) && !getAccessToken()) {
+    if (isUnauthorizedError(error)) {
       redirectToLogin();
     }
 
