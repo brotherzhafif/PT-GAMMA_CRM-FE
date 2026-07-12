@@ -4,11 +4,12 @@ import { getAccessToken } from "@/services/auth.service";
 import {
   markActivityRead,
   markAllActivityRead,
-} from "@/services/notification.service"; 
+} from "@/services/notification.service";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
+import { handleSSEUnauthorized } from "@/lib/sse";
 
 const normalizeList = (data) => {
-  if (!data) return []; 
+  if (!data) return [];
   if (Array.isArray(data)) return data;
   if (data.data) return Array.isArray(data.data) ? data.data : [data.data];
   return [data];
@@ -35,13 +36,15 @@ const formatRelativeTime = (timestamp) => {
 };
 
 const normalizeNotification = (item) => {
-  if (!item) return null; 
+  if (!item) return null;
 
   return {
     id: item.id,
     title: item.title || item.action || item.category || "Notifikasi",
     message: item.message || item.description || "-",
-    time: formatRelativeTime(item.created_at || item.createdAt || item.timestamp),
+    time: formatRelativeTime(
+      item.created_at || item.createdAt || item.timestamp,
+    ),
     unread: item.is_read === false || item.read === false,
     raw: item,
   };
@@ -51,13 +54,13 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   const initialized = useRef(false);
   const { play } = useNotificationSound(soundSrc);
 
   const unreadCount = useMemo(
     () => notifications.filter((notification) => notification.unread).length,
-    [notifications]
+    [notifications],
   );
 
   useEffect(() => {
@@ -71,15 +74,22 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
         await fetchEventSource(sseUrl, {
           method: "GET",
           headers: {
-            "Accept": "text/event-stream",
-            "Authorization": `Bearer ${token}`,
+            Accept: "text/event-stream",
+            Authorization: `Bearer ${token}`,
           },
           signal: controller.signal,
           onopen(res) {
+            if (handleSSEUnauthorized(res)) {
+              return;
+            }
+
             if (res.ok && active) {
               setLoading(false);
               setError("");
-            } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+              return;
+            }
+
+            if (res.status >= 400 && res.status < 500 && res.status !== 429) {
               throw new Error(`Akses ditolak (Status: ${res.status})`);
             }
           },
@@ -89,23 +99,26 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
               const data = JSON.parse(event.data);
               const incomingItems = normalizeList(data)
                 .map(normalizeNotification)
-                .filter(Boolean); 
+                .filter(Boolean);
 
               if (incomingItems.length === 0) return;
 
               setNotifications((prev) => {
                 const uniqueNew = incomingItems.filter(
-                  (newItem) => !prev.some((prevItem) => prevItem.id === newItem.id)
+                  (newItem) =>
+                    !prev.some((prevItem) => prevItem.id === newItem.id),
                 );
 
-                const newUnreadCount = uniqueNew.filter((item) => item.unread).length;
+                const newUnreadCount = uniqueNew.filter(
+                  (item) => item.unread,
+                ).length;
 
                 if (initialized.current && newUnreadCount > 0) {
                   play();
                 }
 
                 initialized.current = true;
-                
+
                 return [...uniqueNew, ...prev];
               });
             } catch (err) {
@@ -117,7 +130,7 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
               setError("Koneksi notifikasi terputus. Memulihkan...");
               setLoading(false);
             }
-            throw err; 
+            throw err;
           },
         });
       } catch (err) {
@@ -134,11 +147,13 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
       active = false;
       controller.abort();
     };
-  }, [play]); 
+  }, [play]);
 
   const markRead = async (id) => {
     setNotifications((prev) =>
-      prev.map((notif) => (notif.id === id ? { ...notif, unread: false } : notif))
+      prev.map((notif) =>
+        notif.id === id ? { ...notif, unread: false } : notif,
+      ),
     );
     try {
       await markActivityRead(id);
@@ -149,7 +164,7 @@ export function useActivityNotifications({ soundSrc = null } = {}) {
 
   const markAllRead = async () => {
     setNotifications((prev) =>
-      prev.map((notif) => ({ ...notif, unread: false }))
+      prev.map((notif) => ({ ...notif, unread: false })),
     );
 
     try {
